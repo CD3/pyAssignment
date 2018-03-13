@@ -1,7 +1,6 @@
 import contextlib,textwrap
 
-from .Utils import Namespace
-from .sfformatting import SFFormatter
+from .Utils import Namespace, SFFormatter
 
 class Question(object):
   """A class representing a question.
