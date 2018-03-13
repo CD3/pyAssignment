@@ -44,6 +44,12 @@ def test_namespace():
   assert not q.NS.has('one')
   assert len(q.NS) == 0
 
+def test_metadata():
+  q = Question()
+
+  q.meta.desc = "a question"
+  q.meta.mod = 1
+  q.meta.tags = "electric force;vectors"
 
 
 def test_parts():

@@ -19,6 +19,7 @@ class Question(object):
     self._pre_text = ""
     self._post_text = ""
     self._namespace = Namespace()
+    self._metadata  = Namespace()
 
     self._formatter = SFFormatter()
 
@@ -55,6 +56,10 @@ class Question(object):
   @property
   def NS(self):
     return self._namespace
+
+  @property
+  def meta(self):
+    return self._metadata
 
   @property
   def text(self):
