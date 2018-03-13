@@ -73,10 +73,10 @@ class Question(object):
 
 
   @contextlib.contextmanager
-  def add_question(self,p=None):
-    if p is None:
-      p = Question()
-    self._questions.append(p)
+  def add_question(self,q=None):
+    if q is None:
+      q = Question()
+    self._questions.append(q)
     self._questions[-1].NS.__dict__.update( self.NS.__dict__ )
     yield self._questions[-1]
 
