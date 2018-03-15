@@ -1,4 +1,6 @@
 from types import SimpleNamespace
+from inspect import getargspec
+
 import pyparsing
 
 class Namespace(SimpleNamespace):
@@ -10,6 +12,34 @@ class Namespace(SimpleNamespace):
 
   def __len__(self):
     return len(self.__dict__)
+
+  def call(self,func,**kwargs):
+    # get list of args required by f
+    rargs = getargspec(func).args
+    # build args to pass to f from our __dict__ and kwargs.
+    # use the value in __dict__ unless an entry exists in kwargs
+
+    args = dict()
+    missing = list()
+    for a in rargs:
+      if a in kwargs:
+        args[a] = kwargs[a]
+      elif a in self.__dict__:
+        args[a] = self.__dict__[a]
+      else:
+        missing.append(a)
+
+    if len(missing) > 0:
+      msg  = "ERROR: could not find all arguments for function.\n"
+      msg += "expected: "+str(rargs)+"\n"
+      msg += "missing: "+str(missing)+"\n"
+      raise RuntimeError(msg)
+
+    result = func(**args)
+
+    return result
+
+
 
   
 class SFFormatter(object):

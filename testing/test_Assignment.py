@@ -30,6 +30,12 @@ def test_question_text():
 
   with ass.add_question() as q:
     q.text = "question 1 text"
+    q.NS.x = 10
+
+    # with q.add_answer( Numerical ) as a:
+      # def calc(x):
+        # return 2*x
+      # a.NS.calc = calc
 
     with q.add_part() as p:
       p.text = "question 1, part 1 text"
@@ -39,10 +45,20 @@ def test_question_text():
   with ass.add_question() as q:
     q.text = "question 2 text"
 
+
     with q.add_part() as p:
       p.text = "question 2, part 1 text"
+
     with q.add_part() as p:
       p.text = "question 2, part 2 text"
+      # with q.add_answer( MultipleChoice ) as a:
+        # a.choices  = '''
+                     # incorrect
+                     # ^correct"
+                     # also not correct
+                     # incorrect 4
+                     # '''
+
 
 
   assert ass._questions[0]._text == "question 1 text"

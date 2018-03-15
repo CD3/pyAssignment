@@ -1,6 +1,7 @@
-import contextlib,textwrap
+import contextlib,textwrap,inspect
 
 from .Utils import Namespace, SFFormatter
+from .Answer import *
 
 class Question(object):
   """A class representing a question.
@@ -92,5 +93,13 @@ class Question(object):
     self._parts[-1].NS.__dict__.update( self.NS.__dict__ )
     yield self._parts[-1]
 
-
+  @contextlib.contextmanager
+  def add_answer(self,a=None):
+    if a is None:
+      a = Answer
+    if inspect.isclass(a):
+      a = a()
+    self._answers.append(a)
+    self._answers[-1].NS.__dict__.update( self.NS.__dict__ )
+    yield self._answers[-1]
 
