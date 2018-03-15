@@ -38,9 +38,6 @@ class Namespace(SimpleNamespace):
     result = func(**args)
 
     return result
-
-
-
   
 class SFFormatter(object):
   def __init__(self, delimiters=None):
@@ -71,3 +68,19 @@ class SFFormatter(object):
 
     return text
 
+# a context manager for temperarily disabling
+# flags in an instance
+class set_state_context(object):
+  def __init__(self,obj,state):
+    self.obj = obj
+    self.state = state
+    self.saved_state = None
+  def __enter__(self):
+    self.saved_state = dict()
+    for k in self.state.keys():
+      self.saved_state[k] = getattr(self.obj,k)
+      setattr(self.obj,k,self.state[k])
+  def __exit__(self,type,value,traceback):
+    for k in self.state.keys():
+      setattr(self.obj,k,self.saved_state[k])
+    self.saved_state = None

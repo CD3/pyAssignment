@@ -1,6 +1,6 @@
 import contextlib,textwrap,inspect
 
-from ..Utils import Namespace, SFFormatter
+from ..Utils import Namespace, SFFormatter, set_state_context
 from .Answer import *
 
 class Question(object):
@@ -32,17 +32,8 @@ class Question(object):
 
     self._lint_flag = True
 
-    class disable_linter_context(object):
-      def __init__(self,question):
-        self.question = question
-      def __enter__(self):
-        self.saved_lint_flag = self.question._lint_flag
-        self.question._lint_flag = False
-      def __exit__(self,type,value,traceback):
-        self.question._lint_flag = self.saved_lint_flag
 
-
-    self.disable_linter = disable_linter_context(self)
+    self.disable_linter = set_state_context(self, {'_lint_flag':False})
 
 
   def _lint(self,text):

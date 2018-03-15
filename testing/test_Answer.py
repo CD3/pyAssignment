@@ -53,3 +53,18 @@ def test_MultipleChoice():
   assert len(a._correct) == 1
   assert 2 in a._correct
 
+def test_Text():
+  
+  a = Answer.Text()
+
+  a.text = "the"
+  a.text += " answer"
+
+  assert a.text == "the answer"
+
+  def func():
+    return "returned answer"
+
+  a.text = func
+
+  assert a.text == "returned answer"

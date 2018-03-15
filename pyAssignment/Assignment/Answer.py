@@ -1,11 +1,12 @@
 import contextlib,textwrap,re
 
-from ..Utils import Namespace, SFFormatter
+from ..Utils import Namespace, SFFormatter, set_state_context
 
 
 class AnswerBase(object):
   def __init__(self):
     self._namespace = Namespace()
+    self._formatter = SFFormatter()
 
   @property
   def NS(self):
@@ -93,3 +94,26 @@ class Text(AnswerBase):
     super().__init__()
     self._text = None
 
+    self._lint_flag = True
+    self.disable_linter = set_state_context(self, {'_lint_flag':False})
+
+
+  def _lint(self,text):
+    if not self._lint_flag:
+      return text
+
+    return textwrap.dedent(text)
+
+  @property
+  def text(self):
+    if hasattr(self._text,'__call__'):
+      return self._namespace.call( self._text )
+    return self._text
+
+  @text.setter
+  def text(self,val):
+    if hasattr(val,'__call__'):
+      self._text = val
+    else:
+      self._text = self._lint(val)
+  
