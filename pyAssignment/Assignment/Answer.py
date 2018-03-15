@@ -1,10 +1,9 @@
 import contextlib,textwrap,re
 
-from .Utils import Namespace, SFFormatter
+from ..Utils import Namespace, SFFormatter
 
 
-class Answer(object):
-
+class AnswerBase(object):
   def __init__(self):
     self._namespace = Namespace()
 
@@ -12,8 +11,7 @@ class Answer(object):
   def NS(self):
     return self._namespace
 
-
-class Numerical(Answer):
+class Numerical(AnswerBase):
   def __init__(self):
     super().__init__()
     self._quantity = None
@@ -31,12 +29,7 @@ class Numerical(Answer):
   def quantity(self,quant):
     self._quantity = quant
 
-class Text(Answer):
-  def __init__(self):
-    self._text = ""
-
-class MultipleChoice(Answer):
-
+class MultipleChoice(AnswerBase):
   # A custom list
   class list(list):
     def __init__(self):
@@ -95,4 +88,8 @@ class MultipleChoice(Answer):
     if i >= 0 and i < len(self._choices):
       self._correct.append( i )
 
+class Text(AnswerBase):
+  def __init__(self):
+    super().__init__()
+    self._text = None
 

@@ -1,5 +1,5 @@
 import pytest
-from pyAssignment.Question import Question
+from pyAssignment.Assignment.Question import Question
 # from .Utils import Approx
 
 def test_adding_text():

@@ -1,6 +1,6 @@
 import contextlib,textwrap,inspect
 
-from .Utils import Namespace, SFFormatter
+from ..Utils import Namespace, SFFormatter
 from .Answer import *
 
 class Question(object):

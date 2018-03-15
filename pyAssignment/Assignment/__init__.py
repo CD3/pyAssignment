@@ -1,6 +1,6 @@
 import contextlib
 from .Question import Question
-from .Utils import Namespace
+from ..Utils import Namespace
 
 class Assignment(object):
   def __init__(self):
