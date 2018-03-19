@@ -39,6 +39,11 @@ def test_MultipleChoice():
   assert len(a._correct) == 1
   assert 2 in a._correct
 
+  assert len(a.choices) == 4
+  assert len(list(a.all_formatted_choices)) == 4
+  assert len(list(a.correct_formatted_choices)) == 1
+  assert len(list(a.incorrect_formatted_choices)) == 3
+
 
 
   a = Answer.MultipleChoice()
@@ -52,6 +57,12 @@ def test_MultipleChoice():
   assert len(a._choices) == 4
   assert len(a._correct) == 1
   assert 2 in a._correct
+
+  assert len(a.choices) == 4
+  assert len(list(a.all_formatted_choices)) == 4
+  assert len(list(a.correct_formatted_choices)) == 1
+  assert len(list(a.incorrect_formatted_choices)) == 3
+
 
 def test_Text():
   

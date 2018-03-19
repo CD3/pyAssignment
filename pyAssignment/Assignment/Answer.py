@@ -25,13 +25,12 @@ class Numerical(AnswerBase):
 
     return self._quantity
 
-
   @quantity.setter
   def quantity(self,quant):
     self._quantity = quant
 
+
 class MultipleChoice(AnswerBase):
-  # A custom list
   class list(list):
     def __init__(self):
       super().__init__()
@@ -54,6 +53,7 @@ class MultipleChoice(AnswerBase):
       return self
 
   def __init__(self):
+    super().__init__()
     self._choices = MultipleChoice.list()
     self._correct = MultipleChoice.list()
 
@@ -74,6 +74,25 @@ class MultipleChoice(AnswerBase):
   def correct(self,val):
     self.choices = val
     self.add_correct(self._choices[-1])
+
+  @property
+  def all_formatted_choices(self):
+    for i in range(len(self._choices)):
+      c = self._choices[i]
+      yield self._formatter.fmt( c, **self.NS.__dict__ )
+
+  @property
+  def correct_formatted_choices(self):
+    for i in self._correct:
+      c = self._choices[i]
+      yield self._formatter.fmt( c, **self.NS.__dict__ )
+
+  @property
+  def incorrect_formatted_choices(self):
+    for i in range(len(self._choices)):
+      if i not in self._correct:
+        c = self._choices[i]
+        yield self._formatter.fmt( c, **self.NS.__dict__ )
 
 
 

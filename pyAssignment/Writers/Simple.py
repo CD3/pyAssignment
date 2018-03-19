@@ -1,6 +1,7 @@
 
+from .WriterBase import *
 
-class SimpleWriter(object):
+class SimpleWriter(WriterBase):
 
   def __init__(self,fh=None):
     self.fh = fh
@@ -24,12 +25,8 @@ class SimpleWriter(object):
         self.i += 1
         self._dump_question(q,fh,prefix)
 
-
   def dump(self, ass, fh=None):
-    if fh is None:
-      fh = self.fh
-    if fh is None:
-      raise(RuntimeError("No filehandle available."))
+    fh = super().get_fh(fh)
 
     self._dump_questions(ass._questions, fh)
 
