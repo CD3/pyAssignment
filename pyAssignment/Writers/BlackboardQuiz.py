@@ -67,26 +67,52 @@ class BlackboardQuiz(WriterBase):
 
       # if the quantity has units, add a statement to the question text specifying
       # the units that the answer should be given in.
-      try:
-        if "{}".format(q.units) != "dimensionless":
-          toks[1] += " Give your answer in {}.".format(q.units)
+      unit_str = ""
+      try: # a pint quantity
+        unit_str = "{}".format(q.units)
       except:
         pass
 
-      try:
+      try: # a pyErrorProp uncertain quantity
+        unit_str = "{}".format(q.nominal.units)
+      except:
+        pass
+
+      if len(unit_str) > 0 and unit_str != "dimensionless":
+        toks[1] += " Give your answer in {}.".format(unit_str)
+
+      val = q
+      try: # a pint quantity
         val = q.magnitude
       except:
-        val = q
+        pass
+      try: # a pyErrorProp uncertain quantity
+        val = q.nominal.magnitude
+      except:
+        pass
 
       toks.append("{:.2e}".format(val))
 
       unc = None
-      if self._default_relative_numerical_uncertainty:
+      try: # a pyErrorProp uncertain quantity
+        unc = q.uncertainty.to( q.nominal.units ).magnitude
+      except:
+        pass
+
+
+      if unc is None and self._default_relative_numerical_uncertainty:
         unc = val*self._default_relative_numerical_uncertainty
+
       if self._minimum_relative_numerical_uncertainty and unc != None and val*self._minimum_relative_numerical_uncertainty > unc:
         unc = val*self._minimum_relative_numerical_uncertainty
 
       toks.append("{:.2e}".format(unc))
+
+    if t == "FIB":
+      answers = a.formatted_text.split(';')
+      for answer in answers:
+        toks.append(answer)
+
 
     fh.write("\t".join(toks)+"\n")
       
@@ -110,6 +136,14 @@ class BlackboardQuiz(WriterBase):
       if len(list(a.correct_formatted_choices)) == 1:
         return "MC"
       return "MA"
+
+    if isinstance(a,Essay):
+      return "ESS"
+
+    if isinstance(a,Text):
+      if a.formatted_text == "":
+        raise RuntimeError( "Fill in the blank question does not have an answer." + q.text )
+      return "FIB"
 
     raise RuntimeError( "Answer type was not recognized." + str(type(a)) )
 

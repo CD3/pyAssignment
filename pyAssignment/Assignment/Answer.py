@@ -29,7 +29,6 @@ class Numerical(AnswerBase):
   def quantity(self,quant):
     self._quantity = quant
 
-
 class MultipleChoice(AnswerBase):
   class list(list):
     def __init__(self):
@@ -116,7 +115,6 @@ class Text(AnswerBase):
     self._lint_flag = True
     self.disable_linter = set_state_context(self, {'_lint_flag':False})
 
-
   def _lint(self,text):
     if not self._lint_flag:
       return text
@@ -136,3 +134,11 @@ class Text(AnswerBase):
     else:
       self._text = self._lint(val)
   
+  @property
+  def formatted_text(self):
+      return self._formatter.fmt( self.text, **self.NS.__dict__ )
+
+
+class Essay(Text):
+  def __init__(self):
+    super().__init__()

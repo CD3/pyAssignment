@@ -3,7 +3,7 @@ from .WriterBase import *
 from ..Assignment import *
 
 
-class LatexWriter(WriterBase):
+class Latex(WriterBase):
 
   def __init__(self,fh=None):
     super().__init__()

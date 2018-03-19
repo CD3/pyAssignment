@@ -79,3 +79,10 @@ def test_Text():
   a.text = func
 
   assert a.text == "returned answer"
+  assert a.formatted_text == "returned answer"
+
+  a.text = "{x} is the answer"
+  a.NS.x = 42
+
+  assert a.text == "{x} is the answer"
+  assert a.formatted_text == "42 is the answer"
