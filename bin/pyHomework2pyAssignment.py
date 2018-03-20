@@ -1,6 +1,6 @@
 #! /usr/bin/env python2
 
-import os,sys
+import os,sys,textwrap
 from argparse import ArgumentParser
 
 if os.path.isdir( '../pyAssignment' ):
@@ -49,32 +49,70 @@ os.chdir(currdir)
 
 
 def fmt_NS_var(v):
-
   return "{}".format(v)
 
-def fmt_Anserr(a):
+def fmt_NS_assignment_line(k,v):
+  return "q.NS.{k} = '''{v}'''\n".format(k=k,v=fmt_NS_var(v))
+
+def fmt_Answer(a):
   return "NONE"
 
+def fmt_Question(q):
+  text = """\
+with ass.add_question() as q:
+  q.text = '''{TEXT}'''
+
+""".format(TEXT=q.question_str)
+  return text
+
+def fmt_Part(p):
+  text = """\
+with q.add_part() as p:
+  p.text = '''{TEXT}'''
+
+""".format(TEXT=p.question_str)
+  return text
+
+def indent(text,level=1):
+  if level == 0:
+    return text
+
+  if level == 1:
+    lines = list()
+    for line in text.split("\n"):
+      if len( line.strip() ) > 0:
+        lines.append("  " + line)
+      else:
+        lines.append(line)
+
+    return "\n".join( lines )
+
+  if level > 1:
+    return indent(text,level-1)
 
 with open(args.output,'w') as f:
+  f.write("import sys\n")
+  f.write("from pyAssignment.Assignment import Assignment\n")
+  f.write("from pyAssignment.Writers import Simple\n")
 
   f.write("ass = Assignment()\n")
 
   for q in ass._questions:
-    f.write("""
-with ass.add_question() as q:
-  q.text = "{TEXT}"
-""".format(TEXT=q.question_str))
+    f.write("\n")
+    f.write( fmt_Question(q) )
 
     for k in q.v.__dict__:
-      f.write("""\
-  q.NS.{k} = '{v}'\n""".format(k=k,v=fmt_NS_var(q.v.__dict__[k])))
+      f.write( indent(fmt_NS_assignment_line(k,q.v.__dict__[k])))
 
     for a in q._answers:
-      f.write("{}\n".format(fmt_Answer(a)))
+      f.write(indent(fmt_Answer(a)))
 
     for p in q._parts:
-      f.write("""\
-  with ass.add_part() as p:
-    p.text = {TEXT}
-""".format(TEXT=p.question_str))
+      f.write( indent(fmt_Part(p)))
+
+  f.write("""\
+writer = Simple(sys.stdout)
+writer.dump(ass)
+""")
+
+
