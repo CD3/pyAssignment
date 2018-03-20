@@ -5,7 +5,7 @@ class ReaderBase(object):
   def __init__(self,fh=None):
     self.fh = fh
 
-  def get_fh(self,ass,fh=None):
+  def get_fh(self,fh=None):
     if fh is None:
       fh = self.fh
     if fh is None:
@@ -37,13 +37,11 @@ class ReaderBase(object):
       with obj.add_part() as p:
         self._load_question_from_dict(e,p)
 
-
   def _load_question_from_dict(self,d,obj):
     obj.text = d['text']
 
     self._load_answers_from_dict( d, obj)
     self._load_questions_and_parts_from_dict( d, obj )
-
 
   def _load_answers_from_dict(self,d,obj):
     for e in d.get('answers',list()):

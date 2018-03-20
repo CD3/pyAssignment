@@ -64,6 +64,6 @@ class Simple(WriterBase):
     fh.write("\n")
 
   def _dump_namespace(self,ns,fh,prefix=""):
-    for k in ns.__dict__.keys():
+    for k in sorted(ns.__dict__.keys()):
       fh.write("{0}{1} = {2}\n".format(prefix,k,ns.__dict__[k]))
 

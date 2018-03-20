@@ -6,14 +6,13 @@ from pyAssignment.Assignment import Assignment
 import pyAssignment.Readers as Readers
 import pyAssignment.Writers as Writers
 
-import yaml
+import yaml,json
 
 def test_reader_base():
-
   text = '''
   namespace :
     v1 : 1
-    v2 : 1
+    v2 : 2
 
   questions:
     - text : q1
@@ -33,7 +32,6 @@ def test_reader_base():
   '''
 
   data = yaml.load(text)
-  print(data)
 
   fh = io.StringIO()
 
@@ -44,15 +42,23 @@ def test_reader_base():
 
   writer.dump(ass)
 
-  print()
-  print(fh.getvalue())
+  assert fh.getvalue() == '''\
+NAMESPACE:
+v1 = 1
+v2 = 2
 
 
+QUESTIONS:
+1. q1
+  1. q1p1
+    ANS: the answer
+  2. q1p2
+    ANS: first answer
+         second answer
+         correct answer (correct)
 
-def test_json():
-  pass
+2. q2
+  ANS: 1.23
+'''
 
-def test_yaml()
-  pass
 
-def test_markdown()
