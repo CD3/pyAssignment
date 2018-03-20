@@ -31,8 +31,6 @@ class Question(object):
 
 
     self._lint_flag = True
-
-
     self.disable_linter = set_state_context(self, {'_lint_flag':False})
 
 
