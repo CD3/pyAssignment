@@ -1,16 +1,9 @@
-import contextlib,textwrap,re
-
-from ..Utils import Namespace, SFFormatter, set_state_context
+from .Element import *
 
 
-class AnswerBase(object):
+class AnswerBase(Element):
   def __init__(self):
-    self._namespace = Namespace()
-    self._formatter = SFFormatter()
-
-  @property
-  def NS(self):
-    return self._namespace
+    super().__init__()
 
 class Numerical(AnswerBase):
   def __init__(self):

@@ -1,9 +1,7 @@
-import contextlib,textwrap,inspect
-
-from ..Utils import Namespace, SFFormatter, set_state_context
+from .Element import *
 from .Answer import *
 
-class Question(object):
+class Question(Element):
   """A class representing a question.
 
   A can question contain:
@@ -15,41 +13,15 @@ class Question(object):
   """
 
   def __init__(self, text=None):
+    super().__init__()
 
     self._text = ""
     self._pre_text = ""
     self._post_text = ""
-    self._namespace = Namespace()
-    self._metadata  = Namespace()
-
-    self._formatter = SFFormatter()
-
-
     self._parts     = []
     self._questions = []
     self._answers   = []
 
-
-    self._lint_flag = True
-    self.disable_linter = set_state_context(self, {'_lint_flag':False})
-
-
-  def _lint(self,text):
-    if not self._lint_flag:
-      return text
-
-    return textwrap.dedent(text)
-
-
-  
-
-  @property
-  def NS(self):
-    return self._namespace
-
-  @property
-  def meta(self):
-    return self._metadata
 
   @property
   def text(self):
