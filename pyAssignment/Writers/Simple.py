@@ -22,17 +22,11 @@ class Simple(WriterBase):
         self.i += 1
         self._dump_question(q,fh,prefix)
 
-  def _dump_answers(self,ans,fh,prefix=""):
-    if len(ans) > 0:
-      for an in ans:
-        self._dump_answer(an,fh,prefix)
-
-
   def _dump_question(self,q,fh,prefix):
     fh.write( "%s%d. %s"%( prefix,self.i,q.formatted_text ) )
     fh.write("\n")
 
-    self._dump_answers(q._answers,fh,prefix+"  ")
+    self._dump_answer(q._answer,fh,prefix+"  ")
 
     i_save = self.i
     self.i = 0

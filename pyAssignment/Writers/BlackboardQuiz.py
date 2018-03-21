@@ -49,7 +49,7 @@ class BlackboardQuiz(WriterBase):
     toks.append(t)
     toks.append(q.formatted_text)
 
-    a = q._answers[0]
+    a = q._answer
 
     if t == "MC" or t == "MA":
       correct_choices = list(a.correct_formatted_choices)
@@ -120,12 +120,10 @@ class BlackboardQuiz(WriterBase):
 
       
   def _get_type(self,q):
-    if len(q._answers) < 1:
-      raise RuntimeError( "Question does not contain any answers." + q.text )
-    if len(q._answers) > 1:
-      raise RuntimeError( "Questoin has too many answers for a Blackboard quiz." + q.text )
+    if q._answer is None:
+      raise RuntimeError( "Question does not contain an answers." + q.text )
 
-    a = q._answers[0]
+    a = q._answer
 
     if isinstance(a,Numerical):
       return "NUM"

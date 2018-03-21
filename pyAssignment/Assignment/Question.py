@@ -7,7 +7,7 @@ class Question(Element):
   A can question contain:
   
   - text : the actual question itself
-  - answers : one or more answers to the question
+  - answer : an answer to the question
   - parts : one or more parts to the questions (sub-questions). these are also questions.
   - questions : one or more questions about the question (i.e. a quiz that references a problem set question.)
   """
@@ -20,7 +20,7 @@ class Question(Element):
     self._post_text = ""
     self._parts     = []
     self._questions = []
-    self._answers   = []
+    self._answer    = None
 
 
   @property
@@ -60,7 +60,7 @@ class Question(Element):
       a = Answer
     if inspect.isclass(a):
       a = a()
-    self._answers.append(a)
-    self._answers[-1].NS.__dict__.update( self.NS.__dict__ )
-    yield self._answers[-1]
+    self._answer = a
+    self._answer.NS.__dict__.update( self.NS.__dict__ )
+    yield self._answer
 

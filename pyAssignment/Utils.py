@@ -84,3 +84,24 @@ class set_state_context(object):
     for k in self.state.keys():
       setattr(self.obj,k,self.saved_state[k])
     self.saved_state = None
+
+class collection(list):
+  def __init__(self):
+    super().__init__()
+
+  def find(self, pattern, exact=True):
+    if exact:
+      return self.index(pattern)
+    else:
+      for i in range(len(self)):
+        if pattern in self[i]:
+          return i
+        return -1
+
+  def __iadd__(self,val):
+    if not isinstance(val,list):
+      val = [val]
+    for item in val:
+      self.append(item)
+
+    return self

@@ -157,3 +157,39 @@ FIB\tq7\tfirst correct answer\tsecond correct answer
 
   assert fh.getvalue() == quiz_text
   
+
+def test_latex_writer():
+
+
+  fh = io.StringIO()
+  writer = Writers.Latex(fh)
+
+  ass = Assignment()
+  ass.meta.title = "Homework Assignment"
+  ass.meta.header = {'R':"powered by \LaTeX"}
+
+
+  with ass.add_question() as q:
+    q.text = "q1"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.incorrect += "a2"
+      a.incorrect += "a3"
+      a.correct += "a4"
+  with ass.add_question() as q:
+    q.text = "q2"
+    with q.add_answer(Answer.Numerical) as a:
+      a.quantity = 1.23
+  with ass.add_question() as q:
+    q.text = "q3"
+    with q.add_part() as p:
+      p.text = "q3p1"
+    with q.add_part() as p:
+      p.text = "q3p2"
+
+  writer.dump(ass)
+  print(fh.getvalue())
+
+  with open('test.tex', 'w') as f:
+    f.write(fh.getvalue())
+
