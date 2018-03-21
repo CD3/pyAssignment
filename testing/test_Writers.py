@@ -160,13 +160,19 @@ FIB\tq7\tfirst correct answer\tsecond correct answer
 
 def test_latex_writer():
 
-
   fh = io.StringIO()
   writer = Writers.Latex(fh)
 
   ass = Assignment()
   ass.meta.title = "Homework Assignment"
   ass.meta.header = {'R':"powered by \LaTeX"}
+  ass.meta.config = {
+                    'answers' : {
+                      'numerical/spacing' :  '2in',
+                      'multiple_choice/symbol' :  r'\alph*)',
+                      'text/spacing' :  r'3in'
+                      }
+                    }
 
 
   with ass.add_question() as q:

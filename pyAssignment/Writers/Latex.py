@@ -7,6 +7,19 @@ from pylatex.utils import italic, NoEscape
 
 
 class Latex(WriterBase):
+  '''
+  Customization Points:
+
+  assignment.meta.title : document title
+  assignment.meta.date : document date
+  assignment.meta.header : dict of fancy headers
+  assignment.meta.footer : dict of fancy footers
+  assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
+  assignment.meta.config['answers']['multiple_choice_symbol'] : symbol used for multiple choice answers
+  assignment.meta.config['answers']['numerical_spacing'] : spacing added after a question with a numerical answer
+  assignment.meta.config['answers']['numerical_spacing'] : spacing added after a question with a numerical answer
+
+  '''
   def __init__(self,fh=None):
     super().__init__(fh)
     self._packages = collection()
@@ -38,8 +51,8 @@ class Latex(WriterBase):
 
     enumeration_symbols = list()
     if ass.meta.has("config"):
-      if 'enumeration_symbols' in ass.meta.config:
-        for symb in ass.meta.config['enumeration_symbols']:
+      if ass.meta.config.get('question',dict()).get('enumeration_symbols', None) is not None:
+        for symb in ass.meta.config['question']['enumeration_symbols']:
           enumeration_symbols.append(symb)
 
     while len(enumeration_symbols) < 5:
@@ -50,8 +63,48 @@ class Latex(WriterBase):
       level += 1
       for q in ass._questions:
         qlist.add_item( NoEscape(q.formatted_text) )
-        # if q._answer is not None:
-          # pass
+        if q._answer is not None:
+          try: # multiple choice
+            # NOTE: need to access all_formatted_choices member of q._answer
+            # so that try block will fail before an enumeration is created
+            choices = list(q._answer.all_formatted_choices)
+            symb = r'\alph*)'
+            try:
+              symb = ass.meta.config['answers']['multiple_choice/symbol']
+            except:
+              pass
+            with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
+              for choice in choices:
+                clist.add_item( NoEscape(choice) )
+          except:
+            pass
+
+          try: # numerical
+            ans = q._answer.quantity
+            space="2in"
+            try:
+              space = ass.meta.config['answers']['numerical/spacing']
+            except:
+              pass
+            doc.append(NoEscape(r"\vspace{%s}"%space))
+          except:
+            pass
+
+
+          try: # numerical
+            ans = q._answer.text
+            space="2in"
+            try:
+              space = ass.meta.config['answers']['text/spacing']
+            except:
+              pass
+            doc.append(NoEscape(r"\vspace{%s}"%space))
+          except:
+            pass
+
+
+
+
         with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as plist:
           level += 1
           for p in q._parts:
