@@ -1,7 +1,7 @@
 from .WriterBase import *
 from ..Assignment import *
 
-from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate
+from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate,Figure
 from pylatex.utils import italic, NoEscape
 
 
@@ -42,13 +42,14 @@ class Latex(WriterBase):
 
     self.build_preamble(doc,ass)
     self.build_questions(doc,ass)
+    self.build_figures(doc,ass)
 
     fh.write(doc.dumps())
 
     return
     
-  def build_questions(self,doc,ass):
 
+  def build_questions(self,doc,ass):
     enumeration_symbols = list()
     if ass.meta.has("config"):
       if ass.meta.config.get('question',dict()).get('enumeration_symbols', None) is not None:
@@ -114,9 +115,7 @@ class Latex(WriterBase):
 
       level -= 1
 
-
   def build_preamble(self,doc,ass):
-
     header_and_footer = PageStyle("header")
     if ass.meta.has("header"):
       for h in ass.meta.header:
@@ -150,6 +149,19 @@ class Latex(WriterBase):
 
     if maketitle:
       doc.append(NoEscape(r'\maketitle'))
+
+  def build_figures(self,doc,ass):
+    for f in ass._figures:
+
+      with doc.create(Figure()) as fig:
+        width=r'0.4\textwidth'
+        if f.meta.has('width'):
+          width=f.meta.width
+        fig.add_image(f.filename,width=NoEscape(width))
+        fig.add_caption(NoEscape(f.formatted_caption))
+
+
+
 
     
 
