@@ -1,7 +1,7 @@
 from .WriterBase import *
 from ..Assignment import *
 
-from pylatex import Document,Command,Head,PageStyle,Package,Itemize,Enumerate
+from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate
 from pylatex.utils import italic, NoEscape
 
 
@@ -138,10 +138,18 @@ class Latex(WriterBase):
       doc.preamble.append(Package(p,o))
 
 
+    maketitle = False
     if ass.meta.has("title"):
       doc.preamble.append(Command('title',ass.meta.title))
+      maketitle = True
     if ass.meta.has("date"):
       doc.preamble.append(Command('date',ass.meta.date))
+      maketitle = True
+    else:
+      doc.preamble.append(Command('date',''))
+
+    if maketitle:
+      doc.append(NoEscape(r'\maketitle'))
 
     
 

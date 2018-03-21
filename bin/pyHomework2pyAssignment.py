@@ -49,10 +49,21 @@ os.chdir(currdir)
 
 
 def fmt_NS_var(v):
-  return "{}".format(v)
+  try:
+    mag = v.magnitude
+    try:
+      mag = [ e for e in mag ]
+    except:
+      pass
+      
+    uni = v.units
+    return "Q_({},'{}')".format(mag,uni)
+  except:
+    pass
+  return "'''{}'''".format(v)
 
 def fmt_NS_assignment_line(k,v):
-  return "q.NS.{k} = '''{v}'''\n".format(k=k,v=fmt_NS_var(v))
+  return "q.NS.{k} = {v}\n".format(k=k,v=fmt_NS_var(v))
 
 def fmt_Answer(a):
   return "NONE"
@@ -60,7 +71,7 @@ def fmt_Answer(a):
 def fmt_Question(q):
   text = """\
 with ass.add_question() as q:
-  q.text = '''{TEXT}'''
+  q.text = r'''{TEXT}'''
 
 """.format(TEXT=q.question_str)
   return text
@@ -68,9 +79,17 @@ with ass.add_question() as q:
 def fmt_Part(p):
   text = """\
 with q.add_part() as p:
-  p.text = '''{TEXT}'''
+  p.text = r'''{TEXT}'''
 
 """.format(TEXT=p.question_str)
+  return text
+
+def fmt_Figure(f):
+  text = """\
+with ass.add_figure() as f:
+  f.caption = '''{CAPTION}'''
+  f.filename = '''{FILENAME}'''
+""".format(CAPTION=' '.join(f._caption),FILENAME=f.filename)
   return text
 
 def indent(text,level=1):
@@ -90,12 +109,37 @@ def indent(text,level=1):
   if level > 1:
     return indent(text,level-1)
 
+
 with open(args.output,'w') as f:
   f.write("import sys\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
-  f.write("from pyAssignment.Writers import Simple\n")
+  f.write("from pyAssignment.Writers import Simple,Latex\n")
+
+  f.write('''\
+import numpy
+import pint
+units = pint.UnitRegistry()
+Q_ = units.Quantity
+''')
 
   f.write("ass = Assignment()\n")
+
+  try:
+    f.write("ass.meta.title = '{}'\n".format(ass._config['title']))
+  except:
+    pass
+  f.write("ass.meta.header = dict()\n")
+  for fh in ["L", "C", "R"]:
+    try:
+      f.write("ass.meta.header['{}'] = '{}'\n".format(fh,ass._config[fh+"H"]))
+    except:
+      pass
+  f.write("ass.meta.footer = dict()\n")
+  for ff in ["L", "C", "R"]:
+    try:
+      f.write("ass.meta.footer['{}'] = '{}'\n".format(ff,ass._config[ff+"F"]))
+    except:
+      pass
 
   for q in ass._questions:
     f.write("\n")
@@ -110,9 +154,17 @@ with open(args.output,'w') as f:
     for p in q._parts:
       f.write( indent(fmt_Part(p)))
 
+  for k in ass._figures:
+    fig = ass._figures[k]
+    f.write( fmt_Figure(fig) )
+
   f.write("""\
-writer = Simple(sys.stdout)
+
+
+writer = Latex(sys.stdout)
 writer.dump(ass)
+
+
 """)
 
 
