@@ -1,5 +1,8 @@
 #! /usr/bin/env python2
 
+# TODO
+# extract paragraphs
+
 import os,sys,textwrap
 from argparse import ArgumentParser
 
@@ -20,7 +23,8 @@ parser.add_argument("-o", "--output",
 
 args = parser.parse_args()
 
-
+if os.path.abspath( args.homework_script ) == os.path.abspath( args.output ):
+  raise RuntimeError("Output file is same as input file. This will overwrite the input, which is probably not desired.")
 
 with open(args.homework_script,'r') as f:
   input_lines = f.readlines()
@@ -111,7 +115,7 @@ def indent(text,level=1):
 
 
 with open(args.output,'w') as f:
-  f.write("import sys\n")
+  f.write("import os,sys, subprocess\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
 
@@ -160,10 +164,19 @@ Q_ = units.Quantity
 
   f.write("""\
 
-
-writer = Latex(sys.stdout)
-writer.packages += ("endfloat","nomarkers,figuresonly,nofiglist")
-writer.dump(ass)
+basename = os.path.basename(__file__).replace(".py","")
+odir = "_"+basename
+if not os.path.exists(odir):
+  os.makedirs(odir)
+cdir = os.getcwd()
+os.chdir(odir)
+ofile = basename+".tex"
+with open(ofile,'w') as f:
+  writer = Latex(f)
+  writer.packages += ("endfloat","nomarkers,figuresonly,nofiglist")
+  writer.dump(ass)
+subprocess.check_call("latexmk -pdf",shell=True)
+os.chdir(cdir)
 
 
 """)
