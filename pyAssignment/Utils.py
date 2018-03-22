@@ -105,3 +105,38 @@ class collection(list):
       self.append(item)
 
     return self
+
+class LatexAux(object):
+  def __init__(self,filename):
+    self._filename = filename
+    self._newlabels = dict()
+
+    class parser:
+      pp = pyparsing
+      name = pp.Word(pp.alphas)
+      argument = pp.originalTextFor(pp.nestedExpr( '{', '}' ))
+
+      command = pp.Combine( pp.WordStart('\\') + pp.Literal('\\') + name('name') + pp.ZeroOrMore(argument)('arguments') )
+
+      newlabel = Namespace()
+      newlabel.arg1 = argument('name')
+      newlabel.arg2 = argument('label') #+argument('page')
+
+    with open(filename,'r') as f:
+      text = f.read()
+    
+
+    res = parser.command.searchString(text)
+
+
+    # extract labels from \newlabel commands
+    for r in res:
+      if r.name == "newlabel":
+        name = r.arguments[0].strip('{}')
+        # argument contains two sub-arguments that we need to parse
+        label,page = [e.strip('{}') for e in (parser.argument('label') + parser.argument('page')).parseString( r.arguments[1][1:-1] )]
+        
+        self._newlabels[r.name] = {'label':label,'page':page}
+
+
+
