@@ -36,6 +36,9 @@ class Simple(WriterBase):
     self.i = i_save
 
   def _dump_answer(self,a,fh,prefix):
+    if a is None:
+      return
+
     fh.write( "%sANS: "%( prefix ) )
 
     if( isinstance(a,Numerical) ):
