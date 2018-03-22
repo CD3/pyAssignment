@@ -44,6 +44,7 @@ class Question(Element):
   def add_question(self,q=None):
     if q is None:
       q = Question()
+    q.meta.parent_uuid = self._uuid
     self._questions.append(q)
     self._questions[-1].NS.__dict__.update( self.NS.__dict__ )
     yield self._questions[-1]
@@ -52,6 +53,7 @@ class Question(Element):
   def add_part(self,p=None):
     if p is None:
       p = Question()
+    p.meta.parent_uuid = self._uuid
     self._parts.append(p)
     self._parts[-1].NS.__dict__.update( self.NS.__dict__ )
     yield self._parts[-1]
@@ -62,6 +64,7 @@ class Question(Element):
       a = Answer
     if inspect.isclass(a):
       a = a()
+    a.meta.parent_uuid = self._uuid
     self._answer = a
     self._answer.NS.__dict__.update( self.NS.__dict__ )
     yield self._answer
