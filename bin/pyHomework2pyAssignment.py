@@ -162,6 +162,7 @@ Q_ = units.Quantity
 
 
 writer = Latex(sys.stdout)
+writer.packages += ("endfloat","nomarkers,figuresonly,nofiglist")
 writer.dump(ass)
 
 
