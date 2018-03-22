@@ -1,6 +1,5 @@
 from .Element import *
 from .Answer import *
-import uuid
 
 class Question(Element):
   """A class representing a question.
@@ -22,7 +21,6 @@ class Question(Element):
     self._parts     = []
     self._questions = []
     self._answer    = None
-    self._uuid = uuid.uuid4()
 
 
   @property

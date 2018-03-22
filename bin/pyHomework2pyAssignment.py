@@ -76,16 +76,16 @@ def fmt_Question(q):
   text = """\
 with ass.add_question() as q:
   q.text = r'''{TEXT}'''
-
-""".format(TEXT=q.question_str)
+  q.meta.label = '''{LABEL}'''
+""".format(TEXT=q.question_str,LABEL=id(q))
   return text
 
 def fmt_Part(p):
   text = """\
 with q.add_part() as p:
   p.text = r'''{TEXT}'''
-
-""".format(TEXT=p.question_str)
+  p.meta.label = '''{LABEL}'''
+""".format(TEXT=p.question_str,LABEL=id(p))
   return text
 
 def fmt_Figure(f):
@@ -93,7 +93,8 @@ def fmt_Figure(f):
 with ass.add_figure() as f:
   f.caption = '''{CAPTION}'''
   f.filename = '''{FILENAME}'''
-""".format(CAPTION=' '.join(f._caption),FILENAME=f.filename)
+  f.meta.label = '''{LABEL}'''
+""".format(CAPTION=' '.join(f._caption),FILENAME=f.filename,LABEL=''.join(f._label))
   return text
 
 def indent(text,level=1):

@@ -63,7 +63,14 @@ class Latex(WriterBase):
     with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
       level += 1
       for q in ass._questions:
-        qlist.add_item( NoEscape(q.formatted_text) )
+        label = r"\label{%s}"%q._uuid
+        if q.meta.has('label'):
+          label += r"\label{%s}"%q.meta.label
+
+        qlist.add_item( NoEscape(label+q.formatted_text) )
+
+
+
         if q._answer is not None:
           try: # multiple choice
             # NOTE: need to access all_formatted_choices member of q._answer
@@ -109,7 +116,11 @@ class Latex(WriterBase):
         with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as plist:
           level += 1
           for p in q._parts:
-            plist.add_item( NoEscape(p.formatted_text) )
+            label = r"\label{%s}"%p._uuid
+            if p.meta.has('label'):
+              label += r"\label{%s}"%p.meta.label
+
+            plist.add_item( NoEscape(label+p.formatted_text) )
 
         level -= 1
 
@@ -158,7 +169,10 @@ class Latex(WriterBase):
         if f.meta.has('width'):
           width=f.meta.width
         fig.add_image(f.filename,width=NoEscape(width))
-        fig.add_caption(NoEscape(f.formatted_caption))
+        label = ("\label{%s}"%f._uuid)
+        if f.meta.has("label"):
+          label += r"\label{%s}"%f.meta.label
+        fig.add_caption(NoEscape(label+f.formatted_caption))
 
 
 
