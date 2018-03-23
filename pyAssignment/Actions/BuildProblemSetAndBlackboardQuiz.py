@@ -37,8 +37,17 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
 
   template = "For problem #{LABEL}: "
   for qq in quiz._questions:
-    prefix = ""
-    if qq.meta.has("parent_uuid"):
+    if qq.meta.has("ancestor_uuids"):
+      labels = list()
+      for u in qq.meta.ancestor_uuids:
+        uuid = str(u)
+        if uuid in aux.labels:
+          label = aux.labels[uuid]['label']
+          labels.append(label.strip(".()"))
+        else:
+          raise RuntimeError("Quiz question needs to reference a problem set question (uuid=%s), but could not find label in .aux file (%s)."%(uuid,basename+".aux"))
+      prefix = template.format(LABEL='.'.join(labels))
+    elif qq.meta.has("parent_uuid"):
       uuid = str(qq.meta.parent_uuid)
       if uuid in aux.labels:
         label = aux.labels[uuid]['label']
@@ -46,7 +55,7 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
         raise RuntimeError("Quiz question needs to reference a problem set question (uuid=%s), but could not find label in .aux file (%s)."%(uuid,basename+".aux"))
       prefix = template.format(LABEL=label)
     else:
-      print("WARNING: A quiz question with no parent was found. This means that no reference to the problem set will be added.")
+      print("WARNING: A quiz question with no ancestors/parent was found. This means that no reference to the problem set will be added.")
 
     qq.text = prefix + qq.text
 
