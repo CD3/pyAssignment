@@ -121,7 +121,7 @@ class BlackboardQuiz(WriterBase):
       
   def _get_type(self,q):
     if q._answer is None:
-      raise RuntimeError( "Question does not contain an answers." + q.text )
+      raise RuntimeError( "Question does not contain an answer: " + q.text )
 
     a = q._answer
 
@@ -130,7 +130,7 @@ class BlackboardQuiz(WriterBase):
 
     if isinstance(a,MultipleChoice):
       if len(list(a.correct_formatted_choices)) < 1:
-        raise RuntimeError( "Multiple choice answer to question does not have a correct answer." + q.text )
+        raise RuntimeError( "Multiple choice answer to question does not have a correct answer: " + q.text )
       if len(list(a.correct_formatted_choices)) == 1:
         return "MC"
       return "MA"
@@ -140,8 +140,8 @@ class BlackboardQuiz(WriterBase):
 
     if isinstance(a,Text):
       if a.formatted_text == "":
-        raise RuntimeError( "Fill in the blank question does not have an answer." + q.text )
+        raise RuntimeError( "Fill in the blank question does not have an answer: " + q.text )
       return "FIB"
 
-    raise RuntimeError( "Answer type was not recognized." + str(type(a)) )
+    raise RuntimeError( "Answer type was not recognized: " + str(type(a)) )
 

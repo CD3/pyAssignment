@@ -1,6 +1,8 @@
 from types import SimpleNamespace
 from inspect import getargspec
 
+import os
+
 import pyparsing
 
 class Namespace(SimpleNamespace):
@@ -122,6 +124,7 @@ class LatexAux(object):
       newlabel.arg1 = argument('name')
       newlabel.arg2 = argument('label') #+argument('page')
 
+    if not os.path.exists(self._filename): raise RuntimeError( "LatexAux: .aux file does not appear to exist: "+self._filename )
     with open(filename,'r') as f:
       text = f.read()
     
@@ -136,7 +139,10 @@ class LatexAux(object):
         # argument contains two sub-arguments that we need to parse
         label,page = [e.strip('{}') for e in (parser.argument('label') + parser.argument('page')).parseString( r.arguments[1][1:-1] )]
         
-        self._newlabels[r.name] = {'label':label,'page':page}
+        self._newlabels[name] = {'label':label,'page':page}
 
+  @property
+  def labels(self):
+    return self._newlabels
 
 
