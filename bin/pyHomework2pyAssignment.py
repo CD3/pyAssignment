@@ -3,7 +3,7 @@
 # TODO
 # extract paragraphs
 
-import os,sys,textwrap
+import os,sys,textwrap,re
 from argparse import ArgumentParser
 
 if os.path.isdir( '../pyAssignment' ):
@@ -97,7 +97,7 @@ with ass.add_figure() as f:
 """.format(CAPTION=' '.join(f._caption),FILENAME=f.filename,LABEL=''.join(f._label))
   return text
 
-def indent(text,level=1):
+def indent(text,level=1,chars="  "):
   if level == 0:
     return text
 
@@ -105,17 +105,21 @@ def indent(text,level=1):
     lines = list()
     for line in text.split("\n"):
       if len( line.strip() ) > 0:
-        lines.append("  " + line)
+        lines.append(chars + line)
       else:
         lines.append(line)
 
     return "\n".join( lines )
 
   if level > 1:
-    return indent(text,level-1)
+    return indent(indent(text,level-1))
+
+
+
 
 
 with open(args.output,'w') as f:
+  # SETUP
   f.write("import os,sys, subprocess\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
@@ -127,43 +131,81 @@ units = pint.UnitRegistry()
 Q_ = units.Quantity
 ''')
 
+  # create Assignment
   f.write("ass = Assignment()\n")
 
-  try:
-    f.write("ass.meta.title = '{}'\n".format(ass._config['title']))
-  except:
-    pass
+  # write config data. title, header, ,etc
+  try: f.write("ass.meta.title = '{}'\n".format(ass._config['title']))
+  except: pass
+
   f.write("ass.meta.header = dict()\n")
   for fh in ["L", "C", "R"]:
-    try:
-      f.write("ass.meta.header['{}'] = '{}'\n".format(fh,ass._config[fh+"H"]))
-    except:
-      pass
+    try: f.write("ass.meta.header['{}'] = '{}'\n".format(fh,ass._config[fh+"H"]))
+    except: pass
+
   f.write("ass.meta.footer = dict()\n")
   for ff in ["L", "C", "R"]:
-    try:
-      f.write("ass.meta.footer['{}'] = '{}'\n".format(ff,ass._config[ff+"F"]))
-    except:
-      pass
+    try: f.write("ass.meta.footer['{}'] = '{}'\n".format(ff,ass._config[ff+"F"]))
+    except: pass
 
+  # loop through questions
   for q in ass._questions:
+    f.write("\n")
     f.write("\n")
     f.write( fmt_Question(q) )
 
+    # write variables to questions namespace
     for k in q.v.__dict__:
       f.write( indent(fmt_NS_assignment_line(k,q.v.__dict__[k])))
 
+    # write answers
     for a in q._answers:
       f.write(indent(fmt_Answer(a)))
 
+    # look for quiz questions that reference this question
+    for j in range(len(quiz._questions)):
+      if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
+        text = fmt_Question(qq)
+        text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
+        f.write( indent(text) )
+        quiz._questions[j] = None
+
+    # loop through question's parts
     for p in q._parts:
+      f.write("\n")
       f.write( indent(fmt_Part(p)))
 
+      # write answers
+      for a in q._answers:
+        f.write(indent(fmt_Answer(a),2))
+
+      # look for quiz questions that reference this question
+      for j in range(len(quiz._questions)):
+        if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
+          text = fmt_Question(qq)
+          text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
+          f.write( indent(text,2) )
+          quiz._questions[j] = None
+
+  # loop through assignment's figures
   for k in ass._figures:
     fig = ass._figures[k]
     f.write( fmt_Figure(fig) )
 
+  # write any quiz questions that were not found
+  # so no information is lost
+  f.write("#############################\n")
+  f.write("### UNUSED QUIZ QUESTIONS ###\n")
+  f.write("#############################\n")
+  for qq in quiz._questions:
+    if qq is not None:
+      print("WARNING: an unused question was found in the quiz.")
+      f.write( indent(fmt_Question(qq),1,"#") )
+  f.write("#############################\n")
+
+
   f.write("""\
+
 
 basename = os.path.basename(__file__).replace(".py","")
 odir = "_"+basename
