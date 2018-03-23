@@ -36,6 +36,7 @@ def test_problem_set_builder():
   assert os.path.isdir("_test")
   assert os.path.isfile("_test/test.tex")
   assert os.path.isfile("_test/test.pdf")
+  assert os.path.isfile("_test/test.aux")
   assert os.path.isfile("_test/test-quiz.txt")
 
   

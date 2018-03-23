@@ -5,6 +5,7 @@ import io
 from pyAssignment.Assignment import Assignment
 import pyAssignment.Filters as Filters
 import pyAssignment.Writers as Writers
+import pyAssignment.Assignment.Answer as Answer
 
 
 def test_extract_quiz():
@@ -16,6 +17,9 @@ def test_extract_quiz():
 
     with q.add_question() as qq:
       qq.text = "q1:qq"
+
+      with qq.add_answer(Answer.Text) as a:
+        a.text = 'the answer'
 
   with ass.add_question() as q:
     q.text = "q2"

@@ -69,23 +69,27 @@ def fmt_NS_var(v):
 def fmt_NS_assignment_line(k,v):
   return "q.NS.{k} = {v}\n".format(k=k,v=fmt_NS_var(v))
 
-def fmt_Answer(a):
-  return "NONE"
-
-def fmt_Question(q):
+def fmt_Answer(a,parent,this):
   text = """\
-with ass.add_question() as q:
-  q.text = r'''{TEXT}'''
-  q.meta.label = '''{LABEL}'''
-""".format(TEXT=q.question_str,LABEL=id(q))
+with {PARENT}.add_answer() as {THIS}:
+  pass
+""".format(PARENT=parent,THIS=this)
   return text
 
-def fmt_Part(p):
+def fmt_Question(q,parent,this):
   text = """\
-with q.add_part() as p:
-  p.text = r'''{TEXT}'''
-  p.meta.label = '''{LABEL}'''
-""".format(TEXT=p.question_str,LABEL=id(p))
+with {PARENT}.add_question() as {THIS}:
+  {THIS}.text = r'''{TEXT}'''
+  {THIS}.meta.label = '''{LABEL}'''
+""".format(TEXT=q.question_str,LABEL=id(q),PARENT=parent,THIS=this)
+  return text
+
+def fmt_Part(p,parent=None,this=None):
+  text = """\
+with {PARENT}.add_part() as {THIS}:
+  {THIS}.text = r'''{TEXT}'''
+  {THIS}.meta.label = '''{LABEL}'''
+""".format(TEXT=p.question_str,LABEL=id(p),PARENT=parent,THIS=this)
   return text
 
 def fmt_Figure(f):
@@ -123,6 +127,7 @@ with open(args.output,'w') as f:
   f.write("import os,sys, subprocess\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
+  f.write("from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz\n")
 
   f.write('''\
 import numpy
@@ -152,39 +157,45 @@ Q_ = units.Quantity
   for q in ass._questions:
     f.write("\n")
     f.write("\n")
-    f.write( fmt_Question(q) )
+    f.write( fmt_Question(q,'ass','q') )
 
     # write variables to questions namespace
     for k in q.v.__dict__:
       f.write( indent(fmt_NS_assignment_line(k,q.v.__dict__[k])))
 
-    # write answers
-    for a in q._answers:
-      f.write(indent(fmt_Answer(a)))
+    # write answer
+    if len(q._answers) > 0:
+      f.write(indent(fmt_Answer(q._answers[0],'q','a')))
 
     # look for quiz questions that reference this question
     for j in range(len(quiz._questions)):
       if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
-        text = fmt_Question(qq)
+        text = fmt_Question(qq,'q','qq')
         text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
         f.write( indent(text) )
+        # write answer
+        if len(quiz._questions[j]._answers) > 0:
+          f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),2))
         quiz._questions[j] = None
 
     # loop through question's parts
     for p in q._parts:
       f.write("\n")
-      f.write( indent(fmt_Part(p)))
+      f.write( indent(fmt_Part(p,'q','p')))
 
       # write answers
-      for a in q._answers:
-        f.write(indent(fmt_Answer(a),2))
+      if len(q._answers) > 0:
+        f.write(indent(fmt_Answer(q._answers[0],'p','a'),2))
 
       # look for quiz questions that reference this question
       for j in range(len(quiz._questions)):
         if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
-          text = fmt_Question(qq)
+          text = fmt_Question(qq,'p','qq')
           text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
           f.write( indent(text,2) )
+          # write answers
+          if len(quiz._questions[j]._answers) > 0:
+            f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),2))
           quiz._questions[j] = None
 
   # loop through assignment's figures
@@ -206,20 +217,8 @@ Q_ = units.Quantity
 
   f.write("""\
 
-
 basename = os.path.basename(__file__).replace(".py","")
-odir = "_"+basename
-if not os.path.exists(odir):
-  os.makedirs(odir)
-cdir = os.getcwd()
-os.chdir(odir)
-ofile = basename+".tex"
-with open(ofile,'w') as f:
-  writer = Latex(f)
-  writer.packages += ("endfloat","nomarkers,figuresonly,nofiglist")
-  writer.dump(ass)
-subprocess.check_call("latexmk -pdf",shell=True)
-os.chdir(cdir)
+BuildProblemSetAndBlackboardQuiz(ass,basename,remove=True)
 
 
 """)
