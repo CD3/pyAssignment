@@ -70,11 +70,42 @@ def fmt_NS_assignment_line(k,v):
   return "q.NS.{k} = {v}\n".format(k=k,v=fmt_NS_var(v))
 
 def fmt_Answer(a,parent,this):
-  text = """\
-with {PARENT}.add_answer() as {THIS}:
-  pass
-""".format(PARENT=parent,THIS=this)
-  return text
+  try: # numerical answer with uncertainty
+    value = a._quant.nominal.magnitude
+    units = a._quant.nominal.units
+
+    text = """\
+with {PARENT}.add_answer(Answer.Numerical) as {THIS}:
+  {THIS}.quantity = Q_({VALUE},"{UNITS}")
+""".format(PARENT=parent,THIS=this,VALUE=value,UNITS=units)
+
+    return text
+  except: pass
+
+  try: # numerical answer without uncertainty
+    value = a._quant.magnitude
+    units = a._quant.units
+
+    text = """\
+with {PARENT}.add_answer(Answer.Numerical) as {THIS}:
+  {THIS}.quantity = Q_({VALUE},"{UNITS}")
+""".format(PARENT=parent,THIS=this,VALUE=value,UNITS=units)
+
+    return text
+  except: pass
+
+  try: # multiple choice
+    text =  """with {PARENT}.add_answer(Answer.MultipleChoice) as {THIS}:\n""".format(PARENT=parent,THIS=this)
+    for correct,choice in a.choices:
+      if correct:
+        text += """  {THIS}.correct += '''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
+      else:
+        text += """  {THIS}.incorrect += '''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
+    return text
+  except: pass
+
+  raise RuntimeError("Could not write answer: {TYPE}.".format(TYPE=type(a)))
+
 
 def fmt_Question(q,parent,this):
   text = """\
@@ -126,6 +157,7 @@ with open(args.output,'w') as f:
   # SETUP
   f.write("import os,sys, subprocess\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
+  f.write("import pyAssignment.Assignment.Answer as Answer\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
   f.write("from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz\n")
 

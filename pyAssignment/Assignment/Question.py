@@ -71,9 +71,7 @@ class Question(Element):
     yield self._parts[-1]
 
   @contextlib.contextmanager
-  def add_answer(self,a=None):
-    if a is None:
-      a = Answer
+  def add_answer(self,a):
     if inspect.isclass(a):
       a = a()
 
