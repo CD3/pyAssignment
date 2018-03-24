@@ -9,5 +9,7 @@ root=$(git rev-parse --show-toplevel)
 echo "cd'ing to root directory ($root)"
 cd $root
 
-./testing/pre-tag-release-run_tests.sh ${tag}
-./testing/pre-tag-release-update_version.sh ${tag}
+echo "__version__ = '${tag}'" > version.py
+git add version.py
+git commit -m "version bump: ${tag}"
+
