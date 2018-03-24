@@ -75,14 +75,14 @@ class Latex(WriterBase):
           try: # multiple choice
             # NOTE: need to access all_formatted_choices member of q._answer
             # so that try block will fail before an enumeration is created
-            choices = list(q._answer.all_formatted_choices)
+            all_choices = self.get_all_choices(q._answer)
             symb = r'\alph*)'
             try:
               symb = ass.meta.config['answers']['multiple_choice/symbol']
             except:
               pass
             with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
-              for choice in choices:
+              for choice in all_choices:
                 clist.add_item( NoEscape(choice) )
           except:
             pass

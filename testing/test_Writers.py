@@ -92,11 +92,28 @@ def test_blackboard_quiz_writer_raises_on_unrecognized_answer_type():
 def test_blackboard_quiz_writer_raises_on_multiple_choice_with_no_correct_answer():
   fh = io.StringIO()
   writer = Writers.BlackboardQuiz(fh)
+  writer.config.add_none_of_the_above_choice = False
 
   ass = Assignment()
   with ass.add_question() as q:
     q.text = "q1"
     with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.incorrect += "a2"
+      a.incorrect += "a3"
+
+  with pytest.raises(RuntimeError):
+    writer.dump(ass)
+
+  writer.config.add_none_of_the_above_choice = True
+  writer.dump(ass)
+
+
+  ass = Assignment()
+  with ass.add_question() as q:
+    q.text = "q1"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.meta.add_none_of_the_above_choice = False
       a.incorrect += "a1"
       a.incorrect += "a2"
       a.incorrect += "a3"
@@ -110,46 +127,56 @@ def test_blackboard_quiz_writer_output():
 
   ass = Assignment()
   with ass.add_question() as q:
-    q.text = "q1"
+    q.text = "q1.1"
     with q.add_answer(Answer.MultipleChoice) as a:
       a.incorrect += "a1"
       a.incorrect += "a2"
       a.incorrect += "a3"
       a.correct += "a4"
   with ass.add_question() as q:
-    q.text = "q2"
+    q.text = "q1.2"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.incorrect += "a2"
+      a.incorrect += "a3"
+      a.incorrect += "a4"
+
+  with ass.add_question() as q:
+    q.text = "q2.1"
     with q.add_answer(Answer.Numerical) as a:
       a.quantity = 1.23
   with ass.add_question() as q:
-    q.text = "q3"
+    q.text = "q2.2"
     with q.add_answer(Answer.Numerical) as a:
       a.quantity = u.Quantity(987654321,'m/s')
   with ass.add_question() as q:
-    q.text = "q4"
+    q.text = "q2.3"
     with q.add_answer(Answer.Numerical) as a:
       a.quantity = u.Quantity(5432,'')
   with ass.add_question() as q:
-    q.text = "q5"
+    q.text = "q2.4"
     with q.add_answer(Answer.Numerical) as a:
       a.quantity = UQ_(Q_(10.234,'m'),Q_(321,'cm'))
+
   with ass.add_question() as q:
-    q.text = "q6"
+    q.text = "q3.1"
     with q.add_answer(Answer.Text) as a:
       a.text = "correct answer"
   with ass.add_question() as q:
-    q.text = "q7"
+    q.text = "q3.2"
     with q.add_answer(Answer.Text) as a:
       a.text = "first correct answer;second correct answer"
   writer.dump(ass)
 
   quiz_text="""\
-MC\tq1\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect
-NUM\tq2\t1.23e+00\t1.23e-02
-NUM\tq3 Give your answer in meter / second.\t9.88e+08\t9.88e+06
-NUM\tq4\t5.43e+03\t5.43e+01
-NUM\tq5 Give your answer in meter.\t1.02e+01\t3.21e+00
-FIB\tq6\tcorrect answer
-FIB\tq7\tfirst correct answer\tsecond correct answer
+MC\tq1.1\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone of the above.\tincorrect
+MC\tq1.2\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tincorrect\tNone of the above.\tcorrect
+NUM\tq2.1\t1.23e+00\t1.23e-02
+NUM\tq2.2 Give your answer in meter / second.\t9.88e+08\t9.88e+06
+NUM\tq2.3\t5.43e+03\t5.43e+01
+NUM\tq2.4 Give your answer in meter.\t1.02e+01\t3.21e+00
+FIB\tq3.1\tcorrect answer
+FIB\tq3.2\tfirst correct answer\tsecond correct answer
 """
 
 

@@ -4,16 +4,16 @@ from ..Assignment.Answer import *
 class BlackboardQuiz(WriterBase):
   def __init__(self,fh=None):
     super().__init__(fh)
-    self._default_relative_numerical_uncertainty = 0.01
-    self._minimum_relative_numerical_uncertainty = 0.01
+    self.config.default_relative_numerical_uncertainty = 0.01
+    self.config.minimum_relative_numerical_uncertainty = 0.01
 
   @property
   def default_relative_numerical_uncertainty(self):
-    return _default_relative_numerical_uncertainty
+    return self.config.default_relative_numerical_uncertainty
 
   @property
   def minimum_relative_numerical_uncertainty(self):
-    return _minimum_relative_numerical_uncertainty
+    return config.minimum_relative_numerical_uncertainty
 
   @default_relative_numerical_uncertainty.setter
   def default_relative_numerical_uncertainty(self,val):
@@ -21,7 +21,7 @@ class BlackboardQuiz(WriterBase):
       val = val.to("")
     except:
       pass
-    _default_relative_numerical_uncertainty = val
+    self.config.default_relative_numerical_uncertainty = val
 
   @minimum_relative_numerical_uncertainty.setter
   def minimum_relative_numerical_uncertainty(self,val):
@@ -30,7 +30,7 @@ class BlackboardQuiz(WriterBase):
     except:
       pass
 
-    _minimum_relative_numerical_uncertainty = val
+    config.minimum_relative_numerical_uncertainty = val
 
 
   def dump(self, ass, fh=None):
@@ -51,9 +51,18 @@ class BlackboardQuiz(WriterBase):
 
     a = q._answer
 
-    if t == "MC" or t == "MA":
-      correct_choices = list(a.correct_formatted_choices)
-      for choice in a.all_formatted_choices:
+    if t == "MC":
+      all_choices = self.MC_Answer_get_all_choices(a)
+      correct_choices = self.MC_Answer_get_correct_choices(a)
+      if len(correct_choices) < 1:
+        raise RuntimeError( "Multiple choice answer to question does not have a correct answer: " + q.text )
+
+      # if there is more than one correct answer
+      # then this should actually be marked as a multiple answer (MA) question.
+      if len(correct_choices) > 1:
+        t = "MA"
+
+      for choice in all_choices:
         toks.append(choice)
         if choice not in correct_choices:
           toks.append("incorrect")
@@ -100,15 +109,17 @@ class BlackboardQuiz(WriterBase):
         pass
 
 
-      if unc is None and self._default_relative_numerical_uncertainty:
-        unc = val*self._default_relative_numerical_uncertainty
+      if unc is None and self.config.default_relative_numerical_uncertainty:
+        unc = val*self.config.default_relative_numerical_uncertainty
 
-      if self._minimum_relative_numerical_uncertainty and unc != None and val*self._minimum_relative_numerical_uncertainty > unc:
-        unc = val*self._minimum_relative_numerical_uncertainty
+      if self.config.minimum_relative_numerical_uncertainty and unc != None and val*self.config.minimum_relative_numerical_uncertainty > unc:
+        unc = val*self.config.minimum_relative_numerical_uncertainty
 
       toks.append("{:.2e}".format(unc))
 
     if t == "FIB":
+      if a.formatted_text == "":
+        raise RuntimeError( "Fill in the blank question does not have an answer: " + q.text )
       answers = a.formatted_text.split(';')
       for answer in answers:
         toks.append(answer)
@@ -129,18 +140,12 @@ class BlackboardQuiz(WriterBase):
       return "NUM"
 
     if isinstance(a,MultipleChoice):
-      if len(list(a.correct_formatted_choices)) < 1:
-        raise RuntimeError( "Multiple choice answer to question does not have a correct answer: " + q.text )
-      if len(list(a.correct_formatted_choices)) == 1:
-        return "MC"
-      return "MA"
+      return "MC"
 
     if isinstance(a,Essay):
       return "ESS"
 
     if isinstance(a,Text):
-      if a.formatted_text == "":
-        raise RuntimeError( "Fill in the blank question does not have an answer: " + q.text )
       return "FIB"
 
     raise RuntimeError( "Answer type was not recognized: " + str(type(a)) )
