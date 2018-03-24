@@ -97,6 +97,9 @@ with {PARENT}.add_answer(Answer.Numerical) as {THIS}:
   try: # multiple choice
     text =  """with {PARENT}.add_answer(Answer.MultipleChoice) as {THIS}:\n""".format(PARENT=parent,THIS=this)
     for correct,choice in a.choices:
+      if choice == "None of the above.":
+        continue
+
       if correct:
         text += """  {THIS}.correct += '''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
       else:
