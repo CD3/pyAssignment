@@ -88,8 +88,8 @@ class set_state_context(object):
     self.saved_state = None
 
 class collection(list):
-  def __init__(self):
-    super().__init__()
+  def __init__(self,*args,**kwargs):
+    super().__init__(*args,**kwargs)
 
   def find(self, pattern, exact=True):
     if exact:
@@ -103,10 +103,7 @@ class collection(list):
   def __iadd__(self,val):
     if not isinstance(val,list):
       val = [val]
-    for item in val:
-      self.append(item)
-
-    return self
+    return super().__iadd__(val)
 
 class LatexAux(object):
   def __init__(self,filename):

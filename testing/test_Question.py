@@ -168,12 +168,19 @@ def test_copying():
   q2 = copy.deepcopy(q)
 
   q2.text = q.text.replace('1','2')
+  q2.answer.correct = "the correct answer"
 
   assert q.text == "question 1"
-  assert q2.text == "question 2"
   assert len(list(q.answer.all_formatted_choices)) == 2
-  assert list(q.answer.all_formatted_choices)[0] == "correct answer"
-  assert list(q.answer.all_formatted_choices)[1] == "incorrect answer"
+  assert "correct answer" in list(q.answer.all_formatted_choices)
+  assert "incorrect answer" in list(q.answer.all_formatted_choices)
+
+  assert q2.text == "question 2"
   assert len(list(q2.answer.all_formatted_choices)) == 2
-  assert list(q2.answer.all_formatted_choices)[0] == "correct answer"
-  assert list(q2.answer.all_formatted_choices)[1] == "incorrect answer"
+  assert "the correct answer" in list(q2.answer.all_formatted_choices)
+  assert "incorrect answer" in list(q2.answer.all_formatted_choices)
+
+  q2.answer.incorrect = "the incorrect answer"
+  assert len(list(q2.answer.all_formatted_choices)) == 2
+  assert "the correct answer" in list(q2.answer.all_formatted_choices)
+  assert "the incorrect answer" in list(q2.answer.all_formatted_choices)
