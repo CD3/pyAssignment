@@ -94,3 +94,30 @@ def test_figures():
   assert ass._figures[1].filename == "image.png"
   assert ass._figures[1].caption == "figure for question {id}"
   assert ass._figures[1].formatted_caption == "figure for question 1234"
+
+def test_information():
+
+  ass = Assignment()
+
+  with ass.add_information() as info:
+    info.text = "For each of the problems below..."
+
+  with ass.add_question() as q:
+    q.text = "Question 1"
+
+  with ass.add_question() as q:
+    q.text = "Question 2"
+
+  with ass.add_information() as info:
+    info.text = "For the next problem, assume..."
+
+  with ass.add_question() as q:
+    q.text = "Question 3"
+
+
+  assert len(ass._questions) == 3
+  assert len(ass._information) == 2
+  assert ass._information[0][0] == 0
+  assert ass._information[1][0] == 2
+  assert ass._information[0][1].text == "For each of the problems below..."
+  assert ass._information[1][1].text == "For the next problem, assume..."
