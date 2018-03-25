@@ -10,7 +10,7 @@ class Assignment(Element):
   def __init__(self):
     super().__init__()
     self._questions = []
-    self._information = []
+    self._information = {}
     self._figures   = []
 
 
@@ -39,8 +39,7 @@ class Assignment(Element):
     # 2. Create an Information object yeild it.
 
     pos = len(self._questions)
-    info = Information()
-
-    self._information.append( [pos,info] )
-    self._information[-1][1].NS.__dict__.update( self.NS.__dict__ )
-    yield self._information[-1][1]
+    if pos not in self._information:
+      self._information[pos] = Information()
+    self._information[pos].NS.__dict__.update( self.NS.__dict__ )
+    yield self._information[pos]

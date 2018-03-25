@@ -117,7 +117,7 @@ def test_information():
 
   assert len(ass._questions) == 3
   assert len(ass._information) == 2
-  assert ass._information[0][0] == 0
-  assert ass._information[1][0] == 2
-  assert ass._information[0][1].text == "For each of the problems below..."
-  assert ass._information[1][1].text == "For the next problem, assume..."
+  assert 0 in ass._information
+  assert 2 in ass._information
+  assert ass._information[0].text == "For each of the problems below..."
+  assert ass._information[2].text == "For the next problem, assume..."
