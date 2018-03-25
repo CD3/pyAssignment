@@ -183,6 +183,30 @@ FIB\tq3.2\tfirst correct answer\tsecond correct answer
 
 
   assert fh.getvalue() == quiz_text
+
+def test_blackboard_quiz_writer_output_with_macros():
+  fh = io.StringIO()
+  writer = Writers.BlackboardQuiz(fh)
+
+  ass = Assignment()
+  with ass.add_question() as q:
+    q.text = r"q1.1 $\nabla \rho = 0$"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.incorrect += "a2"
+      a.incorrect += "a3"
+      a.correct += "a4"
+  writer.dump(ass)
+
+  quiz_text="""\
+MC\tq1.1\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone of the above.\tincorrect
+"""
+
+
+
+
+  assert fh.getvalue() == quiz_text
+  
   
 
 def test_latex_writer():

@@ -1,6 +1,15 @@
 from .WriterBase import *
 from ..Assignment.Answer import *
 
+import pyparsing
+
+try:
+  import macro_expander
+  have_macro_expander = True
+except:
+  have_macro_expander = False
+
+
 class BlackboardQuiz(WriterBase):
   def __init__(self,fh=None):
     super().__init__(fh)
@@ -37,6 +46,19 @@ class BlackboardQuiz(WriterBase):
     fh = super().get_fh(fh)
 
     self._dump_questions(ass._questions, fh)
+
+  def _format_line(self,text):
+    if have_macro_expander:
+      latex_math = pyparsing.QuotedString( quoteChar='$' )
+      def latex_math_to_mathimg(s,loc,toks):
+        return [ r'\mathimg[o="html"]{%s}'%t for t in toks ]
+      latex_math.addParseAction(latex_math_to_mathimg)
+      text = latex_math.transformString(text)
+
+      proc = macro_expander.MacroProcessor()
+      text = proc.process(text)
+
+    return text
 
   def _dump_questions(self,qs,fh,level=0):
     for q in qs:
@@ -125,7 +147,7 @@ class BlackboardQuiz(WriterBase):
         toks.append(answer)
 
 
-    fh.write("\t".join(toks)+"\n")
+    fh.write(self._format_line("\t".join(toks)+"\n"))
       
        
 
