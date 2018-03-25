@@ -44,7 +44,7 @@ def test_simple_writer():
 
   # assert fh.getvalue() == "1. q1\n  1. q1p1\n  2. q1p2\n2. q2\n  1. q2p1\n  2. q2p2\n"
 
-def test_latex_writer():
+def test_latex_writer_raises_with_no_fh():
   ass = Assignment()
 
   with ass.add_question() as q:
@@ -225,6 +225,8 @@ def test_latex_writer():
                       }
                     }
 
+  with ass.add_information() as info:
+    info.text = "This is some information for the assignment."
 
   with ass.add_question() as q:
     q.text = "q1"

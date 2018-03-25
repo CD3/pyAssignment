@@ -2,6 +2,7 @@ from .WriterBase import *
 from ..Assignment import *
 
 from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate,Figure
+from pylatex.section import Section,Paragraph
 from pylatex.utils import italic, NoEscape
 
 
@@ -59,10 +60,15 @@ class Latex(WriterBase):
     while len(enumeration_symbols) < 5:
       enumeration_symbols.append(r'\arabic*.')
         
+    for i in sorted(ass._information.keys()):
+      info = ass._information[i]
+      doc.append(NoEscape(info.formatted_text))
+
     level = 0
     with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
       level += 1
-      for q in ass._questions:
+      for i in range(len(ass._questions)):
+        q = ass._questions[i]
         label = r"\label{%s}"%q._uuid
         if q.meta.has('label'):
           label += r"\label{%s}"%q.meta.label
