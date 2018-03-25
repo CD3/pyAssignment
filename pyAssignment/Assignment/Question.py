@@ -1,5 +1,5 @@
 from .Element import *
-from .Answer import *
+from .Answers import *
 
 class Question(Element):
   """A class representing a question.

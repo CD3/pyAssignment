@@ -4,7 +4,7 @@ import io,os
 
 from pyAssignment.Assignment import Assignment
 import pyAssignment.Writers as Writers
-import pyAssignment.Assignment.Answer as Answer
+import pyAssignment.Assignment.Answers as Answer
 
 import pint
 u = pint.UnitRegistry()

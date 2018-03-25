@@ -160,7 +160,7 @@ with open(args.output,'w') as f:
   # SETUP
   f.write("import os,sys, subprocess\n")
   f.write("from pyAssignment.Assignment import Assignment\n")
-  f.write("import pyAssignment.Assignment.Answer as Answer\n")
+  f.write("import pyAssignment.Assignment.Answers as Answer\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
   f.write("from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz\n")
 

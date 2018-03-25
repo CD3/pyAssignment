@@ -1,5 +1,5 @@
 from ..Assignment import *
-from ..Assignment.Answer import *
+from ..Assignment.Answers import *
 
 class ReaderBase(object):
   def __init__(self,fh=None):

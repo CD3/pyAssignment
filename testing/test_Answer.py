@@ -1,14 +1,14 @@
 import pytest
-import pyAssignment.Assignment.Answer as Answer
+import pyAssignment.Assignment.Answers as Answers
 
 def test_Numerical():
 
-  a = Answer.Numerical()
+  a = Answers.Numerical()
 
   a.quantity = 1.2
   assert a.quantity == 1.2
 
-  a = Answer.Numerical()
+  a = Answers.Numerical()
   assert a.quantity is None
 
   a.NS.x = 2
@@ -27,7 +27,7 @@ def test_Numerical():
   
 def test_MultipleChoice_choices_property():
 
-  a = Answer.MultipleChoice()
+  a = Answers.MultipleChoice()
 
   a.choices  = "one"
   a.choices += "two"
@@ -45,7 +45,7 @@ def test_MultipleChoice_choices_property():
   assert len(list(a.incorrect_formatted_choices)) == 3
 
 
-  a = Answer.MultipleChoice()
+  a = Answers.MultipleChoice()
 
   a.choices  = "one"
   a.choices += "two"
@@ -65,7 +65,7 @@ def test_MultipleChoice_choices_property():
 
 
 def test_MultipleChoice_correct_incorrect_properties():
-  a = Answer.MultipleChoice()
+  a = Answers.MultipleChoice()
 
   a.incorrect = "incorrect"
   a.correct   = "correct"
@@ -85,7 +85,7 @@ def test_MultipleChoice_correct_incorrect_properties():
   assert len(list(a.incorrect_formatted_choices)) == 2
 
 
-  a = Answer.MultipleChoice()
+  a = Answers.MultipleChoice()
 
   a.incorrect += "1"
   a.incorrect += "2"
@@ -104,7 +104,7 @@ def test_MultipleChoice_correct_incorrect_properties():
 
 def test_Text():
   
-  a = Answer.Text()
+  a = Answers.Text()
 
   a.text = "the"
   a.text += " answer"

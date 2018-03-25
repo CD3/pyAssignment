@@ -1,6 +1,6 @@
 from .Element import *
 from .Question import *
-from .Answer import *
+from .Answers import *
 from .Figure import *
 
 class Assignment(Element):

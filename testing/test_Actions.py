@@ -4,7 +4,7 @@ import io,os,shutil
 
 from pyAssignment.Assignment import Assignment
 import pyAssignment.Actions as Actions
-import pyAssignment.Assignment.Answer as Answer
+import pyAssignment.Assignment.Answers as Answer
 
 def test_problem_set_builder():
   ass = Assignment()

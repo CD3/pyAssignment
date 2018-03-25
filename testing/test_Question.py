@@ -1,7 +1,7 @@
 import pytest
 import copy
 from pyAssignment.Assignment.Question import Question
-from pyAssignment.Assignment.Answer  import MultipleChoice
+from pyAssignment.Assignment.Answers  import MultipleChoice
 # from .Utils import Approx
 
 def test_adding_text():

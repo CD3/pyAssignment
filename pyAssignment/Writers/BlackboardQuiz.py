@@ -1,5 +1,5 @@
 from .WriterBase import *
-from ..Assignment.Answer import *
+from ..Assignment.Answers import *
 
 import pyparsing
 
