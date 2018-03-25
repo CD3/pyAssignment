@@ -35,6 +35,13 @@ class Question(Element):
   def formatted_text(self):
     return self._formatter.fmt( self._text, **self.NS.__dict__ )
 
+  @property
+  def answer(self):
+    return self._answer
+
+  @answer.setter
+  def answer(self,val):
+    self._answer = val
 
 
 

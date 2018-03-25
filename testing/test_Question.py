@@ -1,5 +1,7 @@
 import pytest
+import copy
 from pyAssignment.Assignment.Question import Question
+from pyAssignment.Assignment.Answer  import MultipleChoice
 # from .Utils import Approx
 
 def test_adding_text():
@@ -128,3 +130,50 @@ def test_text():
     setting text.
     '''
   assert q.text == "\n    setting text.\n    "
+
+def test_adding_answer():
+  q = Question()
+  with q.add_answer(MultipleChoice) as a:
+    a.correct += "c1"
+    a.incorrect += "i1"
+
+  assert type(q._answer) == MultipleChoice
+  assert type(q.answer) == MultipleChoice
+  assert len(q.answer.choices) == 2
+  assert q.answer.choices[0] == "c1"
+  assert q.answer.choices[1] == "i1"
+  
+  a = MultipleChoice()
+  a.correct = 'correct'
+  a.incorrect += 'incorrect 1'
+  a.incorrect += 'incorrect 2'
+
+  q.answer = a
+
+  assert type(q.answer) == MultipleChoice
+  assert len(q.answer.choices) == 3
+  assert q.answer.choices[0] == "correct"
+  assert q.answer.choices[1] == "incorrect 1"
+  assert q.answer.choices[2] == "incorrect 2"
+
+
+def test_copying():
+  q = Question()
+  q.text = "question 1"
+
+  with q.add_answer(MultipleChoice) as a:
+    a.correct   += "correct answer"
+    a.incorrect += "incorrect answer"
+
+  q2 = copy.deepcopy(q)
+
+  q2.text = q.text.replace('1','2')
+
+  assert q.text == "question 1"
+  assert q2.text == "question 2"
+  assert len(list(q.answer.all_formatted_choices)) == 2
+  assert list(q.answer.all_formatted_choices)[0] == "correct answer"
+  assert list(q.answer.all_formatted_choices)[1] == "incorrect answer"
+  assert len(list(q2.answer.all_formatted_choices)) == 2
+  assert list(q2.answer.all_formatted_choices)[0] == "correct answer"
+  assert list(q2.answer.all_formatted_choices)[1] == "incorrect answer"
