@@ -1,6 +1,6 @@
 import pytest
 
-import io
+import io,os
 
 from pyAssignment.Assignment import Assignment
 import pyAssignment.Writers as Writers
@@ -190,7 +190,7 @@ def test_blackboard_quiz_writer_output_with_macros():
 
   ass = Assignment()
   with ass.add_question() as q:
-    q.text = r"q1.1 $\nabla \rho = 0$"
+    q.text = r"q1.1 \shell[strip]{pwd}"
     with q.add_answer(Answer.MultipleChoice) as a:
       a.incorrect += "a1"
       a.incorrect += "a2"
@@ -199,8 +199,8 @@ def test_blackboard_quiz_writer_output_with_macros():
   writer.dump(ass)
 
   quiz_text="""\
-MC\tq1.1\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone of the above.\tincorrect
-"""
+MC\tq1.1 {CWD}\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone of the above.\tincorrect
+""".format(CWD=os.path.abspath(os.getcwd()))
 
 
 
