@@ -1,0 +1,75 @@
+#! /usr/bin/env python
+
+import os,sys,stat
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description="Generate pyAssignment scripts from pyHomework scripts.")
+
+parser.add_argument("-o", "--output",
+                    action="store",
+                    default="/dev/stdout",
+                    help="Output file")
+
+parser.add_argument("-x", "--overwrite",
+                    action="store_true",
+                    default=False,
+                    help="Overwrite output file if it exists")
+
+args = parser.parse_args()
+
+if os.path.exists(args.output) and not args.overwrite:
+  print("Output file (%s) exists. Use -x option if you want to overwrite."%args.output)
+  sys.exit(1)
+
+text = r"""#! /usr/bin/env python
+
+import os,sys, subprocess
+from pyAssignment.Assignment import Assignment
+import pyAssignment.Assignment.Answers as Answer
+from pyAssignment.Writers import Simple,Latex
+from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz
+import numpy
+import pint
+units = pint.UnitRegistry()
+Q_ = units.Quantity
+
+ass = Assignment()
+ass.meta.title = 'Title'
+ass.meta.header = dict()
+ass.meta.header['L'] = ''
+ass.meta.header['C'] = 'FHSU'
+ass.meta.header['R'] = ''
+ass.meta.footer = dict()
+ass.meta.footer['L'] = 'Last Updated: \today{} \currenttime{}'
+ass.meta.footer['C'] = ''
+ass.meta.footer['R'] = 'Powered by \LaTeX'
+
+
+with ass.add_question() as q:
+  q.text = r'''Question 1'''
+  q.NS.var = Q_(1,'')
+
+  with q.add_question() as qq:
+    qq.text = r'''Quiz question'''
+    with qq.add_answer(Answer.Numerical) as a:
+      a.quantity = Q_(1,'')
+
+with ass.add_question() as q:
+  q.text = r'''Question 2'''
+
+  with q.add_part() as p:
+    p.text = r'''Part 1'''
+    with p.add_question() as qq:
+      qq.text = r'''Quiz question'''
+    with qq.add_answer(Answer.Numerical) as a:
+      a.quantity = Q_(1,'')
+
+basename = os.path.basename(__file__).replace(".py","")
+BuildProblemSetAndBlackboardQuiz(ass,basename,remove=True)
+"""
+
+with open(args.output,'w') as f:
+  f.write(text)
+
+st = os.stat(args.output)
+os.chmod(args.output, st.st_mode | stat.S_IEXEC)
