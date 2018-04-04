@@ -39,7 +39,7 @@ def trans(line):
 script_lines = [ trans(line) for line in filter( filt, input_lines ) ]
 script_text = "".join(script_lines)
 
-script_dir = os.path.dirname(args.homework_script)
+script_dir = os.path.abspath(os.path.dirname(args.homework_script))
 
 currdir = os.getcwd()
 os.chdir(script_dir)
