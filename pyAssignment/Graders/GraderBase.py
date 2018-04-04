@@ -6,4 +6,4 @@ class GraderBase(object):
 
   @property
   def NS(self):
-    return selt._namespace
+    return self._namespace

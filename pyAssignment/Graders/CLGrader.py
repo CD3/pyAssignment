@@ -20,11 +20,13 @@ def run(cmd,**kwargs):
 
 class ShellTest(object):
   def __init__(self):
-    self._name = ""
+    self._name = None
+    self._desc = None
     self._cmds = collection()
     self._o = None
     self._e = None
     self._r = None
+    self._dir = None
 
     self._namespace = Namespace()
     self._formatter = SFFormatter()
@@ -35,7 +37,8 @@ class ShellTest(object):
 
   @property
   def command(self):
-    return ";".join(self._cmds)
+    cmds = ["cd %s"%self._dir] + self._cmds if self._dir else self._cmds
+    return self._formatter.fmt( ";".join( cmds ), **self.NS.__dict__ )
 
   @command.setter
   def command(self,val):
@@ -43,8 +46,7 @@ class ShellTest(object):
     self._cmds.append(val)
 
   def run(self):
-    cmd = self._formatter.fmt( ";".join(self._cmds), **self.NS.__dict__ )
-    self._r,self._o,self._e = run(cmd)
+    self._r,self._o,self._e = run(self.command)
 
 
   @property
@@ -59,6 +61,31 @@ class ShellTest(object):
   def error(self):
     return self._e
 
+  @property
+  def directory(self):
+    if self._dir is None:
+      return None
+    else:
+      return self._formatter.fmt( self._dir, **self.NS.__dict__ )
+
+  @directory.setter
+  def directory(self,val):
+    self._dir = val
+
+  @property
+  def description(self):
+    if self._desc is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._desc , **self.NS.__dict__ )
+
+  @property
+  def name(self):
+    if self._name is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._name , **self.NS.__dict__ )
+
   @contextlib.contextmanager
   def add_fail_callback(self):
     pass
@@ -69,6 +96,8 @@ class CLGrader(GraderBase):
   def __init__(self):
     super().__init__()
     self._tests = collection()
+
+    self._dir = None
 
   def run(self):
     for t in self._tests:
@@ -94,10 +123,41 @@ class CLGrader(GraderBase):
         n += 1
     return n
 
+  @property
+  def summary(self):
+    s = ""
+    for t in self._tests:
+      if t.returncode is None:
+        s += "DID NOT RUN\n"
+        continue
+      if t.returncode == 0:
+        s += "PASS"
+      if t.returncode != 0:
+        s += "FAIL"
+      s += "  "
+      s += t.name
+      s += ": "
+      s += t.description
+      s += "\n"
+
+    return s
 
   @contextlib.contextmanager
   def add_test(self):
     t = ShellTest()
+    t.NS.__dict__.update( self.NS.__dict__ )
+    t.directory = self._dir
     yield t
+    if t._name is None:
+      t._name = "Test "+str(len(self._tests))
+    if t._desc is None:
+      t._desc = t.command
     self._tests.append(t)
+
+  @contextlib.contextmanager
+  def directory(self,dir):
+    odir = self._dir
+    self._dir = dir
+    yield
+    self._dir = odir
 
