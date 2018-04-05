@@ -37,8 +37,8 @@ class ShellTest(object):
 
   @property
   def command(self):
-    cmds = ["cd %s"%self._dir] + self._cmds if self._dir else self._cmds
-    return self._formatter.fmt( ";".join( cmds ), **self.NS.__dict__ )
+    startup = "cd %s;"%self._dir if self._dir is not None else ""
+    return self._formatter.fmt( startup+";".join( self._cmds), **self.NS.__dict__ )
 
   @command.setter
   def command(self,val):
@@ -79,12 +79,20 @@ class ShellTest(object):
     else:
       return self._formatter.fmt( self._desc , **self.NS.__dict__ )
 
+  @description.setter
+  def description(self,val):
+    self._desc = val
+
   @property
   def name(self):
     if self._name is None:
       return ""
     else:
       return self._formatter.fmt( self._name , **self.NS.__dict__ )
+
+  @name.setter
+  def name(self,val):
+    self._name = val
 
   @contextlib.contextmanager
   def add_fail_callback(self):
@@ -149,9 +157,7 @@ class CLGrader(GraderBase):
     t.directory = self._dir
     yield t
     if t._name is None:
-      t._name = "Test "+str(len(self._tests))
-    if t._desc is None:
-      t._desc = t.command
+      t.name = "Test "+str(len(self._tests))
     self._tests.append(t)
 
   @contextlib.contextmanager

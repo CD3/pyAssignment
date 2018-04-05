@@ -1,7 +1,7 @@
 import pytest
-import os
+import os,pickle
 
-from pyAssignment.Graders.CLGrader import CLGrader
+from pyAssignment.Graders.CLGrader import CLGrader, ShellTest
 
 def test_CLGrader_simple():
   g = CLGrader()
@@ -15,6 +15,8 @@ def test_CLGrader_simple():
   g.run()
 
   assert os.path.isfile("file1.txt")
+
+  os.remove("file1.txt")
 
 def test_CLGrader_tests_summary():
   g = CLGrader()
@@ -84,6 +86,35 @@ def test_CLGrader_workdir():
     assert g._tests[i].command.startswith("cd")
     assert g._tests[i].directory == "test"
     assert g._tests[i].output.strip() == os.path.join(os.getcwd(),"test")
+
+def test_CLGrader_shelltest_pickle():
+  t = ShellTest()
+  t.command = "pwd"
+  t2 = pickle.loads( pickle.dumps(t) )
+
+  assert len(t2._cmds) == 1
+  assert t2._cmds[0] == "pwd"
+  assert t2.command == "pwd"
+
+  t = ShellTest()
+  t.command = "ls {DIR}"
+  t.NS.DIR = "dir1"
+  t2 = pickle.loads( pickle.dumps(t) )
+
+  assert len(t2._cmds) == 1
+  assert t2._cmds[0] == "ls {DIR}"
+  assert t2.command == "ls dir1"
+  assert t2.NS.DIR  == "dir1"
+
+def test_CLGrader_clgrader_pickle():
+  g = CLGrader()
+
+  with g.add_test() as t:
+    t.NS.FILE = "file1.txt"
+    t.command = "touch {FILE}"
+
+
+  g2 = pickle.loads( pickle.dumps(g) )
 
 @pytest.mark.skip()
 def test_CLGrader_multiple_commands():
