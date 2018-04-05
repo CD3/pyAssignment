@@ -1,4 +1,5 @@
 from ..Utils import Namespace, collection
+import pickle
 
 class GraderBase(object):
   def __init__(self):

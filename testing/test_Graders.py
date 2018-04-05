@@ -36,13 +36,12 @@ def test_CLGrader_tests_summary():
 
   assert g.num_tests == 5
   assert g.num_fail == 2
-  assert g.num_success == 3
+  assert g.num_pass == 3
 
   assert g.summary.split("\n")[0].startswith("PASS")
   assert g.summary.split("\n")[1].startswith("PASS")
   assert g.summary.split("\n")[2].startswith("FAIL")
   assert g.summary.split("\n")[-1] == ""
-  assert len(g.summary.split("\n")) == 6
 
 def test_CLGrader_namespace_inheritance():
   g = CLGrader()
@@ -116,6 +115,26 @@ def test_CLGrader_clgrader_pickle():
 
   g2 = pickle.loads( pickle.dumps(g) )
 
+def test_CLGrader_grader_script():
+  g = CLGrader()
+
+  with g.add_test() as t:
+    t.NS.FILE = "file1.txt"
+    t.command = "touch {FILE}"
+
+  with g.add_test() as t:
+    t.command = "test 1 -eq 0"
+    t.description = "test that will fail"
+
+  with g.add_test() as t:
+    t.command = "tst 1 -eq 0"
+    t.description = "another test that will fail"
+
+  with g.add_test() as t:
+    t.command = "pwd"
+
+  g.write_grader_script("grader.py")
+
 @pytest.mark.skip()
 def test_CLGrader_multiple_commands():
   g = CLGrader()
@@ -140,7 +159,7 @@ def test_CLGrader_on_fail_extra_commands():
     t.commands += "test -f {IMAGENAME}"
 
     t.on_fail = "touch {IMAGENAME}"
-    t.on_success = None
+    t.on_pass = None
 
 
 @pytest.mark.skip()

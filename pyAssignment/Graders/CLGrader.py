@@ -124,7 +124,7 @@ class CLGrader(GraderBase):
     return n
 
   @property
-  def num_success(self):
+  def num_pass(self):
     n = 0
     for t in self._tests:
       if t.returncode is not None and t.returncode == 0:
@@ -147,6 +147,19 @@ class CLGrader(GraderBase):
       s += ": "
       s += t.description
       s += "\n"
+      if t.returncode != 0:
+        s += "  error msg: "
+        s += t.error
+        s += "\n"
+    s += "\n\n"
+    s +="Summary\n"
+    s += "    fail: %d\n"%self.num_fail
+    s += "    pass: %d\n"%self.num_pass
+    s += " missing: %d\n"%(self.num_tests - self.num_pass - self.num_fail)
+    s += "===========================\n"
+    s += "total: %d\n"%self.num_tests
+    s += "score: %.2f%%\n"%(100.*self.num_pass/self.num_tests)
+
 
     return s
 
@@ -166,4 +179,17 @@ class CLGrader(GraderBase):
     self._dir = dir
     yield
     self._dir = odir
+
+
+  def write_grader_script(self,fn):
+    with open(fn,'w') as f:
+      f.write("script = ")
+      f.write(str(pickle.dumps(self)))
+      f.write("\n")
+
+
+      f.write("import pickle\n")
+      f.write("g = pickle.loads(script)\n")
+      f.write("g.run()\n")
+      f.write("print(g.summary)\n")
 
