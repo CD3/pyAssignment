@@ -148,6 +148,9 @@ class CLGrader(GraderBase):
       s += t.description
       s += "\n"
       if t.returncode != 0:
+        s += "  return code: "
+        s += str(t.returncode)
+        s += "\n"
         s += "  error msg: "
         s += t.error
         s += "\n"
