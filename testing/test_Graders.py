@@ -135,6 +135,51 @@ def test_CLGrader_grader_script():
 
   g.write_grader_script("grader.py")
 
+
+def test_CLGrader_on_fail_callback():
+  if os.path.exists("ON_FAIL_CMD.txt"):
+    os.remove("ON_FAIL_CMD.txt")
+  if os.path.exists("ON_PASS_CMD.txt"):
+    os.remove("ON_PASS_CMD.txt")
+
+  assert not os.path.exists("ON_FAIL_CMD.txt")
+  assert not os.path.exists("ON_PASS_CMD.txt")
+
+  g = CLGrader()
+  with g.add_test() as t:
+    t.command = "doe-not-exist-cmd arg1 arg2"
+    with t.add_on_fail_test() as ft:
+      ft.command = 'touch ON_FAIL_CMD.txt'
+    with t.add_on_pass_test() as pt:
+      pt.command = 'touch ON_PASS_CMD.txt'
+
+  g.run()
+
+  assert os.path.exists("ON_FAIL_CMD.txt")
+  assert not os.path.exists("ON_PASS_CMD.txt")
+
+def test_CLGrader_on_pass_callback():
+  if os.path.exists("ON_FAIL_CMD.txt"):
+    os.remove("ON_FAIL_CMD.txt")
+  if os.path.exists("ON_PASS_CMD.txt"):
+    os.remove("ON_PASS_CMD.txt")
+
+  assert not os.path.exists("ON_FAIL_CMD.txt")
+  assert not os.path.exists("ON_PASS_CMD.txt")
+
+  g = CLGrader()
+  with g.add_test() as t:
+    t.command = "ls"
+    with t.add_on_fail_test() as ft:
+      ft.command = 'touch ON_FAIL_CMD.txt'
+    with t.add_on_pass_test() as pt:
+      pt.command = 'touch ON_PASS_CMD.txt'
+
+  g.run()
+
+  assert not os.path.exists("ON_FAIL_CMD.txt")
+  assert os.path.exists("ON_PASS_CMD.txt")
+
 @pytest.mark.skip()
 def test_CLGrader_multiple_commands():
   g = CLGrader()
@@ -162,23 +207,6 @@ def test_CLGrader_on_fail_extra_commands():
     t.on_pass = None
 
 
-@pytest.mark.skip()
-def test_CLGrader_on_fail_callback():
-  g = CLGrader()
-
-
-  with a.add_test() as t:
-    t.NS.SCRIPTNAME = "cos.gnuplot"
-    t.NS.IMAGENAME = "cos.png"
-
-    t.directory = "gnuplot"
-    t.commands += "gnuplot {SCRIPTNAME}"
-    t.commands += "test -f {IMAGENAME}"
-
-    with t.add_fail_callback() as f:
-      f.commands += 'gnuplot $(find_file "{SCRIPTNAME}")'
-      with f.add_fail_callback() as ff:
-        ff.commands += '''gnuplot -e 'set term png; set ouptut "{IMAGENAME}"' $(find_file "{SCRIPTNAME}")'''
 
 
 @pytest.mark.skip()

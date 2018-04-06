@@ -28,6 +28,9 @@ class ShellTest(object):
     self._r = None
     self._dir = None
 
+    self._on_fail_tests = collection()
+    self._on_pass_tests = collection()
+
     self._namespace = Namespace()
     self._formatter = SFFormatter()
 
@@ -47,6 +50,14 @@ class ShellTest(object):
 
   def run(self):
     self._r,self._o,self._e = run(self.command)
+    if self._r == 0 and len(self._on_pass_tests) > 0:
+      for t in self._on_pass_tests:
+        t.run()
+    if self._r != 0 and len(self._on_fail_tests) > 0:
+      for t in self._on_fail_tests:
+        t.run()
+
+
 
 
   @property
@@ -95,8 +106,24 @@ class ShellTest(object):
     self._name = val
 
   @contextlib.contextmanager
-  def add_fail_callback(self):
-    pass
+  def add_on_fail_test(self):
+    t = ShellTest()
+    t.NS.__dict__.update( self.NS.__dict__ )
+    t.directory = self._dir
+    yield t
+    if t._name is None:
+      t.name = "Failure Follow-up Test "+str(len(self._on_fail_tests))
+    self._on_fail_tests.append(t)
+
+  @contextlib.contextmanager
+  def add_on_pass_test(self):
+    t = ShellTest()
+    t.NS.__dict__.update( self.NS.__dict__ )
+    t.directory = self._dir
+    yield t
+    if t._name is None:
+      t.name = "Success Follow-up Test "+str(len(self._on_pass_tests))
+    self._on_pass_tests.append(t)
 
 
 
