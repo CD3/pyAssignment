@@ -28,6 +28,8 @@ class ShellTest(object):
     self._r = None
     self._dir = None
 
+    self._pts = None
+
     self._on_fail_tests = collection()
     self._on_pass_tests = collection()
 
@@ -39,6 +41,29 @@ class ShellTest(object):
     return self._namespace
 
   @property
+  def name(self):
+    if self._name is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._name , **self.NS.__dict__ )
+
+  @name.setter
+  def name(self,val):
+    self._name = val
+
+  @property
+  def description(self):
+    if self._desc is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._desc , **self.NS.__dict__ )
+
+  @description.setter
+  def description(self,val):
+    self._desc = val
+
+
+  @property
   def command(self):
     startup = "cd %s;"%self._dir if self._dir is not None else ""
     return self._formatter.fmt( startup+";".join( self._cmds), **self.NS.__dict__ )
@@ -47,18 +72,6 @@ class ShellTest(object):
   def command(self,val):
     self._cmds = collection()
     self._cmds.append(val)
-
-  def run(self):
-    self._r,self._o,self._e = run(self.command)
-    if self._r == 0 and len(self._on_pass_tests) > 0:
-      for t in self._on_pass_tests:
-        t.run()
-    if self._r != 0 and len(self._on_fail_tests) > 0:
-      for t in self._on_fail_tests:
-        t.run()
-
-
-
 
   @property
   def returncode(self):
@@ -72,6 +85,7 @@ class ShellTest(object):
   def error(self):
     return self._e
 
+
   @property
   def directory(self):
     if self._dir is None:
@@ -83,27 +97,15 @@ class ShellTest(object):
   def directory(self,val):
     self._dir = val
 
-  @property
-  def description(self):
-    if self._desc is None:
-      return ""
-    else:
-      return self._formatter.fmt( self._desc , **self.NS.__dict__ )
+  def run(self):
+    self._r,self._o,self._e = run(self.command)
+    if self._r == 0 and len(self._on_pass_tests) > 0:
+      for t in self._on_pass_tests:
+        t.run()
+    if self._r != 0 and len(self._on_fail_tests) > 0:
+      for t in self._on_fail_tests:
+        t.run()
 
-  @description.setter
-  def description(self,val):
-    self._desc = val
-
-  @property
-  def name(self):
-    if self._name is None:
-      return ""
-    else:
-      return self._formatter.fmt( self._name , **self.NS.__dict__ )
-
-  @name.setter
-  def name(self,val):
-    self._name = val
 
   @contextlib.contextmanager
   def add_on_fail_test(self):

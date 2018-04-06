@@ -180,16 +180,27 @@ def test_CLGrader_on_pass_callback():
   assert not os.path.exists("ON_FAIL_CMD.txt")
   assert os.path.exists("ON_PASS_CMD.txt")
 
-@pytest.mark.skip()
-def test_CLGrader_multiple_commands():
+def test_CLGrader_command_plusequal():
   g = CLGrader()
 
-  with a.add_test() as t:
-    t.NS.DIR = "dir1"
-    t.NS.FILE = "file.txt"
+  if os.path.exists("first-file.txt"):
+    os.remove("first-file.txt")
+  if os.path.exists("second-file.txt"):
+    os.remove("second-file.txt")
 
-    t.commands += "test -d {DIR}"
-    t.commands += "test -f {DIR}/{FILE}"
+  with g.add_test() as t:
+    t.NS.FILE1 = "first-file.txt"
+    t.NS.FILE2 = "second-file.txt"
+
+    t.command += "touch {FILE1};"
+    t.command += "touch {FILE2};"
+
+  g.run()
+  assert os.path.exists("first-file.txt")
+  assert os.path.exists("second-file.txt")
+
+  os.remove("first-file.txt")
+  os.remove("second-file.txt")
 
 @pytest.mark.skip()
 def test_CLGrader_on_fail_extra_commands():
