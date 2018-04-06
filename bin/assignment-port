@@ -47,8 +47,6 @@ sys.path.append( script_dir )
 exec(script_text)
 os.chdir(currdir)
 
-
-
 def fmt_NS_var(v):
   try:
     mag = v.magnitude
@@ -132,6 +130,14 @@ with ass.add_figure() as f:
 """.format(CAPTION=' '.join(f._caption),FILENAME=f.filename,LABEL=''.join(f._label))
   return text
 
+def fmt_GradeTest(n,cs):
+  text = """\
+with g.add_test() as t:
+  t.name = '''{NAME}'''
+  t.command = '''{CMD}'''
+""".format(NAME=n,CMD=';'.join(cs))
+  return text
+
 def indent(text,level=1,chars="  "):
   if level == 0:
     return text
@@ -160,6 +166,7 @@ with open(args.output,'w') as f:
   f.write("import pyAssignment.Assignment.Answers as Answer\n")
   f.write("from pyAssignment.Writers import Simple,Latex\n")
   f.write("from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz\n")
+  f.write("from pyAssignment.Graders.CLGrader import CLGrader\n")
 
   f.write('''\
 import numpy
@@ -246,13 +253,23 @@ Q_ = units.Quantity
       f.write( indent(fmt_Question(qq),1,"#") )
   f.write("#############################\n")
 
+  try:
+    len(g._items)
+    f.write("g = CLGrader()\n")
+    for k in g._items:
+      f.write( fmt_GradeTest(k,g._items[k]) )
+  except: pass
 
   f.write("""\
 
 basename = os.path.basename(__file__).replace(".py","")
 BuildProblemSetAndBlackboardQuiz(ass,basename,remove=True)
-
-
 """)
+  try:
+    f.write("g.write_grader_script(basename+'-grader.py')\n")
+    len(g._items)
+  except: pass
+
+
 
 
