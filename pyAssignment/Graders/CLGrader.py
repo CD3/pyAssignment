@@ -18,6 +18,7 @@ def run(cmd,**kwargs):
 
   return r,o,e
 
+
 class ShellTest(object):
   def __init__(self):
     self._name = None
@@ -28,13 +29,12 @@ class ShellTest(object):
     self._r = None
     self._dir = None
 
-    self._pts = None
-
     self._on_fail_tests = collection()
     self._on_pass_tests = collection()
 
     self._namespace = Namespace()
     self._formatter = SFFormatter()
+
 
   @property
   def NS(self):
@@ -126,6 +126,46 @@ class ShellTest(object):
     if t._name is None:
       t.name = "Success Follow-up Test "+str(len(self._on_pass_tests))
     self._on_pass_tests.append(t)
+
+  @property
+  def weight(self):
+    try: return self._weight
+    except: return 1
+
+  @weight.setter
+  def weight(self,val):
+    self._weight = val
+
+  @property
+  def fail_tests_weight(self):
+    try: return self._fail_tests_weight
+    except: return 0.5
+
+  @fail_tests_weight.setter
+  def fail_tests_weight(self,val):
+    self._fail_tests_weight = val
+
+
+  @property
+  def score(self):
+    # return None if the test hasn't been run
+    if self._r is None:
+      return None
+
+    # if test succeeded, return 100%
+    if self._r == 0:
+      return 1
+    else:
+      # if test failed,
+      # add up the score from the _on_fail_tests (if any)
+      # and return
+      score = 0
+      total_weight = sum([t.weight for t in self._on_fail_tests])
+      for t in self._on_fail_tests:
+        score += t.weight * t.score / total_weight
+      score *= self.fail_tests_weight
+      return score
+
 
 
 

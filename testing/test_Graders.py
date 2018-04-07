@@ -3,6 +3,18 @@ import os,pickle
 
 from pyAssignment.Graders.CLGrader import CLGrader, ShellTest
 
+
+class Approx(object):
+  def __init__(self,val):
+    self._val = val
+    self._epsilon = 0.01
+  def epsilon(self,epsilon):
+    self._epsilon = epsilon
+    return self
+  def __eq__(self,other):
+    return abs(other - self._val) <= self._epsilon*abs(other + self._val)/2
+
+
 def test_CLGrader_simple():
   g = CLGrader()
 
@@ -134,6 +146,79 @@ def test_CLGrader_grader_script():
     t.command = "pwd"
 
   g.write_grader_script("grader.py")
+
+def test_CLGrader_ShellTest_scoring():
+  t = ShellTest()
+  t.command = "pwd"
+  t.run()
+  assert t.score == 1
+
+  t = ShellTest()
+  t.command = "missing"
+  t.run()
+  assert t.score == 0
+
+  t = ShellTest()
+  t.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.command = "pwd"
+  t.run()
+  assert t.score == 0.5
+
+  t = ShellTest()
+  t.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.command = "missing"
+    with ft.add_on_fail_test() as fft:
+      fft.command = "pwd"
+  t.run()
+  assert t.score == 0.25
+
+  t = ShellTest()
+  t.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.command = "pwd"
+  t.run()
+  assert t.score == 0.25
+
+  t = ShellTest()
+  t.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.command = "missing"
+  with t.add_on_fail_test() as ft:
+    ft.weight = 2
+    ft.command = "pwd"
+  t.run()
+  assert t.score == Approx(0.5*2/3)
+
+def test_CLGrader_scoring():
+
+  g = CLGrader()
+
+  with g.add_test() as t:
+    t.command = "pwd"
+
+  with g.add_test() as t:
+    t.command = "missing"
+
+    with t.add_on_fail_test() as ft:
+      ft.command = "pwd"
+
+  with g.add_test() as t:
+    t.command = "missing"
+
+    with t.add_on_fail_test() as ft:
+      ft.command = "still-missing"
+
+      with ft.add_on_fail_test() as fft:
+        ft.command = "pwd"
+
+  g.run()
+
+  # assert g.score == Approx( 1 + 0.5 + 0.25 )
+
 
 
 def test_CLGrader_on_fail_callback():
