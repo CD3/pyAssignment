@@ -229,8 +229,7 @@ class CLGrader(GraderBase):
     s += "    pass: %d\n"%self.num_pass
     s += " missing: %d\n"%(self.num_tests - self.num_pass - self.num_fail)
     s += "===========================\n"
-    s += "total: %d\n"%self.num_tests
-    s += "score: %.2f%%\n"%(100.*self.num_pass/self.num_tests)
+    s += "score: %.2f%%\n"%(100*self.score)
 
 
     return s
