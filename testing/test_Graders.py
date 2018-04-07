@@ -202,22 +202,19 @@ def test_CLGrader_scoring():
 
   with g.add_test() as t:
     t.command = "missing"
-
     with t.add_on_fail_test() as ft:
       ft.command = "pwd"
 
   with g.add_test() as t:
     t.command = "missing"
-
     with t.add_on_fail_test() as ft:
       ft.command = "still-missing"
-
       with ft.add_on_fail_test() as fft:
-        ft.command = "pwd"
+        fft.command = "pwd"
 
   g.run()
 
-  # assert g.score == Approx( 1 + 0.5 + 0.25 )
+  assert g.score == Approx( (1 + 0.5 + 0.25) / 3 )
 
 
 

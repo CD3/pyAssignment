@@ -252,6 +252,14 @@ class CLGrader(GraderBase):
     yield
     self._dir = odir
 
+  @property
+  def score(self):
+    score = 0
+    total_weight = sum([t.weight for t in self._tests])
+    for t in self._tests:
+      score += t.weight * t.score / total_weight
+    return score
+
 
   def write_grader_script(self,fn):
     with open(fn,'w') as f:
