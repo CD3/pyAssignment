@@ -4,8 +4,6 @@ from ..Utils import Namespace, SFFormatter
 import contextlib, subprocess, io
 
 def run(cmd,**kwargs):
-
-
   c = subprocess.run( cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
   r = c.returncode
   o = c.stdout
@@ -19,11 +17,19 @@ def run(cmd,**kwargs):
   return r,o,e
 
 
+#  ____  _          _ _ _____         _   
+# / ___|| |__   ___| | |_   _|__  ___| |_ 
+# \___ \| '_ \ / _ \ | | | |/ _ \/ __| __|
+#  ___) | | | |  __/ | | | |  __/\__ \ |_ 
+# |____/|_| |_|\___|_|_| |_|\___||___/\__|
+
 class ShellTest(object):
   def __init__(self):
     self._name = None
     self._desc = None
-    self._cmds = collection()
+    self._scmds = "" #collection() # setup commands
+    self._cmds  = "" #collection()
+    self._ecmds = "" #collection() # teardown command
     self._o = None
     self._e = None
     self._r = None
@@ -64,14 +70,35 @@ class ShellTest(object):
 
 
   @property
-  def command(self):
+  def command_string(self):
     startup = "cd %s;"%self._dir if self._dir is not None else ""
-    return self._formatter.fmt( startup+";".join( self._cmds), **self.NS.__dict__ )
+    cmds = [ c.strip(';') for c in  [startup, self._scmds, self._cmds, self._ecmds] if c != "" ]
+    cmds_string = self._formatter.fmt( ";".join(cmds), **self.NS.__dict__ )
+    return cmds_string
+
+  @property
+  def command(self):
+    return self._cmds
 
   @command.setter
   def command(self,val):
-    self._cmds = collection()
-    self._cmds.append(val)
+    self._cmds = val
+
+  @property
+  def startup_command(self):
+    return self._scmds
+
+  @startup_command.setter
+  def startup_command(self,val):
+    self._scmds = val
+
+  @property
+  def cleanup_command(self):
+    return self._ecmds
+
+  @cleanup_command.setter
+  def cleanup_command(self,val):
+    self._ecmds = val
 
   @property
   def returncode(self):
@@ -98,7 +125,7 @@ class ShellTest(object):
     self._dir = val
 
   def run(self):
-    self._r,self._o,self._e = run(self.command)
+    self._r,self._o,self._e = run(self.command_string)
     if self._r == 0 and len(self._on_pass_tests) > 0:
       for t in self._on_pass_tests:
         t.run()
@@ -167,18 +194,41 @@ class ShellTest(object):
       return score
 
 
-
+#   ____ _     ____               _           
+#  / ___| |   / ___|_ __ __ _  __| | ___ _ __ 
+# | |   | |  | |  _| '__/ _` |/ _` |/ _ \ '__|
+# | |___| |__| |_| | | | (_| | (_| |  __/ |   
+#  \____|_____\____|_|  \__,_|\__,_|\___|_|   
 
 class CLGrader(GraderBase):
   def __init__(self):
     super().__init__()
     self._tests = collection()
+    self._scmds = ""
+    self._ecmds = ""
 
     self._dir = None
 
   def run(self):
     for t in self._tests:
       t.run()
+
+  @property
+  def startup_command(self):
+    return self._scmds
+
+  @startup_command.setter
+  def startup_command(self,val):
+    self._scmds = val
+
+  @property
+  def cleanup_command(self):
+    return self._ecmds
+
+  @cleanup_command.setter
+  def cleanup_command(self,val):
+    self._ecmds = val
+
 
   @property
   def num_tests(self):
@@ -242,6 +292,8 @@ class CLGrader(GraderBase):
     yield t
     if t._name is None:
       t.name = "Test "+str(len(self._tests))
+    t.startup_command = self.startup_command +    t.startup_command
+    t.clenaup_command =    t.cleanup_command + self.cleanup_command
     self._tests.append(t)
 
   @contextlib.contextmanager

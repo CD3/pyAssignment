@@ -63,7 +63,7 @@ def test_CLGrader_namespace_inheritance():
     t.NS.VAR2= "y"
     t.command = "echo {VAR1}{VAR2}"
 
-  assert g._tests[0].command == "echo xy"
+  assert g._tests[0].command_string == "echo xy"
 
 def test_CLGrader_workdir():
   g = CLGrader()
@@ -89,12 +89,12 @@ def test_CLGrader_workdir():
   os.rmdir("test")
 
   for i in [ 0, 4 ]:
-    assert g._tests[i].command.startswith("pwd")
+    assert g._tests[i].command_string.startswith("pwd")
     assert g._tests[i].directory is None
     assert g._tests[i].output.strip() == os.getcwd()
 
   for i in range(1,4):
-    assert g._tests[i].command.startswith("cd")
+    assert g._tests[i].command_string.startswith("cd test")
     assert g._tests[i].directory == "test"
     assert g._tests[i].output.strip() == os.path.join(os.getcwd(),"test")
 
@@ -103,18 +103,16 @@ def test_CLGrader_shelltest_pickle():
   t.command = "pwd"
   t2 = pickle.loads( pickle.dumps(t) )
 
-  assert len(t2._cmds) == 1
-  assert t2._cmds[0] == "pwd"
-  assert t2.command == "pwd"
+  assert t2._cmds == "pwd"
+  assert t2.command_string == "pwd"
 
   t = ShellTest()
   t.command = "ls {DIR}"
   t.NS.DIR = "dir1"
   t2 = pickle.loads( pickle.dumps(t) )
 
-  assert len(t2._cmds) == 1
-  assert t2._cmds[0] == "ls {DIR}"
-  assert t2.command == "ls dir1"
+  assert t2._cmds == "ls {DIR}"
+  assert t2.command_string == "ls dir1"
   assert t2.NS.DIR  == "dir1"
 
 def test_CLGrader_clgrader_pickle():
@@ -215,6 +213,22 @@ def test_CLGrader_scoring():
   g.run()
 
   assert g.score == Approx( (1 + 0.5 + 0.25) / 3 )
+
+def test_CLGrader_setup():
+  g = CLGrader()
+
+  with g.add_test() as t:
+    t.startup_command = "TMP=startup"
+    t.command = "echo ${TMP}"
+  with g.add_test() as t:
+    t.startup_command = "MSG=startup"
+    t.command = 'MSG="${MSG}|exec"'
+    t.cleanup_command = 'echo ${MSG}'
+
+  g.run()
+
+  assert g._tests[0].output.strip() == "startup"
+  assert g._tests[1].output.strip() == "startup|exec"
 
 
 
