@@ -149,6 +149,7 @@ class ShellTest(object):
   def add_on_fail_test(self):
     t = ShellTest()
     t.NS.__dict__.update( self.NS.__dict__ )
+    t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
     yield t
     if t._name is None:
@@ -159,6 +160,7 @@ class ShellTest(object):
   def add_on_pass_test(self):
     t = ShellTest()
     t.NS.__dict__.update( self.NS.__dict__ )
+    t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
     yield t
     if t._name is None:
