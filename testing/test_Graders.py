@@ -230,6 +230,19 @@ def test_CLGrader_setup():
   assert g._tests[0].output.strip() == "startup"
   assert g._tests[1].output.strip() == "startup|exec"
 
+  g = CLGrader()
+  g.startup_command = 'MSG="grader startup"'
+
+  with g.add_test() as t:
+    t.startup_command = 'MSG="${MSG}|test startup"'
+    t.command = "echo ${MSG}"
+
+
+  g.run()
+
+  assert g._tests[0].command_string == 'MSG="grader startup";MSG="${MSG}|test startup";echo ${MSG}'
+  assert g._tests[0].output.strip() == "grader startup|test startup"
+
 
 
 def test_CLGrader_on_fail_callback():

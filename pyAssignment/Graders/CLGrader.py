@@ -292,8 +292,8 @@ class CLGrader(GraderBase):
     yield t
     if t._name is None:
       t.name = "Test "+str(len(self._tests))
-    t.startup_command = self.startup_command +    t.startup_command
-    t.clenaup_command =    t.cleanup_command + self.cleanup_command
+    t.startup_command = (self.startup_command + ";" +   t.startup_command).strip(";")
+    t.clenaup_command =    (t.cleanup_command + ";" +self.cleanup_command).strip(";")
     self._tests.append(t)
 
   @contextlib.contextmanager
