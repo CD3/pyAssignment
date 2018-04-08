@@ -14,6 +14,12 @@ def run(cmd,**kwargs):
     e = e.decode('utf-8')
   except: pass
 
+  if 'debug' in kwargs and kwargs['debug']:
+    print("CMD:",cmd)
+    print("R:",r)
+    print("O:",o)
+    print("E:",e)
+
   return r,o,e
 
 
@@ -38,13 +44,18 @@ class ShellTest(object):
     self._on_fail_tests = collection()
     self._on_pass_tests = collection()
 
-    self._namespace = Namespace()
     self._formatter = SFFormatter()
 
+    self._namespace = Namespace()
+    self._meta      = Namespace()
 
   @property
   def NS(self):
     return self._namespace
+
+  @property
+  def meta(self):
+    return self._meta
 
   @property
   def name(self):
@@ -125,7 +136,7 @@ class ShellTest(object):
     self._dir = val
 
   def run(self):
-    self._r,self._o,self._e = run(self.command_string)
+    self._r,self._o,self._e = run(self.command_string,**self._meta.__dict__.get('run_kwargs',{}))
     if self._r == 0 and len(self._on_pass_tests) > 0:
       for t in self._on_pass_tests:
         t.run()
@@ -209,6 +220,18 @@ class CLGrader(GraderBase):
 
     self._dir = None
 
+    self._namespace = Namespace()
+    self._meta      = Namespace()
+
+  @property
+  def NS(self):
+    return self._namespace
+
+  @property
+  def meta(self):
+    return self._meta
+
+
   def run(self):
     for t in self._tests:
       t.run()
@@ -288,6 +311,7 @@ class CLGrader(GraderBase):
   def add_test(self):
     t = ShellTest()
     t.NS.__dict__.update( self.NS.__dict__ )
+    t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
     yield t
     if t._name is None:
