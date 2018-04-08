@@ -273,29 +273,45 @@ class CLGrader(GraderBase):
         n += 1
     return n
 
+  def _summarize_test(self,t,prefix=""):
+    s = ""
+    if t.returncode is None:
+      s += prefix+"DID NOT RUN\n"
+      return s
+    if t.returncode == 0:
+      s += prefix+"PASS"
+    if t.returncode != 0:
+      s += prefix+"FAIL"
+    s += "  "
+    s += t.name
+    s += ": "
+    s += t.description
+    s += "\n"
+    if t.returncode != 0:
+      s += prefix+"  return code: "
+      s += str(t.returncode)
+      s += "\n"
+      s += prefix+"  error msg: "
+      s += t.error.strip()
+      s += "\n"
+
+    if len(t._on_fail_tests):
+      s += prefix+"Additional Tests\n"
+      for ft in t._on_fail_tests:
+        s += self._summarize_test(ft,prefix="  "+prefix)
+
+    if len(t._on_pass_tests):
+      s += prefix+"Additional Tests\n"
+      for pt in t._on_pass_tests:
+        s += self._summarize_test(pt,prefix="  "+prefix)
+
+    return s
+
   @property
   def summary(self):
     s = ""
     for t in self._tests:
-      if t.returncode is None:
-        s += "DID NOT RUN\n"
-        continue
-      if t.returncode == 0:
-        s += "PASS"
-      if t.returncode != 0:
-        s += "FAIL"
-      s += "  "
-      s += t.name
-      s += ": "
-      s += t.description
-      s += "\n"
-      if t.returncode != 0:
-        s += "  return code: "
-        s += str(t.returncode)
-        s += "\n"
-        s += "  error msg: "
-        s += t.error
-        s += "\n"
+      s += self._summarize_test(t)
     s += "\n\n"
     s +="Summary\n"
     s += "    fail: %d\n"%self.num_fail

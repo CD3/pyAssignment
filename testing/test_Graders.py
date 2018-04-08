@@ -140,6 +140,14 @@ def test_CLGrader_grader_script():
     t.command = "tst 1 -eq 0"
     t.description = "another test that will fail"
 
+    with t.add_on_fail_test() as ft:
+      ft.command = "missing"
+      ft.description = "sub test that will fail"
+
+      with ft.add_on_fail_test() as fft:
+        fft.command = "missing"
+        fft.description = "sub-sub test that will fail"
+
   with g.add_test() as t:
     t.command = "pwd"
 
