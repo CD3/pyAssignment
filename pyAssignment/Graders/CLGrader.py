@@ -4,7 +4,7 @@ from ..Utils import Namespace, SFFormatter
 import contextlib, subprocess, io
 
 def run(cmd,**kwargs):
-  c = subprocess.run( cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE )
+  c = subprocess.run( cmd, shell=True, executable="/bin/bash", stdout=subprocess.PIPE, stderr=subprocess.PIPE )
   r = c.returncode
   o = c.stdout
   e = c.stderr
@@ -151,6 +151,8 @@ class ShellTest(object):
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
+    t.startup_command = self.startup_command
+    t.clenaup_command = self.cleanup_command
     yield t
     if t._name is None:
       t.name = "Failure Follow-up Test "+str(len(self._on_fail_tests))
@@ -162,6 +164,8 @@ class ShellTest(object):
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
+    t.startup_command = self.startup_command
+    t.clenaup_command = self.cleanup_command
     yield t
     if t._name is None:
       t.name = "Success Follow-up Test "+str(len(self._on_pass_tests))
@@ -331,11 +335,11 @@ class CLGrader(GraderBase):
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
+    t.startup_command = self.startup_command
+    t.clenaup_command = self.cleanup_command
     yield t
     if t._name is None:
       t.name = "Test "+str(len(self._tests))
-    t.startup_command = (self.startup_command + ";" +   t.startup_command).strip(";")
-    t.clenaup_command =    (t.cleanup_command + ";" +self.cleanup_command).strip(";")
     self._tests.append(t)
 
   @contextlib.contextmanager
