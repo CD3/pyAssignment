@@ -18,17 +18,17 @@ def test_reader_base():
     - text : q1
       parts :
         - text : q1p1
-          answers :
-           - text : "the answer"
+          answer :
+            text : "the answer"
         - text : q1p2
-          answers :
-           - choices :
+          answer :
+            choices :
               - first answer
               - second answer
               - ^correct answer
     - text : q2
-      answers :
-        - quantity : 1.23
+      answer :
+         quantity : 1.23
   '''
 
   data = yaml.load(text)

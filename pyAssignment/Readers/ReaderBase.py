@@ -13,6 +13,23 @@ class ReaderBase(object):
     return fh
 
   def _load_from_dict(self,d,ass=None):
+    '''
+    Creates an assignment from a python dictionary.
+    This can be used as the "backend" for many different readers:
+    if a reader can get data into a python dictionary, then
+    it can pass the dictionary off to this function to generate
+    a pyAssignment.Assignment instance.
+
+    dict format:
+
+    { 'namespace' : { 'var1' : val1, ...}
+    , 'questions' [
+        'text' : 'question text',
+        'answer' : { See below }
+        'parts' : [ See below ]
+    ]
+    }
+    '''
     if ass is None:
       ass = Assignment()
 
@@ -40,24 +57,25 @@ class ReaderBase(object):
   def _load_question_from_dict(self,d,obj):
     obj.text = d['text']
 
-    self._load_answers_from_dict( d, obj)
+    self._load_answer_from_dict( d, obj)
     self._load_questions_and_parts_from_dict( d, obj )
 
-  def _load_answers_from_dict(self,d,obj):
-    for e in d.get('answers',list()):
-        with obj.add_answer(self._get_answer_type(e)) as a:
-          if isinstance(a,Numerical):
-            a.quantity = e['quantity']
+  def _load_answer_from_dict(self,d,obj):
+    e = d.get('answer',None)
+    if e is not None:
+      with obj.add_answer(self._get_answer_type(e)) as a:
+        if isinstance(a,Numerical):
+          a.quantity = e['quantity']
 
-          if isinstance(a,Text):
-            a.text = e['text']
+        if isinstance(a,Text):
+          a.text = e['text']
 
-          if isinstance(a,MultipleChoice):
-            for choice in e['choices']:
-              if choice.startswith('^'):
-                a.correct += choice[1:]
-              else:
-                a.incorrect += choice
+        if isinstance(a,MultipleChoice):
+          for choice in e['choices']:
+            if choice.startswith('^'):
+              a.correct += choice[1:]
+            else:
+              a.incorrect += choice
 
   def _get_answer_type(self,d):
     if "quantity" in d:
