@@ -242,7 +242,9 @@ def test_CLGrader_setup():
   g.startup_command = 'MSG="grader startup"'
 
   with g.add_test() as t:
-    t.startup_command = 'MSG="${MSG}|test startup"'
+    # need to fix this...
+    # it would be very easty to forget that we have to use +=
+    t.startup_command += ';MSG="${MSG}|test startup"'
     t.command = "echo ${MSG}"
 
 

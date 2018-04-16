@@ -335,6 +335,7 @@ class CLGrader(GraderBase):
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
+    # this needs to be fixed. caller can easily overwrite parent setup command by accident.
     t.startup_command = self.startup_command
     t.clenaup_command = self.cleanup_command
     yield t
