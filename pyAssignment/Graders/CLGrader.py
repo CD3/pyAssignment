@@ -302,12 +302,12 @@ class CLGrader(GraderBase):
       s += "\n"
 
     if len(t._on_fail_tests):
-      s += prefix+"Additional Tests\n"
+      s += prefix+"  Additional Tests\n"
       for ft in t._on_fail_tests:
         s += self._summarize_test(ft,prefix="  "+prefix)
 
     if len(t._on_pass_tests):
-      s += prefix+"Additional Tests\n"
+      s += prefix+"  Additional Tests\n"
       for pt in t._on_pass_tests:
         s += self._summarize_test(pt,prefix="  "+prefix)
 
