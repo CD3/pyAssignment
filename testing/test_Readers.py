@@ -62,3 +62,51 @@ QUESTIONS:
 '''
 
 
+
+def test_markdown_reader():
+
+  text = '''
+# Configuration
+
+# Questions
+
+1. q1
+    1. ^a1
+    1. a2
+    1. a3
+    1. a4
+1. q2
+    1. a1
+    1. ^a2
+    1. a3
+    1. a4
+'''
+
+  fh = io.StringIO()
+  ifh = io.StringIO(text)
+
+  reader = Readers.Markdown()
+  writer = Writers.Simple(fh)
+
+  ass = reader.load(ifh)
+
+  writer.dump(ass)
+
+  assert fh.getvalue() == '''\
+NAMESPACE:
+
+
+QUESTIONS:
+1. q1
+  ANS: a1 (correct)
+       a2
+       a3
+       a4
+
+2. q2
+  ANS: a1
+       a2 (correct)
+       a3
+       a4
+
+'''

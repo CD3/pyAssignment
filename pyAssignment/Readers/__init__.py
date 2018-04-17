@@ -1,4 +1,4 @@
 from .ReaderBase import *
-#from .Markdown import *
-#from .HTML import *
+from .Markdown import *
+from .HTML import *
 

@@ -1,6 +1,8 @@
 from ..Assignment import *
 from ..Assignment.Answers import *
 
+import io
+
 class ReaderBase(object):
   def __init__(self,fh=None):
     self.fh = fh
