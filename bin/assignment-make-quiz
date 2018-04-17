@@ -1,0 +1,67 @@
+#! /usr/bin/env python
+
+import os,sys,stat
+from argparse import ArgumentParser
+parser = ArgumentParser(description="Generate pyAssignment scripts from pyHomework scripts.")
+
+parser.add_argument("-p", "--pythonpath",
+                    action="store",
+                    nargs='*',
+                    default=['.'],
+                    help="Additional paths to add to python module search path.")
+
+parser.add_argument("-f", "--from",
+                    action="store",
+                    dest="_from",
+                    default="markdown",
+                    help="Input format")
+
+parser.add_argument("-t", "--to",
+                    action="store",
+                    default="latex",
+                    help="Output format")
+
+parser.add_argument("-o", "--output",
+                    action="store",
+                    default="/dev/stdout",
+                    help="Output file")
+
+parser.add_argument("-x", "--overwrite",
+                    action="store_true",
+                    default=False,
+                    help="Overwrite output file if it exists")
+
+parser.add_argument("input",
+                    action="store",
+                    help="Input file containing quiz.")
+
+args = parser.parse_args()
+
+sys.path += args.pythonpath
+import pyAssignment.Readers as Readers
+import pyAssignment.Writers as Writers
+
+
+if args.output != "/dev/stdout" and os.path.exists(args.output) and not args.overwrite:
+  print("Output file (%s) exists. Use -x option if you want to overwrite."%args.output)
+  sys.exit(1)
+
+reader = None
+writer = None
+
+if args._from == 'markdown':
+  reader = Readers.Markdown()
+
+if args.to == 'latex':
+  writer = Writers.Latex()
+
+if args.to == 'simple':
+  writer = Writers.Simple()
+
+with open(args.input,'r') as f:
+  ass = reader.load(f)
+
+with open(args.output,'w') as f:
+  writer.dump(ass,f)
+
+
