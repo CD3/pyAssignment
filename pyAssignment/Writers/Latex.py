@@ -16,9 +16,9 @@ class Latex(WriterBase):
   assignment.meta.header : dict of fancy headers
   assignment.meta.footer : dict of fancy footers
   assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
-  assignment.meta.config['answers']['multiple_choice_symbol'] : symbol used for multiple choice answers
-  assignment.meta.config['answers']['numerical_spacing'] : spacing added after a question with a numerical answer
-  assignment.meta.config['answers']['numerical_spacing'] : spacing added after a question with a numerical answer
+  assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers
+  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer
+  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer
 
   '''
   def __init__(self,fh=None):
@@ -81,10 +81,10 @@ class Latex(WriterBase):
           try: # multiple choice
             # NOTE: need to access all_formatted_choices member of q._answer
             # so that try block will fail before an enumeration is created
-            all_choices = self.get_all_choices(q._answer)
+            all_choices = self.MC_Answer_get_all_choices(q._answer)
             symb = r'\alph*)'
             try:
-              symb = ass.meta.config['answers']['multiple_choice/symbol']
+              symb = ass.meta.config['answer']['multiple_choice/symbol']
             except:
               pass
             with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
@@ -97,7 +97,7 @@ class Latex(WriterBase):
             ans = q._answer.quantity
             space="2in"
             try:
-              space = ass.meta.config['answers']['numerical/spacing']
+              space = ass.meta.config['answer']['numerical/spacing']
             except:
               pass
             doc.append(NoEscape(r"\vspace{%s}"%space))
@@ -109,7 +109,7 @@ class Latex(WriterBase):
             ans = q._answer.text
             space="2in"
             try:
-              space = ass.meta.config['answers']['text/spacing']
+              space = ass.meta.config['answer']['text/spacing']
             except:
               pass
             doc.append(NoEscape(r"\vspace{%s}"%space))
