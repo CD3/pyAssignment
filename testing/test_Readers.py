@@ -66,7 +66,10 @@ QUESTIONS:
 def test_markdown_reader():
 
   text = '''
-# Configuration
+---
+title: Quiz
+randomize: true
+---
 
 # Questions
 

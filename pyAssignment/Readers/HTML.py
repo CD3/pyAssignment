@@ -18,10 +18,13 @@ class HTML(ReaderBase):
 
     current_section = None
     for e in tree.xpath('/html/body/*'):
-      if e.text.lower() == 'questions':
-        current_section = 'questions'
-      if e.tag == 'ol' and current_section == 'questions':
-        d['questions'] = self._parse_questions( e )
+      if e.tag == 'h1':
+        current_section = e.text.lower()
+
+      if e.tag == 'ol':
+        if current_section == 'questions':
+          d['questions'] = self._parse_questions( e )
+
 
 
 

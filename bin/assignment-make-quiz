@@ -54,9 +54,10 @@ if args._from == 'markdown':
 
 if args.to == 'latex':
   writer = Writers.Latex()
-
 if args.to == 'simple':
   writer = Writers.Simple()
+if args.to == 'blackboard':
+  writer = Writers.BlackboardQuiz()
 
 with open(args.input,'r') as f:
   ass = reader.load(f)
