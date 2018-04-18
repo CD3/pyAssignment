@@ -213,6 +213,7 @@ def test_latex_writer():
 
   fh = io.StringIO()
   writer = Writers.Latex(fh)
+  writer.make_key = True
 
   ass = Assignment()
   ass.meta.title = "Homework Assignment"

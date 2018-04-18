@@ -15,6 +15,7 @@ class Latex(WriterBase):
   assignment.meta.date : document date
   assignment.meta.header : dict of fancy headers
   assignment.meta.footer : dict of fancy footers
+  assignment.meta.make_key : bool that specifies if a key should be printed at the end of the document.
   assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
   assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers
   assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer
@@ -27,6 +28,8 @@ class Latex(WriterBase):
     self._packages += "physics"
     self._packages += "siunitx"
     self._packages += "fullpage"
+
+    self.make_key = False
 
   @property
   def packages(self):
@@ -44,6 +47,9 @@ class Latex(WriterBase):
     self.build_preamble(doc,ass)
     self.build_questions(doc,ass)
     self.build_figures(doc,ass)
+
+    if self.make_key:
+      self.build_key(doc,ass)
 
     fh.write(doc.dumps())
 
@@ -179,6 +185,13 @@ class Latex(WriterBase):
         if f.meta.has("label"):
           label += r"\label{%s}"%f.meta.label
         fig.add_caption(NoEscape(label+f.formatted_caption))
+
+  def build_key(self,doc,ass):
+    doc.append(NoEscape(r"\newpage"))
+    doc.append(NoEscape(r"\textbf{\large Answers:}"))
+    for i in range(len(ass._questions)):
+      q = ass._questions[i]
+      doc.append(NoEscape(r"\\ \ref{%s}"%q._uuid))
 
 
 
