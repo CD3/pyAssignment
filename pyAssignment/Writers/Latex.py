@@ -95,7 +95,8 @@ class Latex(WriterBase):
               pass
             with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
               for choice in all_choices:
-                clist.add_item( NoEscape(choice) )
+                label = r'\label{%s}'%id(choice)
+                clist.add_item( NoEscape(label+choice) )
           except:
             pass
 
@@ -192,6 +193,25 @@ class Latex(WriterBase):
     for i in range(len(ass._questions)):
       q = ass._questions[i]
       doc.append(NoEscape(r"\\ \ref{%s}"%q._uuid))
+
+      if q._answer is not None:
+        try: # multiple choice
+          answers = [ r'\ref{%s}'%id(choice) for choice in self.MC_Answer_get_correct_choices(q._answer) ]
+          doc.append(NoEscape(",".join(answers)))
+
+        except: pass
+
+        try: # numerical
+          ans = q._answer.quantity
+        except:
+          pass
+
+
+        try: # text
+          ans = q._answer.text
+          space="2in"
+        except:
+          pass
 
 
 

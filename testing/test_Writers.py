@@ -246,6 +246,13 @@ def test_latex_writer():
       p.text = "q3p1"
     with q.add_part() as p:
       p.text = "q3p2"
+  with ass.add_question() as q:
+    q.text = "q1"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.correct += "a1"
+      a.incorrect += "a2"
+      a.incorrect += "a3"
+      a.correct += "a4"
 
   writer.dump(ass)
   print(fh.getvalue())
