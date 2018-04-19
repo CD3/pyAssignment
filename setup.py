@@ -21,5 +21,5 @@ setup(
     url='https://github.com/CD3/pyAssignment',
     author='C.D. Clark III',
     packages=["pyAssignment"],
-    scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-port"]
+    scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-port", "bin/assignment-make-quiz"]
 )

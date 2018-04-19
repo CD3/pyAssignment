@@ -112,7 +112,7 @@ class Latex(WriterBase):
             pass
 
 
-          try: # numerical
+          try: # text
             ans = q._answer.text
             space="2in"
             try:
@@ -198,18 +198,17 @@ class Latex(WriterBase):
         try: # multiple choice
           answers = [ r'\ref{%s}'%id(choice) for choice in self.MC_Answer_get_correct_choices(q._answer) ]
           doc.append(NoEscape(",".join(answers)))
-
         except: pass
 
         try: # numerical
           ans = q._answer.quantity
+          doc.append(NoEscape("{}".format(ans)))
         except:
           pass
 
-
         try: # text
           ans = q._answer.text
-          space="2in"
+          doc.append(NoEscape("{}".format(ans)))
         except:
           pass
 

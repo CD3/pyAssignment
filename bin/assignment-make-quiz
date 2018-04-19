@@ -31,8 +31,13 @@ parser.add_argument("-x", "--overwrite",
                     default=False,
                     help="Overwrite output file if it exists")
 
+parser.add_argument("-s", "--skeleton",
+                    action="store_true",
+                    help="Write a skeleton file.")
+
 parser.add_argument("input",
                     action="store",
+                    nargs='?',
                     help="Input file containing quiz.")
 
 args = parser.parse_args()
@@ -44,6 +49,26 @@ import pyAssignment.Writers as Writers
 
 if args.output != "/dev/stdout" and os.path.exists(args.output) and not args.overwrite:
   print("Output file (%s) exists. Use -x option if you want to overwrite."%args.output)
+  sys.exit(1)
+
+
+
+if args.skeleton:
+  with open(args.output,'w') as f:
+    f.write('''---
+title: TITLE
+---
+
+# Questions
+
+1. Question 1
+    1. Answer 1
+    1. Answer 2
+''')
+  sys.exit(0)
+
+if args.input is None:
+  parser.print_usage()
   sys.exit(1)
 
 reader = None
