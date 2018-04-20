@@ -46,7 +46,15 @@ class HTML(ReaderBase):
     d = dict()
     d['choices'] = list()
     for c in tree.xpath('li'):
-      d['choices'].append(c.text)
+      text = None
+      text = c.text
+      if text is None and len(c) > 0:
+        text = c[0].text
+        
+      if text is None:
+        raise RuntimeError("ERROR: could not parse answer text in MC question'"+etree.tostring(c).decode('utf-8')+"'")
+
+      d['choices'].append(text)
 
     return d
 

@@ -11,15 +11,16 @@ class Latex(WriterBase):
   '''
   Customization Points:
 
-  assignment.meta.title : document title
-  assignment.meta.date : document date
-  assignment.meta.header : dict of fancy headers
-  assignment.meta.footer : dict of fancy footers
+  assignment.meta.title : document title.
+  assignment.meta.date : document date.
+  assignment.meta.header : dict of fancy headers.
+  assignment.meta.footer : dict of fancy footers.
   assignment.meta.make_key : bool that specifies if a key should be printed at the end of the document.
+  assignment.meta.header-includes : list of lines that will be added to the preamble.
   assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
-  assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers
-  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer
-  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer
+  assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers.
+  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
+  assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
 
   '''
   def __init__(self,fh=None):
@@ -159,6 +160,11 @@ class Latex(WriterBase):
         o = None
 
       doc.preamble.append(Package(p,o))
+
+    if ass.meta.has("header-includes"):
+      for line in ass.meta.__dict__.get("header-includes"):
+        doc.preamble.append(NoEscape(line))
+        pass
 
 
     maketitle = False
