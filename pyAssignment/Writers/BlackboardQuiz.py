@@ -2,6 +2,7 @@ from .WriterBase import *
 from ..Assignment.Answers import *
 
 import pyparsing
+import re
 
 try:
   import macro_expander
@@ -57,6 +58,12 @@ class BlackboardQuiz(WriterBase):
 
       proc = macro_expander.MacroProcessor()
       text = proc.process(text)
+
+      # need to clean up text.
+      # should not have any new line chars
+      text = text.replace("\n"," ")
+      text = re.sub(" +"," ",text)
+      # should not have multiple spaces together
 
     return text
 
@@ -147,7 +154,7 @@ class BlackboardQuiz(WriterBase):
         toks.append(answer)
 
 
-    fh.write(self._format_line("\t".join(toks)+"\n"))
+    fh.write(self._format_line("\t".join(toks))+"\n")
       
        
 

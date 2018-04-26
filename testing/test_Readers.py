@@ -113,3 +113,26 @@ QUESTIONS:
        a4
 
 '''
+
+def test_markdown_reader_exceptions():
+
+  text = '''
+# Questions
+
+1. q1
+    1. ^a1
+    1. a2
+1. q2
+1. q3
+'''
+
+  fh = io.StringIO()
+  ifh = io.StringIO(text)
+
+  reader = Readers.Markdown()
+  writer = Writers.Simple(fh)
+
+  with pytest.raises(RuntimeError):
+    ass = reader.load(ifh)
+
+

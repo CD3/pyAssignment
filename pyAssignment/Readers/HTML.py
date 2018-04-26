@@ -35,6 +35,8 @@ class HTML(ReaderBase):
     l = list()
     for e in tree.xpath('*'):
       if e.tag == 'li':
+        if len(l) > 0 and 'answer' not in l[-1]:
+          raise RuntimeError("A question without an answer was found. Question text'%s'."%l[-1]['text'])
         l.append(dict())
         l[-1]['text'] = e.text
       if e.tag == 'ol':
