@@ -1,0 +1,30 @@
+FROM python:3.6
+
+RUN pip install lxml
+RUN pip install mistletoe
+RUN pip install numpy
+RUN pip install Pint
+RUN pip install PyLaTeX
+RUN pip install pyparsing
+RUN pip install pytest
+RUN pip install PyYAML
+RUN apt-get update
+RUN apt-get install -y latexmk
+RUN apt-get install -y texlive-full
+
+WORKDIR /repos
+RUN git clone https://github.com/CD3/pyErrorProp
+WORKDIR pyErrorProp
+RUN git checkout py3
+RUN python ./setup.py install
+
+WORKDIR /repos
+RUN git clone https://github.com/CD3/macro_expander
+WORKDIR macro_expander
+RUN git checkout py3
+RUN python ./setup.py install
+
+WORKDIR /home/testenv
+CMD find ./ -iname '__pycache__' -type d -exec rm -r {} \;
+WORKDIR /home/testenv/testing
+CMD pytest
