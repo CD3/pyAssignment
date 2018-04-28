@@ -1,3 +1,3 @@
 #! /bin/bash
 
-docker run -v $PWD:/home/testenv pyassignment-testing-3.6:latest
+docker run --rm -v $PWD:/var/repo pyassignment-testing-3.6:latest "$@"

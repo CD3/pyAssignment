@@ -9,13 +9,13 @@ COPY requirements.txt ./
 RUN pip install $(cat requirements.txt)
 
 WORKDIR /repos
-RUN git clone https://github.com/CD3/pyErrorProp
-WORKDIR pyErrorProp
+RUN git clone https://github.com/CD3/macro_expander
+WORKDIR macro_expander
 RUN python ./setup.py install
 
 WORKDIR /repos
-RUN git clone https://github.com/CD3/macro_expander
-WORKDIR macro_expander
+RUN git clone https://github.com/CD3/pyErrorProp
+WORKDIR pyErrorProp
 RUN python ./setup.py install
 
 WORKDIR /home/testenv
