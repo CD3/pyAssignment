@@ -1,0 +1,8 @@
+pytest
+lxml
+mistletoe
+numpy
+Pint
+PyLaTeX
+pyparsing
+PyYAML

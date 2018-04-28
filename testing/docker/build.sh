@@ -1,3 +1,7 @@
 #! /bin/bash
 
-docker build -t pyassignment-testing-3.6 -f Dockerfile-pyassignment-testing-3.6 .
+for file in Dockerfile-*
+do
+  tag=$(echo $file | sed "s/Dockerfile-//")
+  docker build -t $tag -f ${file} .
+done
