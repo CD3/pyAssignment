@@ -20,6 +20,6 @@ setup(
     long_description=long_description,  # Optional
     url='https://github.com/CD3/pyAssignment',
     author='C.D. Clark III',
-    packages=["pyAssignment"],
+    packages=find_packages(),
     scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-port", "bin/assignment-make-quiz"]
 )
