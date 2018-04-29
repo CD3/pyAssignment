@@ -1,9 +1,2 @@
-.*cache/
 .*.swp
-*.pyc
-__pycache__
 env/
-_*
-build/
-dist/
-*.egg-info/
