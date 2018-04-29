@@ -1,4 +1,4 @@
-FROM pyassignment-test-3.6
+FROM cdc3/pyassignment-testing-3.6
 
 WORKDIR /repos
 RUN git clone https://github.com/CD3/pyAssignment
