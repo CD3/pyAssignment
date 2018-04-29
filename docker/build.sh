@@ -1,3 +1,3 @@
 #! /bin/bash
 
-docker build -t pyassignment .
+docker build -t pyassignment . "$@"
