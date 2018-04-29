@@ -1,6 +1,6 @@
 import pytest
 
-import io,os
+import io,os,re
 
 from pyAssignment.Assignment import Assignment
 import pyAssignment.Writers as Writers
@@ -210,7 +210,6 @@ MC\tq1.1 {CWD}\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone o
   
 
 def test_latex_writer():
-
   fh = io.StringIO()
   writer = Writers.Latex(fh)
   writer.make_key = True
@@ -255,8 +254,48 @@ def test_latex_writer():
       a.correct += "a4"
 
   writer.dump(ass)
-  print(fh.getvalue())
 
   with open('test.tex', 'w') as f:
     f.write(fh.getvalue())
+
+def test_latex_writer_header_and_footers():
+  ass = Assignment()
+  ass.meta.title = "The Title"
+  ass.meta.header = {'R':"right header",
+                     'L':"left header",
+                     'C':"center header"}
+  ass.meta.footer = {'R':"right footer",
+                     'L':"left footer",
+                     'C':"center footer"}
+  ass.meta.config = {
+                    'answers' : {
+                      'numerical/spacing' :  '2in',
+                      'multiple_choice/symbol' :  r'\alph*)',
+                      'text/spacing' :  r'3in'
+                      }
+                    }
+
+  with ass.add_question() as q:
+    q.text = "q1"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.correct += "a2"
+
+
+  fh = io.StringIO()
+  writer = Writers.Latex(fh)
+  writer.make_key = True
+
+  writer.dump(ass)
+
+  print(fh.getvalue())
+  assert re.search( "header", fh.getvalue() )
+  assert re.search( "footer", fh.getvalue() )
+  assert re.search( "left header", fh.getvalue() )
+  assert re.search( "center header", fh.getvalue() )
+  assert re.search( "right header", fh.getvalue() )
+  assert re.search( "left footer", fh.getvalue() )
+  assert re.search( "center footer", fh.getvalue() )
+  assert re.search( "right footer", fh.getvalue() )
+  assert re.search( r"\\title\{The Title\}", fh.getvalue() )
 

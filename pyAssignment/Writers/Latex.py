@@ -141,17 +141,8 @@ class Latex(WriterBase):
       level -= 1
 
   def build_preamble(self,doc,ass):
-    header_and_footer = PageStyle("header")
-    if ass.meta.has("header"):
-      for h in ass.meta.header:
-        with header_and_footer.create(Head(h)):
-          header_and_footer.append( NoEscape(ass.meta.header[h]) )
-    if ass.meta.has("footer"):
-      for f in ass.meta.footer:
-        with header_and_footer.create(Foot(f)):
-          header_and_footer.append( NoEscape(ass.meta.footer[f]) )
-    doc.preamble.append(header_and_footer)
 
+    # add packages
     for e in self._packages:
       try:
         p,o = e
@@ -161,10 +152,24 @@ class Latex(WriterBase):
 
       doc.preamble.append(Package(p,o))
 
+    # allow assignment metadata to add header info
+    # this allows support pandoc-style config data in input files
     if ass.meta.has("header-includes"):
       for line in ass.meta.__dict__.get("header-includes"):
         doc.preamble.append(NoEscape(line))
         pass
+
+    doc.preamble.append(Package('fancyhdr'))
+    doc.preamble.append(Command('pagestyle','fancyplain'))
+    doc.preamble.append(Command('setlength',[NoEscape(r'\headheight'),'0.5in']))
+    if ass.meta.has("header"):
+      for h in ass.meta.header:
+        doc.preamble.append(Head(position=h,data=NoEscape(ass.meta.header[h])))
+    if ass.meta.has("footer"):
+      for f in ass.meta.footer:
+        doc.preamble.append(Foot(position=f,data=NoEscape(ass.meta.footer[f])))
+    doc.preamble.append(Command('renewcommand',[NoEscape(r'\headrulewidth'),'0pt']))
+
 
 
     maketitle = False
