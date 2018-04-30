@@ -16,7 +16,7 @@ class Latex(WriterBase):
   assignment.meta.header : dict of fancy headers.
   assignment.meta.footer : dict of fancy footers.
   assignment.meta.make_key : bool that specifies if a key should be printed at the end of the document.
-  assignment.meta.header-includes : list of lines that will be added to the preamble.
+  assignment.meta.header_includes : list of lines that will be added to the preamble.
   assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
   assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers.
   assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
@@ -154,10 +154,11 @@ class Latex(WriterBase):
 
     # allow assignment metadata to add header info
     # this allows support pandoc-style config data in input files
-    if ass.meta.has("header-includes"):
-      for line in ass.meta.__dict__.get("header-includes"):
+    if ass.meta.has("header_includes"):
+      if not isinstance( ass.meta.header_includes, list ):
+        ass.meta.header_includes = [ass.meta.header_includes]
+      for line in ass.meta.header_includes:
         doc.preamble.append(NoEscape(line))
-        pass
 
     doc.preamble.append(Package('fancyhdr'))
     doc.preamble.append(Command('pagestyle','fancyplain'))
