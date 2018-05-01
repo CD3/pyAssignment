@@ -11,6 +11,7 @@ class FilterBase(object):
       for p in self.predicates:
         if p(q):
           with quiz.add_question(q) as qq: pass
+          break
 
     return quiz
 

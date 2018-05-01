@@ -83,8 +83,36 @@ def test_question_tagging():
         a.quantity = 3.2
 
   tf = Filters.TagFilter()
-  fass = tf.filter( ass, 'topic 2' )
 
+  fass = tf.filter( ass, 'topic 2' )
   assert len(fass._questions) == 2
   assert fass._questions[0]._text == "q1"
   assert fass._questions[1]._text == "q3"
+
+  fass = tf.filter( ass, 'topic 3' )
+  assert len(fass._questions) == 1
+  assert fass._questions[0]._text == "q2"
+
+
+  tf.add_pattern( 'topic 2' )
+  fass = tf.filter( ass )
+  assert len(fass._questions) == 2
+  assert fass._questions[0]._text == "q1"
+  assert fass._questions[1]._text == "q3"
+
+  fass = tf.filter( ass, 'topic 3' )
+  assert len(fass._questions) == 1
+  assert fass._questions[0]._text == "q2"
+
+  fass = tf.filter( ass )
+  assert len(fass._questions) == 2
+  assert fass._questions[0]._text == "q1"
+  assert fass._questions[1]._text == "q3"
+
+  tf.add_pattern( 'topic .' )
+  fass = tf.filter( ass )
+  assert len(fass._questions) == 3
+  assert fass._questions[0]._text == "q1"
+  assert fass._questions[1]._text == "q2"
+  assert fass._questions[2]._text == "q3"
+
