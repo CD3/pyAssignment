@@ -8,7 +8,7 @@ class TagFilter(FilterBase):
     self.filter_untagged = True
 
 
-  def filter(self,ass):
+  def filter(self,ass,tag):
     quiz = Assignment()
 
     for q in ass._questions:
