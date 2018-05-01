@@ -171,10 +171,10 @@ def test_blackboard_quiz_writer_output():
   quiz_text="""\
 MC\tq1.1\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone of the above.\tincorrect
 MC\tq1.2\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tincorrect\tNone of the above.\tcorrect
-NUM\tq2.1\t1.23e+00\t1.23e-02
-NUM\tq2.2 Give your answer in meter / second.\t9.88e+08\t9.88e+06
-NUM\tq2.3\t5.43e+03\t5.43e+01
-NUM\tq2.4 Give your answer in meter.\t1.02e+01\t3.21e+00
+NUM\tq2.1\t1.23E+00\t1.23E-02
+NUM\tq2.2 Give your answer in meter / second.\t9.88E+08\t9.88E+06
+NUM\tq2.3\t5.43E+03\t5.43E+01
+NUM\tq2.4 Give your answer in meter.\t1.02E+01\t3.21E+00
 FIB\tq3.1\tcorrect answer
 FIB\tq3.2\tfirst correct answer\tsecond correct answer
 """
