@@ -129,7 +129,7 @@ class BlackboardQuiz(WriterBase):
       except:
         pass
 
-      toks.append("{:.2e}".format(val))
+      toks.append("{:.2E}".format(val))
 
       unc = None
       try: # a pyErrorProp uncertain quantity
@@ -144,7 +144,7 @@ class BlackboardQuiz(WriterBase):
       if self.config.minimum_relative_numerical_uncertainty and unc != None and val*self.config.minimum_relative_numerical_uncertainty > unc:
         unc = val*self.config.minimum_relative_numerical_uncertainty
 
-      toks.append("{:.2e}".format(unc))
+      toks.append("{:.2E}".format(unc))
 
     if t == "FIB":
       if a.formatted_text == "":
