@@ -1,4 +1,3 @@
-from ..Assignment import *
 from .FilterBase import *
 
 class TagFilter(FilterBase):
@@ -7,17 +6,25 @@ class TagFilter(FilterBase):
 
     self.filter_untagged = True
 
-
-  def filter(self,ass,tag):
-    quiz = Assignment()
-
-    for q in ass._questions:
+  def has_tag(self,tag):
+    def imp(q):
       if q.meta.has('tag'):
         tags = q.meta.tag.split(',')
         if tag in tags:
-          with quiz.add_question(q) as qq: pass
-      else:
-        if not self.filter_untagged:
-          with quiz.add_question(q) as qq: pass
+          return True
+
+      return False
+
+
+    return imp
+
+  def filter(self,ass,tag=None):
+
+    predicates = self.predicates
+    self.predicates = [ self.has_tag(tag) ]
+
+    quiz = super().filter(ass)
+
+    self.predicates = predicates
 
     return quiz
