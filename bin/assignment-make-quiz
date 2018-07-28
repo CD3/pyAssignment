@@ -1,8 +1,9 @@
 #! /usr/bin/env python
 
 import os,sys,stat
+import json,random
 from argparse import ArgumentParser
-parser = ArgumentParser(description="Generate pyAssignment scripts from pyHomework scripts.")
+parser = ArgumentParser(description="Generate quiz files from a markdown quiz input file.")
 
 parser.add_argument("-p", "--pythonpath",
                     action="store",
@@ -40,7 +41,14 @@ parser.add_argument("input",
                     nargs='?',
                     help="Input file containing quiz.")
 
+parser.add_argument("--config",
+                    action="store",
+                    default=[],
+                    nargs='*',
+                    help="Configuration options that will be passed to the assignment class. These options will override any options in the quiz file.")
+
 args = parser.parse_args()
+
 
 sys.path += args.pythonpath
 import pyAssignment.Readers as Readers
@@ -74,18 +82,45 @@ if args.input is None:
 reader = None
 writer = None
 
-if args._from == 'markdown':
+if args._from.lower() == 'markdown':
   reader = Readers.Markdown()
+else:
+  print("ERROR: unrecognized input format '{}'".format(args._from))
+  sys.exit()
 
-if args.to == 'latex':
+
+if args.to.lower() == 'latex':
   writer = Writers.Latex()
-if args.to == 'simple':
+elif args.to.lower() == 'simple':
   writer = Writers.Simple()
-if args.to == 'blackboard':
+elif args.to.lower() == 'blackboard':
   writer = Writers.BlackboardQuiz()
+else:
+  print("ERROR: unrecognized output format '{}'".format(args.to))
+  sys.exit()
 
 with open(args.input,'r') as f:
   ass = reader.load(f)
+
+config_json = "{"+','.join(args.config)+"}"
+try:
+  config = json.loads( config_json )
+  ass.meta.__dict__.update(config)
+except:
+  print("ERROR: could not parse configuration passed at command line")
+  print("Note: this should be valid JSON")
+  print( config_json )
+  sys.exit(1)
+
+if ass.meta.has('randomize_questions') and ass.meta.randomize_questions:
+  random.shuffle(ass._questions)
+if ass.meta.has('randomize_answers') and ass.meta.randomize_answers:
+  for q in ass._questions:
+    if hasattr(q._answer,'shuffle'):
+      print("Ranomizing answers")
+      q._answer.shuffle()
+
+
 
 with open(args.output,'w') as f:
   writer.dump(ass,f)

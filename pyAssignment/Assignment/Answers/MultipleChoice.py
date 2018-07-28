@@ -1,4 +1,5 @@
 from .AnswerBase import *
+from random import shuffle
 
 class MultipleChoice(AnswerBase):
   def __init__(self):
@@ -140,6 +141,19 @@ class MultipleChoice(AnswerBase):
         c = self._choices[i]
         yield self._formatter.fmt( c, **self.NS.__dict__ )
 
+
+  def shuffle(self):
+    idx = [ i for i in range(len(self._choices)) ]
+    shuffle(idx)
+    old_choices = self._choices
+    self._choices = collection()
+    for i in idx:
+      self._choices.append( old_choices[i] )
+    old_correct = self._correct
+    self._correct = collection()
+    for i in old_correct:
+      self._correct.append( idx.index(i) )
+    
 
 
   def set_correct( self, i = None ):
