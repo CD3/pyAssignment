@@ -1,2 +1,4 @@
 .*.swp
 env/
+dist/
+pyAssignment.egg-info/
