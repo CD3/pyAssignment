@@ -92,13 +92,13 @@ with {PARENT}.add_answer(Answer.Numerical) as {THIS}:
   try: # multiple choice
     text =  """with {PARENT}.add_answer(Answer.MultipleChoice) as {THIS}:\n""".format(PARENT=parent,THIS=this)
     for correct,choice in a.choices:
-      if choice == "None of the above.":
+      if choice.lower() == "none of the above.":
         continue
 
       if correct:
-        text += """  {THIS}.correct += '''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
+        text += """  {THIS}.correct += r'''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
       else:
-        text += """  {THIS}.incorrect += '''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
+        text += """  {THIS}.incorrect += r'''{TEXT}'''\n""".format(THIS=this,TEXT=choice)
     return text
   except: pass
 
@@ -109,7 +109,7 @@ def fmt_Question(q,parent,this):
   text = """\
 with {PARENT}.add_question() as {THIS}:
   {THIS}.text = r'''{TEXT}'''
-  {THIS}.meta.label = '''{LABEL}'''
+  {THIS}.meta.label = r'''{LABEL}'''
 """.format(TEXT=q.question_str,LABEL=id(q),PARENT=parent,THIS=this)
   return text
 
@@ -117,24 +117,24 @@ def fmt_Part(p,parent=None,this=None):
   text = """\
 with {PARENT}.add_part() as {THIS}:
   {THIS}.text = r'''{TEXT}'''
-  {THIS}.meta.label = '''{LABEL}'''
+  {THIS}.meta.label = r'''{LABEL}'''
 """.format(TEXT=p.question_str,LABEL=id(p),PARENT=parent,THIS=this)
   return text
 
 def fmt_Figure(f):
   text = """\
 with ass.add_figure() as f:
-  f.caption = '''{CAPTION}'''
-  f.filename = '''{FILENAME}'''
-  f.meta.label = '''{LABEL}'''
+  f.caption = r'''{CAPTION}'''
+  f.filename = r'''{FILENAME}'''
+  f.meta.label = r'''{LABEL}'''
 """.format(CAPTION=' '.join(f._caption),FILENAME=f.filename,LABEL=''.join(f._label))
   return text
 
 def fmt_GradeTest(n,cs):
   text = """\
 with g.add_test() as t:
-  t.name = '''{NAME}'''
-  t.command = '''{CMD}'''
+  t.name = r'''{NAME}'''
+  t.command = r'''{CMD}'''
 """.format(NAME=n,CMD=';'.join(cs))
   return text
 
@@ -179,17 +179,17 @@ Q_ = units.Quantity
   f.write("ass = Assignment()\n")
 
   # write config data. title, header, ,etc
-  try: f.write("ass.meta.title = '{}'\n".format(ass._config['title']))
+  try: f.write("ass.meta.title = r'{}'\n".format(ass._config['title']))
   except: pass
 
   f.write("ass.meta.header = dict()\n")
   for fh in ["L", "C", "R"]:
-    try: f.write("ass.meta.header['{}'] = '{}'\n".format(fh,ass._config[fh+"H"]))
+    try: f.write("ass.meta.header['{}'] = r'{}'\n".format(fh,ass._config[fh+"H"]))
     except: pass
 
   f.write("ass.meta.footer = dict()\n")
   for ff in ["L", "C", "R"]:
-    try: f.write("ass.meta.footer['{}'] = '{}'\n".format(ff,ass._config[ff+"F"]))
+    try: f.write("ass.meta.footer['{}'] = r'{}'\n".format(ff,ass._config[ff+"F"]))
     except: pass
 
   # loop through questions
@@ -208,7 +208,8 @@ Q_ = units.Quantity
 
     # look for quiz questions that reference this question
     for j in range(len(quiz._questions)):
-      if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
+      qq = quiz._questions[j]
+      if qq is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
         text = fmt_Question(qq,'q','qq')
         text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
         f.write( indent(text) )
@@ -228,7 +229,8 @@ Q_ = units.Quantity
 
       # look for quiz questions that reference this question
       for j in range(len(quiz._questions)):
-        if quiz._questions[j] is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
+        qq = quiz._questions[j]
+        if qq is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
           text = fmt_Question(qq,'p','qq')
           text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
           f.write( indent(text,2) )
@@ -266,7 +268,7 @@ basename = os.path.basename(__file__).replace(".py","")
 BuildProblemSetAndBlackboardQuiz(ass,basename,remove=True)
 """)
   try:
-    f.write("g.write_grader_script(basename+'-grader.py')\n")
+    f.write("try:g.write_grader_script(basename+'-grader.py')\nexcept:pass")
     len(g._items)
   except: pass
 

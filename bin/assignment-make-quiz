@@ -50,20 +50,10 @@ parser.add_argument("--config",
 
 args = parser.parse_args()
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-
 sys.path += args.pythonpath
 import pyAssignment.Readers as Readers
 import pyAssignment.Writers as Writers
+from pyAssignment.Utils import ColorCodes
 
 
 if args.output != "/dev/stdout" and os.path.exists(args.output) and not args.overwrite:
@@ -140,7 +130,7 @@ if args.to.lower() == 'blackboard':
     text = f.read()
     ms = re.findall('\\\[a-zA-Z]+{',text)
     if len(ms) > 0:
-      print(bcolors.WARNING, file=sys.stderr)
+      print(ColorCodes.WARNING, file=sys.stderr)
       print("WARNING: it appears that the quiz text ({}) contains one ore more LaTeX macros.".format(args.output), file=sys.stderr)
       print("         This is almost certainly *NOT* what you want.", file=sys.stderr)
       print("Possible Macros:", file=sys.stderr)
@@ -148,7 +138,7 @@ if args.to.lower() == 'blackboard':
       for m in ms:
         print(i,m, file=sys.stderr)
         i += 1
-      print(bcolors.ENDC, file=sys.stderr)
+      print(ColorCodes.ENDC, file=sys.stderr)
 
 
 
