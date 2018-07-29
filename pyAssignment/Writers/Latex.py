@@ -29,6 +29,7 @@ class Latex(WriterBase):
     self._packages += "physics"
     self._packages += "siunitx"
     self._packages += "fullpage"
+    self._packages += "datetime"
 
     self.make_key = False
 

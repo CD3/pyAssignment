@@ -50,7 +50,7 @@ class BlackboardQuiz(WriterBase):
 
   def _format_line(self,text):
     if have_macro_expander:
-      latex_math = pyparsing.QuotedString( quoteChar='$' )
+      latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
       def latex_math_to_mathimg(s,loc,toks):
         return [ r'\mathimg[o="html"]{%s}'%t for t in toks ]
       latex_math.addParseAction(latex_math_to_mathimg)
