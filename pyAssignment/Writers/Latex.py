@@ -49,7 +49,11 @@ class Latex(WriterBase):
     self.build_questions(doc,ass)
     self.build_figures(doc,ass)
 
-    if self.make_key:
+    make_key = self.make_key
+    # if assignment has a make_key entry, use it instead
+    if ass.meta.has('make_key'):
+      make_key = ass.meta.make_key
+    if make_key:
       self.build_key(doc,ass)
 
     fh.write(doc.dumps())
