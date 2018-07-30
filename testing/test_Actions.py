@@ -26,9 +26,9 @@ def test_problem_set_builder():
 
   if os.path.exists("_test"): shutil.rmtree("_test")
   os.mkdir("_test")
-  with pytest.raises(RuntimeError):
-    Actions.BuildProblemSetAndBlackboardQuiz(ass,"test")
-    shutil.rmtree("_test")
+
+  Actions.BuildProblemSetAndBlackboardQuiz(ass,"test")
+  shutil.rmtree("_test")
 
   Actions.BuildProblemSetAndBlackboardQuiz(ass,"test",True)
 
