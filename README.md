@@ -10,10 +10,10 @@ write homework assignments for physics classes. The rewrite is currently in prog
 ## Features
 
 - Build assignments and compute solutions in pure Python.
-    - Write assignment to LaTeX.
-    - Write assignment to Blackboard Quiz.
-- Command-line grader.
-    - Write tests that are ran in the shell.
+    - Output assignment to LaTeX and bulid a PDF.
+    - Output assignment to a Blackboard quiz.
+    - Create problem set / Blackboard quiz pair. I.e. a Blackboard quiz that asks questions about
+      a problem set distributed as PDF.
 - [`pyErrorProp'](https://github.com/CD3/pyErrorProp) integration. Tolerances for numerical solutions
   can be automatically calculated using error propagation.
 
