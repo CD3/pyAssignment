@@ -4,6 +4,7 @@ python:
   - "3.6"
 install:
   - pip3 install -r requirements.txt
+  - pip3 install git+https://github.com/CD3/pyErrorProp
 script:
   - pytest
 
