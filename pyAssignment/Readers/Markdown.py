@@ -10,6 +10,7 @@ class Markdown(ReaderBase):
 
   def __init__(self,fh=None):
     super().__init__(fh)
+    self.throw_on_missing_answers = True
 
   def _markdown_to_json( self, markdown_text ):
     '''Return a json representation of the markdown text.'''
@@ -62,10 +63,12 @@ class Markdown(ReaderBase):
     while i < N:
       q = dict()
       q['text'] = in_data[qkey][i]
-      if isinstance( in_data[qkey][i+1], list ):
+      if i+1 < N and isinstance( in_data[qkey][i+1], list ):
         i += 1
         q['answer'] = dict()
         q['answer']['choices'] = in_data[qkey][i]
+      elif self.throw_on_missing_answers:
+        raise RuntimeError("A question without an answer was found. Question test '{}'".format(q['text']) )
 
       out_data['questions'].append(q)
       i += 1

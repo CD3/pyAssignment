@@ -1,1 +1,4 @@
 test.tex
+_test/
+grader.py
+ON_PASS_CMD.txt

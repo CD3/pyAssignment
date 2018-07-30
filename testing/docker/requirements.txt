@@ -1,6 +1,6 @@
 pytest
 lxml
-mistletoe
+markdown-to-json
 numpy
 Pint
 PyLaTeX
