@@ -17,6 +17,8 @@ class Latex(WriterBase):
   assignment.meta.footer : dict of fancy footers.
   assignment.meta.make_key : bool that specifies if a key should be printed at the end of the document.
   assignment.meta.header_includes : list of lines that will be added to the preamble.
+  assignment.meta.latex_packages: list of latex packages that will be loaded with '\\usepackage'
+  assignment.meta.latex_preamble_lines: list of lines that will be added to the preamble.
   assignment.meta.config['questions']['enumeration_symbols'] : list of symbols used for question numbering.
   assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers.
   assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
@@ -148,7 +150,7 @@ class Latex(WriterBase):
   def build_preamble(self,doc,ass):
 
     # add packages
-    for e in self._packages:
+    for e in self._packages + ass.meta.__dict__.get('latex_packages',list()):
       try:
         p,o = e
       except:
@@ -163,6 +165,13 @@ class Latex(WriterBase):
       if not isinstance( ass.meta.header_includes, list ):
         ass.meta.header_includes = [ass.meta.header_includes]
       for line in ass.meta.header_includes:
+        doc.preamble.append(NoEscape(line))
+
+    # allow assignment metadata to add header info
+    if ass.meta.has("latex_preamble_lines"):
+      if not isinstance( ass.meta.latex_preamble_lines, list ):
+        ass.meta.latex_preamble_lines = [ass.meta.latex_preamble_lines]
+      for line in ass.meta.latex_preamble_lines:
         doc.preamble.append(NoEscape(line))
 
     doc.preamble.append(Package('fancyhdr'))

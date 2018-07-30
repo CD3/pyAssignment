@@ -21,7 +21,8 @@ class Markdown(ReaderBase):
 
     res = subprocess.run("md_to_json {}".format(f.name),shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     if res.returncode:
-      print("Error: there was a problem running md_to_json")
+      print("Error: there was a problem running md_to_json.")
+      print("       Is 'markdown-to-json' installed?")
       print("Stdout:")
       print(res.stdout.decode('utf-8'))
       print("Stderr:")

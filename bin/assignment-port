@@ -192,6 +192,36 @@ Q_ = units.Quantity
     try: f.write("ass.meta.footer['{}'] = r'{}'\n".format(ff,ass._config[ff+"F"]))
     except: pass
 
+  # some stuff we will want in the LaTeX premble
+  f.write(r'''
+units.define('electronvolt = 1.60217653e-19 * J = eV')
+ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
+                                ,r'\DeclareSIUnit \degC {\degree C}'
+                                ,r'\DeclareSIUnit \degK {K}'
+                                ,r'\DeclareSIUnit \mile {mi}'
+                                ,r'\DeclareSIUnit \inch {in}'
+                                ,r'\DeclareSIUnit \foot {ft}'
+                                ,r'\DeclareSIUnit \yard {yd}'
+                                ,r'\DeclareSIUnit \acre {acre}'
+                                ,r'\DeclareSIUnit \lightyear {ly}'
+                                ,r'\DeclareSIUnit \year {yr}'
+                                ,r'\DeclareSIUnit \parcec {pc}'
+                                ,r'\DeclareSIUnit \teaspoon {tsp.}'
+                                ,r'\DeclareSIUnit \tablespoon {tbsp.}'
+                                ,r'\DeclareSIUnit \gallon {gal}'
+                                ,r'\DeclareSIUnit \quart {qt}'
+                                ,r'\DeclareSIUnit \pallet {pallet}'
+                                ,r'\DeclareSIUnit \dollar {{\$}}'
+                                ,r'\DeclareSIUnit \poundmass {lbm}'
+                                ,r'\DeclareSIUnit \poundforce {lbf}'
+                                ,r'\DeclareSIUnit \gravity {g}'
+                                ,r'\DeclareSIUnit \revolutionsperminute{rpm}'
+                                ,r'\DeclareSIUnit \mph{mph}'
+                                ,r'\DeclareSIUnit \fluidounce{floz}'
+                                ,r'\DeclareSIUnit \turn {rev}'
+                                ]
+''')
+
   # loop through questions
   for q in ass._questions:
     f.write("\n")
