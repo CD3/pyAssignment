@@ -6,7 +6,7 @@ from pyAssignment.Assignment import Assignment
 import pyAssignment.Actions as Actions
 import pyAssignment.Assignment.Answers as Answer
 
-@pytest.mark.skipif( "TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Not running latex on Travis CI" )
+@pytest.mark.skipif( "TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", reason="Not running latex on Travis CI" )
 def test_problem_set_builder():
   ass = Assignment()
   with ass.add_question() as q:
