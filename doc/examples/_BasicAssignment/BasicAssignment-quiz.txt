@@ -1,0 +1,1 @@
+NUM	For problem #1: What is the mass? Give your answer in newton.	1.96E+02	1.96E+00
