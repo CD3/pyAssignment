@@ -60,12 +60,12 @@ A couple of things to note about the Blackboard quiz:
    I wanted a way to write quizzes for homework assignments that could be automatically graded and did not require me to
    restate a bunch of information from the problem set. In order to do this, each quiz question needed to reference a specific
    problem number. Doing this manually can be error-prone, as you can imagine...
-1. `pyAssignment` automatically detects the units for a numerical answer and inserts a statement "Give your answer in X" at
+1. `pyAssignment` automatically detects the units for a numerical answer and inserts a statement "Give your answer in X." at
    the end of each question text. Blackboard only accepts numerical values, its not possible to specify the units in your answer,
    so the quiz question must indicate to the student what units their answer is to be expressed in. Otherwise, students
-   will say "well, I computed the answer in X. I think its the same thing as Y, can you please check this?".
+   will say "Well, I computed the answer in Y. I think its the same thing as X, can you please check this?".
 1. `pyAssignment` automatically computes a tolerance for the numerical answer. If no estimate of error
    is given (i.e. you don't specify uncertainties in your input values), then `pyAssignment` will use 1%. It is also
-   possible to have the tolerance directly computed using error propagation. However, `pyAssignment`
+   possible to have the tolerance directly computed using error propagation (using the [`pyErrorProp'](https://github.com/CD3/pyErrorProp) module). However, `pyAssignment`
    will always use at least a 1% tolerance, even if the actual uncertainty is compted to be less. This lets the students
    safely round their answer to three significant figures when they enter it into Blackboard.
