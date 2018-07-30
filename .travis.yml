@@ -5,7 +5,7 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install git+https://github.com/CD3/pyErrorProp
-  - sudo apt-get install latexmk
+  - pip install git+https://github.com/CD3/macro_expander
 script:
   - pytest
 
