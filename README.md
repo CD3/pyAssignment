@@ -75,3 +75,6 @@ Both files are written to a sub-directory named `_<BASENAME>`, where
 assignment file is named `BasicAssignment.py`, then the PDF and Blackboard quiz
 file will be named `_BasicAssignment/BasicAssignment.pdf` and
 `_BasicAssignment/BasicAssignment-quiz.txt`, respectivly.
+
+Note that `pyAssignment` automatically computes a tolerance for the numerical answer. If no estimate of error
+is given (i.e. you don't specify uncertainties in your input values), then `pyAssignment` will use 1%.
