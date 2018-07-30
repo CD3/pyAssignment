@@ -8,13 +8,12 @@ import os,shutil,subprocess,re,sys
 def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
   current_dir = os.getcwd()
   assignment_dir = "_"+basename
-  if os.path.exists(assignment_dir):
-    if remove:
-      shutil.rmtree(assignment_dir)
-    else:
-      raise RuntimeError("Assignment directory '%s' already exists. Either delete it, or pass 'remove=True' to BuildProblemSetAndBlackboardQuiz."%assignment_dir)
 
-  os.mkdir(assignment_dir)
+  if os.path.exists(assignment_dir) and remove:
+    shutil.rmtree(assignment_dir)
+  if not os.path.exists(assignment_dir):
+    os.mkdir(assignment_dir)
+
   os.chdir(assignment_dir)
 
   # Write problem set
