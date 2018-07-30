@@ -14,6 +14,8 @@ write homework assignments for physics classes. The rewrite is currently in prog
     - Write assignment to Blackboard Quiz.
 - Command-line grader.
     - Write tests that are ran in the shell.
+- (`pyErrorProp')[https://github.com/CD3/pyErrorProp] integration. Tolerances for numerical solutions
+  can be automatically calculated using error propagation.
 
 ## Examples
 
