@@ -30,7 +30,7 @@ $ pip install .
 
 `pyAssignment` depends on the following modules avialble on PyPi, which you will need to install with `pip`.
 
-\file{../requirements.txt}
+\file[transform='/^/- /']{../requirements.txt}
 
 In addition to these, you will need to install `macro_expander`
 

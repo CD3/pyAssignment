@@ -30,13 +30,13 @@ $ pip install .
 
 `pyAssignment` depends on the following modules avialble on PyPi, which you will need to install with `pip`.
 
-pytest
-markdown-to-json
-numpy
-Pint
-PyLaTeX
-pyparsing
-PyYAML
+- pytest
+- markdown-to-json
+- numpy
+- Pint
+- PyLaTeX
+- pyparsing
+- PyYAML
 
 
 In addition to these, you will need to install `macro_expander`
