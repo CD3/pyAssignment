@@ -17,6 +17,33 @@ write homework assignments for physics classes. The rewrite is currently in prog
 - [`pyErrorProp'](https://github.com/CD3/pyErrorProp) integration. Tolerances for numerical solutions
   can be automatically calculated using error propagation.
 
+## Installing
+
+To install `pyAssignment`, code this repository and use `pip` to install.
+
+```bash
+$ git clone https://github.com/CD3/pyAssignment
+$ cd pyAssignment
+$ pip install .
+```
+
+
+`pyAssignment` depends on the following modules avialble on PyPi, which you will need to install with `pip`.
+
+\file{../requirements.txt}
+
+In addition to these, you will need to install `macro_expander`
+
+```bash
+$ pip install git+https://github.com/CD3/macro_expander
+```
+
+Optionally, if you want to do error propagation (which is very useful), you will need to install `pyErrorProp`
+
+```bash
+$ pip install git+https://github.com/CD3/pyErrorProp
+```
+
 ## Examples
 
 My primary use case for `pyAssignment` is writing a Physics homework set. I want to create a PDF that contains
