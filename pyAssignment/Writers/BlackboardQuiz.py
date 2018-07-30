@@ -52,7 +52,7 @@ class BlackboardQuiz(WriterBase):
     if have_macro_expander:
       latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
       def latex_math_to_mathimg(s,loc,toks):
-        return [ r'\mathimg[o="html"]{%s}'%t for t in toks ]
+        return [ r'\mathimg[o="html",tex2im_opts="-r 80x80"]{%s}'%t for t in toks ]
       latex_math.addParseAction(latex_math_to_mathimg)
       text = latex_math.transformString(text)
 
@@ -80,7 +80,7 @@ class BlackboardQuiz(WriterBase):
 
     a = q._answer
 
-    if t == "MC":
+    if t == "MC" or t == "MA":
       all_choices = self.MC_Answer_get_all_choices(a)
       correct_choices = self.MC_Answer_get_correct_choices(a)
       if len(correct_choices) < 1:
@@ -169,7 +169,10 @@ class BlackboardQuiz(WriterBase):
       return "NUM"
 
     if isinstance(a,MultipleChoice):
-      return "MC"
+      if len(a._correct) > 1:
+        return "MA"
+      else:
+        return "MC"
 
     if isinstance(a,Essay):
       return "ESS"
