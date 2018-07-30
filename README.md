@@ -66,9 +66,9 @@ The `BuildProblemSetAndBlackboardQuiz` function is an "action". It takes an assi
 the assignment questions, and any parts that the questions might have. Questions contained in each question or part
 are extracted and written to a text file that is suitable for uploading directly into a Blackboard quiz.
 
-[Here](.doc/examples/_BasicAssignment/BasicAssignment.pdf) is the PDF that gets generated.
+[Here](./doc/examples/_BasicAssignment/BasicAssignment.pdf) is the PDF that gets generated.
 
-[Here](.doc/examples/_BasicAssignment/BasicAssignment-quiz.txt) is the Blackboard quiz file that gets generated.
+[Here](./doc/examples/_BasicAssignment/BasicAssignment-quiz.txt) is the Blackboard quiz file that gets generated.
 
 Both files are written to a sub-directory named `_<BASENAME>`, where
 `<BASENAME>` is the basename of the assignment file. For example, if the
