@@ -22,8 +22,11 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
     latex_writer = Latex(f)
     latex_writer.dump(ass)
 
-  if shutil.which("latexmk"): subprocess.check_call( "latexmk -pdf", shell=True )
-  else: raise RuntimeError("Could not find 'latexmk' command. Please install it, or add the directory containing it to your PATH")
+  # run latex in the background
+  latex_cmd = "pdflatex -interaction=nonstopmode {}".format(latex_filename)
+  if shutil.which("pdflatex"):
+    latex_proc = subprocess.Popen( latex_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+  else: raise RuntimeError("Could not find 'pdflatex' command. Please install it, or add the directory containing it to your PATH")
 
 
   # Write quiz
@@ -32,8 +35,17 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
   # We need/want to add a statement to reference which problem set question each
   # quiz question is about. The problem set question numbers will be written
   # to the .aux file.
+  # NOTE: we can't read the aux file until AFTER the latex's first pass
+  if latex_proc.wait(30):
+    print(ColorCodes.WARNING, file=sys.stderr)
+    print(latex_proc.stdout.read().decode('utf-8'), file=sys.stderr)
+    print(ColorCodes.ENDC, file=sys.stderr)
+    raise RuntimeError("There was a problem running pdflatex")
   aux = LatexAux(basename+'.aux')
+  # now we can run latex again in the background
+  latex_proc = subprocess.Popen( latex_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+  # replace labels in the quiz text
   template = "For problem #{LABEL}: "
   for qq in quiz._questions:
     if qq.meta.has("ancestor_uuids"):
@@ -58,11 +70,15 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
 
     qq.text = prefix + qq.text
 
+  # write the blackboard quiz
   blackboard_filename = basename+'-quiz.txt'
   with open(blackboard_filename, 'w') as f:
     blackboard_writer = BlackboardQuiz(f)
     blackboard_writer.dump(quiz)
 
+  # read the quiz file that was just written and check
+  # to see if there are any latex commands that didn't get
+  # replaced.
   with open(blackboard_filename,'r') as f:
     text = f.read()
     ms = [ m for m in re.finditer('\\\[a-zA-Z]+[\[{]',text) ]
@@ -77,7 +93,12 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
         i += 1
       print(ColorCodes.ENDC, file=sys.stderr)
 
-
-
   os.chdir(current_dir)
+
+  # wait for latex to finish (it's probably already done)
+  if latex_proc.wait(30):
+    print(ColorCodes.WARNING, file=sys.stderr)
+    print(latex_proc.stdout.read().decode('utf-8'), file=sys.stderr)
+    print(ColorCodes.ENDC, file=sys.stderr)
+    raise RuntimeError("There was a problem running pdflatex")
 

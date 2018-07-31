@@ -51,6 +51,8 @@ Optionally, if you want to do error propagation (which is very useful), you will
 $ pip install git+https://github.com/CD3/pyErrorProp
 ```
 
+You will also need a LaTeX installation, such as texlive, with `pdflatex` to use the LaTeX writer.
+
 ## Examples
 
 My primary use case for `pyAssignment` is writing a Physics homework set. I want to create a PDF that contains
