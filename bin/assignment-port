@@ -170,9 +170,16 @@ with open(args.output,'w') as f:
 
   f.write('''\
 import numpy
-import pint
-units = pint.UnitRegistry()
+import pyErrorProp as err
+from utils import Constants
+from utils import Units
+from utils import Spelling
+
+uconv = err.UncertaintyConvention()
+units = uconv._UNITREGISTRY
 Q_ = units.Quantity
+UQ_ = uconv.UncertainQuantity
+c = Constants.ConstantsCollection(units,3)
 ''')
 
   # create Assignment
