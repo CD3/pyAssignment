@@ -33,6 +33,6 @@ then
 fi
 
 echo "tagging with ${tag}"
-git tag ${tag}
+git tag -a ${tag}
 git tag | grep ${tag}
 echo "Successfully tagged commit."
