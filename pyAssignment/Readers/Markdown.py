@@ -3,6 +3,7 @@ from .JSON import *
 import yaml
 import pyparsing
 import subprocess, tempfile
+import sys
 
 class Markdown(ReaderBase):
   '''A (very) limited Markdown parser. Currently

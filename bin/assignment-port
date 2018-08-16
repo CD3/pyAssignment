@@ -226,6 +226,7 @@ ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
                                 ,r'\DeclareSIUnit \mph{mph}'
                                 ,r'\DeclareSIUnit \fluidounce{floz}'
                                 ,r'\DeclareSIUnit \turn {rev}'
+                                ,r'\sisetup{per-mode=fraction}'
                                 ]
 ''')
 
@@ -273,7 +274,7 @@ ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
           f.write( indent(text,2) )
           # write answers
           if len(quiz._questions[j]._answers) > 0:
-            f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),2))
+            f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),3))
           quiz._questions[j] = None
 
   # loop through assignment's figures
@@ -302,7 +303,7 @@ ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
   f.write("""\
 
 basename = os.path.basename(__file__).replace(".py","")
-BuildProblemSetAndBlackboardQuiz(ass,basename,remove=True)
+BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False)
 """)
   try:
     f.write("try:g.write_grader_script(basename+'-grader.py')\nexcept:pass")
