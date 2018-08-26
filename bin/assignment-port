@@ -102,6 +102,15 @@ with {PARENT}.add_answer(Answer.Numerical) as {THIS}:
     return text
   except: pass
 
+  try: # a "raw" answer
+    text = """\
+with {PARENT}.add_answer(Answer.Text) as {THIS}:
+  {THIS}.text = r'''{TEXT}'''
+""".format(PARENT=parent,THIS=this,TEXT=a._text)
+
+    return text
+  except: pass
+
   raise RuntimeError("Could not write answer: {TYPE}.".format(TYPE=type(a)))
 
 
