@@ -216,9 +216,8 @@ class Latex(WriterBase):
   def build_key(self,doc,ass):
     doc.append(NoEscape(r"\newpage"))
     doc.append(NoEscape(r"\textbf{\large Answers:}"))
-    for i in range(len(ass._questions)):
-      q = ass._questions[i]
-      doc.append(NoEscape(r"\\ \ref{%s}"%q._uuid))
+
+    def write_answer(q):
 
       if q._answer is not None:
         try: # multiple choice
@@ -237,6 +236,18 @@ class Latex(WriterBase):
           doc.append(NoEscape("{}".format(ans)))
         except:
           pass
+
+
+    for i in range(len(ass._questions)):
+      q = ass._questions[i]
+      doc.append(NoEscape(r"\\ \ref{%s} "%q._uuid))
+      write_answer(q)
+
+      for j in range(len(q._parts)):
+        p = q._parts[j]
+        doc.append(NoEscape(r"\\ \ref{%s}\ref{%s} "%(q._uuid,p._uuid)))
+        write_answer(p)
+
 
 
 
