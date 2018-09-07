@@ -141,8 +141,10 @@ class BlackboardQuiz(WriterBase):
       if unc is None and self.config.default_relative_numerical_uncertainty:
         unc = val*self.config.default_relative_numerical_uncertainty
 
-      if self.config.minimum_relative_numerical_uncertainty and unc != None and val*self.config.minimum_relative_numerical_uncertainty > unc:
+      if self.config.minimum_relative_numerical_uncertainty and unc != None and abs(val*self.config.minimum_relative_numerical_uncertainty) > abs(unc):
         unc = val*self.config.minimum_relative_numerical_uncertainty
+
+      unc = abs(unc)
 
       toks.append("{:.2E}".format(unc))
 
