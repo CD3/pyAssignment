@@ -1,5 +1,6 @@
 from .Element import *
 from .Answers import *
+from .Figure import *
 
 class Question(Element):
   """A class representing a question.
@@ -21,6 +22,7 @@ class Question(Element):
     self._parts     = []
     self._questions = []
     self._answer    = None
+    self._figures = []
 
 
   @property
@@ -92,4 +94,13 @@ class Question(Element):
     self._answer = a
     self._answer.NS.__dict__.update( self.NS.__dict__ )
     yield self._answer
+
+  @contextlib.contextmanager
+  def add_figure(self,f=None):
+    if f is None:
+      f = Figure()
+
+    self._figures.append(f)
+
+    yield self._figures[-1]
 

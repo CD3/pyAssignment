@@ -1,5 +1,6 @@
 from .WriterBase import *
 from ..Assignment.Answers import *
+from ..Utils import image2html
 
 import pyparsing
 import re
@@ -76,7 +77,17 @@ class BlackboardQuiz(WriterBase):
 
     toks = list()
     toks.append(t)
-    toks.append(q.formatted_text)
+
+    text = ""
+    if len(q._figures):
+      for f in q._figures:
+        text += image2html(f.filename)+"</br>"
+
+    text += q.formatted_text
+
+
+
+    toks.append(text)
 
     a = q._answer
 

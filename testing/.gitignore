@@ -1,4 +1,7 @@
 test.tex
 _test/
+_tmp/
 grader.py
 ON_PASS_CMD.txt
+Bb-quiz-with-figure.txt
+file.svg

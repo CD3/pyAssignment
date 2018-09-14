@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 from inspect import getargspec
 
-import os
+import os, urllib, base64
 
 import pyparsing
 
@@ -153,4 +153,50 @@ class ColorCodes:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
+
+def image2html( filename, fmt=None, opts="" ):
+  '''Return html code to directly embed an image file into an html document.
+     filename may be a local filename, or a remote URL.
+  '''
+
+  # we are using urlib here to support remote images.
+  # need to to some work to support local files too.
+  url = urllib.parse.urlparse(filename)
+  if url.scheme == '':
+    url = url._replace(scheme='file')
+
+  if url.scheme == 'file':
+    filename = os.path.join( os.getcwd(), filename)
+    filename = os.path.normpath(filename)
+    if not os.path.isfile( filename ):
+      raise RuntimeError("ERROR: could not find image file '%s'." % filename )
+    url = url._replace(path=filename)
+
+
+  url = url.geturl()
+
+  if fmt is None:
+    fmt = os.path.splitext( filename )[-1][1:] # use extension for file format
+
+  # get the image.
+  f = urllib.request.urlopen(url)
+  img = f.read()
+  f.close()
+
+  
+  # we can embed images directly into html by encoding them to Base64.
+  # however, svg images are actually valid html, so we can just embed
+  # directly. so if we have an svg, we want to return the image text.
+  # otherwise, we need to encode the image to Base64 and put it in an
+  # html <img> tag.
+
+  if fmt == "svg":
+    text = img.decode('utf-8')
+  else:
+    # encode the image so it can be embedded
+    code = base64.b64encode(img).decode('utf-8')
+    # create html text image tag with image embedded.
+    text  = r'''<img src="data:image/{fmt};base64,{code}" {opts}>'''.format(fmt=fmt,code=code,opts=opts)
+
+  return text
 

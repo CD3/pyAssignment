@@ -299,3 +299,46 @@ def test_latex_writer_header_and_footers():
   assert re.search( "right footer", fh.getvalue() )
   assert re.search( r"\\title\{The Title\}", fh.getvalue() )
 
+
+def test_blackboard_writer_figures():
+
+  image_text = r"""<?xml version="1.0" encoding="UTF-8" ?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+<circle cx="125" cy="125" r="75" fill="orange" />
+</svg>
+"""
+  with open("file.svg", "w") as f:
+    f.write(image_text)
+
+
+
+  fh = io.StringIO()
+  writer = Writers.BlackboardQuiz(fh)
+
+  ass = Assignment()
+  with ass.add_question() as q:
+    q.text = "See image above."
+    with q.add_figure() as f:
+      f.filename = "file.svg"
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a"
+      a.correct += "b"
+  with ass.add_question() as q:
+    q.text = "no image here."
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.correct += "a"
+      a.incorrect += "b"
+
+  writer.dump(ass)
+
+  quiz_text = """\
+MC\t{IMAGE_TEXT}</br>See image above.\ta\tincorrect\tb\tcorrect\tNone of the above.\tincorrect
+MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
+""".format(IMAGE_TEXT=image_text.replace("\n"," "))
+
+  assert fh.getvalue() == quiz_text
+
+  with open("Bb-quiz-with-figure.txt","w") as f:
+    writer.dump(ass,f)
+    
+
