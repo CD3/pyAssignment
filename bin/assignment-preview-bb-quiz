@@ -1,0 +1,37 @@
+#! /usr/bin/env python
+
+import tempfile, subprocess
+
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description="A sweet program for doing something.")
+
+parser.add_argument("quiz_file",
+                    action="store",
+                    help="Blackboard quiz text file to preview." )
+
+args = parser.parse_args()
+
+
+with open(args.quiz_file) as f:
+  text = f.read()
+
+text = text.replace("\tcorrect","<<<<")
+text = text.replace("\tincorrect","")
+text = text.replace("\t",r"</br>")
+text = text.replace("\n",r"</br></br>")
+
+with tempfile.NamedTemporaryFile(mode="w",suffix=".html",delete=False) as f:
+  f.write(text)
+  filename = f.name
+
+browsers = ["chromium", "chromium-browser", "firefox", "firefox-bin"]
+
+for browser in browsers:
+  try:
+    subprocess.run( [browser,filename] )
+    break
+  except:
+    pass
+
+
