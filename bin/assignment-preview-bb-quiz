@@ -16,6 +16,7 @@ args = parser.parse_args()
 with open(args.quiz_file) as f:
   text = f.read()
 
+
 text = text.replace("\tcorrect","<<<<")
 text = text.replace("\tincorrect","")
 text = text.replace("\t",r"</br>")
