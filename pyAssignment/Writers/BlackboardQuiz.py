@@ -79,9 +79,17 @@ class BlackboardQuiz(WriterBase):
     toks.append(t)
 
     text = ""
+
+    if level > 0:
+      text += "This question is about the same scenario as the previous question. "
+
+
     if len(q._figures):
       for f in q._figures:
-        text += image2html(f.filename)+"</br>"
+        fmt = None
+        if f.meta.has("fmt"):
+          fmt = f.meta.fmt
+        text += image2html(f.filename,fmt)+"</br>Consider the figure above. "
 
     text += q.formatted_text
 
@@ -110,7 +118,7 @@ class BlackboardQuiz(WriterBase):
           toks.append("correct")
 
     if t == "NUM":
-      q = a.quantity
+      ans = a.quantity
 
       # we are using the pythonic 'try-and-ask-for-forgiveness-later' method of type inspection.
 
@@ -118,25 +126,25 @@ class BlackboardQuiz(WriterBase):
       # the units that the answer should be given in.
       unit_str = ""
       try: # a pint quantity
-        unit_str = "{}".format(q.units)
+        unit_str = "{}".format(ans.units)
       except:
         pass
 
       try: # a pyErrorProp uncertain quantity
-        unit_str = "{}".format(q.nominal.units)
+        unit_str = "{}".format(ans.nominal.units)
       except:
         pass
 
       if len(unit_str) > 0 and unit_str != "dimensionless":
         toks[1] += " Give your answer in {}.".format(unit_str)
 
-      val = q
+      val = ans
       try: # a pint quantity
-        val = q.magnitude
+        val = ans.magnitude
       except:
         pass
       try: # a pyErrorProp uncertain quantity
-        val = q.nominal.magnitude
+        val = ans.nominal.magnitude
       except:
         pass
 
@@ -144,7 +152,7 @@ class BlackboardQuiz(WriterBase):
 
       unc = None
       try: # a pyErrorProp uncertain quantity
-        unc = q.uncertainty.to( q.nominal.units ).magnitude
+        unc = ans.uncertainty.to( ans.nominal.units ).magnitude
       except:
         pass
 
@@ -168,6 +176,10 @@ class BlackboardQuiz(WriterBase):
 
 
     fh.write(self._format_line("\t".join(toks))+"\n")
+
+    # write question parts
+    if len(q._parts) > 0:
+      self._dump_questions( q._parts, fh, level+1)
       
        
 

@@ -1,4 +1,5 @@
 from .Element import *
+import os
 
 class Figure(Element):
   '''Represents a figure.'''
@@ -27,6 +28,8 @@ class Figure(Element):
 
   @filename.setter
   def filename(self,val):
+    # store absolute path to file
+    val = os.path.abspath(val)
     # todo: if file does not exist, search
     # for a candidate
     self._filename = self._lint(val)

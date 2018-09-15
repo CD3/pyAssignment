@@ -87,7 +87,14 @@ class Latex(WriterBase):
         if q.meta.has('label'):
           label += r"\label{%s}"%q.meta.label
 
-        qlist.add_item( NoEscape(label+q.formatted_text) )
+        text = label
+        if len(q._figures) > 0:
+          if len(q._figures) > 1:
+            raise RuntimeError("WARNING: multiple figures detected in a single question. This is not supported by the LaTeX Writer.\n")
+          f = q._figures[0]
+          text += r"For this question, consider Figure \ref{%s}. "%f._uuid
+        text += q.formatted_text
+        qlist.add_item( NoEscape(text) )
 
 
 
@@ -201,7 +208,8 @@ class Latex(WriterBase):
       doc.append(NoEscape(r'\maketitle'))
 
   def build_figures(self,doc,ass):
-    for f in ass._figures:
+    figures = ass._figures + [f for q in ass._questions for f in q._figures]
+    for f in figures:
 
       with doc.create(Figure()) as fig:
         width=r'0.4\textwidth'
