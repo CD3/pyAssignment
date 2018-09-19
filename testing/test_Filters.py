@@ -3,10 +3,10 @@ import pytest
 import io
 
 from pyAssignment.Assignment import Assignment
-import pyAssignment.Filters as Filters
 import pyAssignment.Writers as Writers
 import pyAssignment.Assignment.Answers as Answer
 
+import pyAssignment.Filters as Filters
 
 def test_extract_quiz():
 
@@ -50,20 +50,21 @@ def test_extract_quiz():
   writer = Writers.Simple(fh)
   writer.dump(quiz)
 
-  print(fh.getvalue())
+  # print(fh.getvalue())
 
 
 def test_question_tagging():
 
   ass = Assignment()
   with ass.add_question() as q:
-    q.meta.tag = "topic 1,topic 2"
+    q.tags = "topic 1"
+    q.tags += "topic 2"
     q.text = "q1"
     with q.add_answer(Answer.Text) as a:
       a.text = 'the answer'
 
   with ass.add_question() as q:
-    q.meta.tag = "topic 3"
+    q.tags = "topic 3"
     q.text = "q2"
     with q.add_part() as p:
       p.text = "q2p1"
@@ -72,7 +73,7 @@ def test_question_tagging():
 
   with ass.add_question() as q:
     q.text = "q3"
-    q.meta.tag = "topic 2"
+    q.tags = "topic 2"
     with q.add_part() as p:
       p.text = "q3p1"
       with p.add_answer(Answer.Text) as a:
@@ -82,37 +83,44 @@ def test_question_tagging():
       with p.add_answer(Answer.Text) as a:
         a.quantity = 3.2
 
-  tf = Filters.TagFilter()
-
-  fass = tf.filter( ass, 'topic 2' )
+  fass = Filters.filter( Filters.has_tag('topic 2'), ass )
   assert len(fass._questions) == 2
   assert fass._questions[0]._text == "q1"
   assert fass._questions[1]._text == "q3"
 
-  fass = tf.filter( ass, 'topic 3' )
+  fass = Filters.filter( Filters.has_tag('topic 3'), ass )
   assert len(fass._questions) == 1
   assert fass._questions[0]._text == "q2"
 
 
-  tf.add_pattern( 'topic 2' )
-  fass = tf.filter( ass )
+  fass = Filters.filter( Filters.has_tag("topic 2"), ass )
   assert len(fass._questions) == 2
   assert fass._questions[0]._text == "q1"
   assert fass._questions[1]._text == "q3"
 
-  fass = tf.filter( ass, 'topic 3' )
+  fass = Filters.filter( Filters.has_tag("topic 3"), ass )
   assert len(fass._questions) == 1
   assert fass._questions[0]._text == "q2"
 
-  fass = tf.filter( ass )
-  assert len(fass._questions) == 2
-  assert fass._questions[0]._text == "q1"
-  assert fass._questions[1]._text == "q3"
-
-  tf.add_pattern( 'topic .' )
-  fass = tf.filter( ass )
+  fass = Filters.filter( Filters.has_matching_tag("topic ."), ass )
   assert len(fass._questions) == 3
   assert fass._questions[0]._text == "q1"
   assert fass._questions[1]._text == "q2"
   assert fass._questions[2]._text == "q3"
+
+
+def test_predicates():
+
+
+  a = [v for v in range(10)]
+  b = [v for v in filter(Filters.Predicate(lambda x: True) & (lambda x : x%2 == 0),a )]
+
+  assert len(a) == 10
+  assert len(b) == 5
+  assert a[0] == 0
+  assert a[1] == 1
+  assert b[0] == 0
+  assert b[1] == 2
+
+
 
