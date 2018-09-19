@@ -30,12 +30,13 @@ def predicate(func):
   update_wrapper(result, func)
   return result
 
-@predicate
 def has_tag(tag):
     def imp(q):
       return tag in q.tags
 
-    return imp
+    p = Predicate(imp)
+    update_wrapper(p,imp)
+    return p
 
 def has_matching_tag(pattern):
     def imp(q):
@@ -44,4 +45,6 @@ def has_matching_tag(pattern):
           return True
       return False
 
-    return imp
+    p = Predicate(imp)
+    update_wrapper(p,imp)
+    return p

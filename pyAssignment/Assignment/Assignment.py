@@ -31,7 +31,7 @@ class Assignment(Element):
     yield self._figures[-1]
 
   @contextlib.contextmanager
-  def add_information(self,):
+  def add_information(self):
     # Need to:
     #
     # 1. Mark the location that the information should be inserted into the assignment
@@ -43,3 +43,12 @@ class Assignment(Element):
       self._information[pos] = Information()
     self._information[pos].NS.__dict__.update( self.NS.__dict__ )
     yield self._information[pos]
+
+  def update(self,ass):
+    '''Add questions, figures, and instructions from another assignment to this assignment.'''
+
+    old_n = len(self._questions)
+    self._questions += ass._questions
+    self._figures += ass._figures
+    for i in ass._information:
+      self._information[old_n+i] = ass._information[i]

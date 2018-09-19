@@ -332,7 +332,7 @@ def test_blackboard_writer_figures():
   writer.dump(ass)
 
   quiz_text = """\
-MC\t{IMAGE_TEXT}</br>See image above.\ta\tincorrect\tb\tcorrect\tNone of the above.\tincorrect
+MC\t{IMAGE_TEXT}</br>Consider the figure above. See image above.\ta\tincorrect\tb\tcorrect\tNone of the above.\tincorrect
 MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
 """.format(IMAGE_TEXT=image_text.replace("\n"," "))
 
