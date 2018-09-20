@@ -1,4 +1,5 @@
 from ..Writers.BlackboardQuiz import *
+from ..Utils import ColorCodes
 import os,shutil,subprocess,re,sys
 
 def BuildBlackboardAssignment(ass,basename,remove=False):
