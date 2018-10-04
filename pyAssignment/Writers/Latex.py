@@ -148,7 +148,15 @@ class Latex(WriterBase):
             if p.meta.has('label'):
               label += r"\label{%s}"%p.meta.label
 
-            plist.add_item( NoEscape(label+p.formatted_text) )
+            text = label
+            if len(p._figures) > 0:
+              if len(p._figures) > 1:
+                raise RuntimeError("WARNING: multiple figures detected in a single part. This is not supported by the LaTeX Writer.\n")
+              f = p._figures[0]
+              text += r"For this part, consider Figure \ref{%s}. "%f._uuid
+            text += p.formatted_text
+
+            plist.add_item( NoEscape(text) )
 
         level -= 1
 
@@ -208,7 +216,7 @@ class Latex(WriterBase):
       doc.append(NoEscape(r'\maketitle'))
 
   def build_figures(self,doc,ass):
-    figures = ass._figures + [f for q in ass._questions for f in q._figures]
+    figures = ass._figures + [f for q in ass._questions for f in q._figures] + [ f for q in ass._questions for p in q._parts for f in p._figures ]
     for f in figures:
 
       with doc.create(Figure()) as fig:
