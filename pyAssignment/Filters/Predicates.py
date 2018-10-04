@@ -31,20 +31,23 @@ def predicate(func):
   return result
 
 def has_tag(tag):
-    def imp(q):
+    def has_tag(q):
+      '''Return true if question has a specific tag.'''
+
       return tag in q.tags
 
-    p = Predicate(imp)
-    update_wrapper(p,imp)
+    p = Predicate(has_tag)
+    update_wrapper(p,has_tag)
     return p
 
 def has_matching_tag(pattern):
-    def imp(q):
+    def has_matching_tag(q):
+      '''Return true if question has a tag matching a pattern.'''
       for tag in q.tags:
         if re.match(pattern,tag):
           return True
       return False
 
-    p = Predicate(imp)
-    update_wrapper(p,imp)
+    p = Predicate(has_matching_tag)
+    update_wrapper(p,has_matching_tag)
     return p
