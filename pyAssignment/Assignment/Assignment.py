@@ -3,6 +3,7 @@ from .Question import *
 from .Answers import *
 from .Figure import *
 from .Information import *
+import inspect
 
 class Assignment(Element):
 
@@ -18,6 +19,13 @@ class Assignment(Element):
   def add_question(self,q=None):
     if q is None:
       q = Question()
+
+    # store the file and line number where the question was created.
+    # this will be useful for diagnostics
+    caller_frame = inspect.stack()[2]
+    q.meta.filename =  caller_frame.filename
+    q.meta.lineno   =  caller_frame.lineno
+
     self._questions.append(q)
     self._questions[-1].NS.__dict__.update( self.NS.__dict__ )
     yield self._questions[-1]
