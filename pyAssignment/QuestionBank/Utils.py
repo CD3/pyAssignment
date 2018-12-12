@@ -66,6 +66,7 @@ def CheckQuestionBank(bank, checks=[], fh=sys.stdout):
           fh.write("\tMessage: {}\n".format(msgfh.getvalue()))
 
       except Exception as e:
+        passed = False
         fh.write("\n")
         fh.write(
             "An exception was thrown when trying to run a check for a question in the bank\n"
