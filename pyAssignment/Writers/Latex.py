@@ -224,7 +224,7 @@ class Latex(WriterBase):
         if f.meta.has('width'):
           width=f.meta.width
         fig.add_image(f.filename,width=NoEscape(width))
-        label = ("\label{%s}"%f._uuid)
+        label = (r"\label{%s}"%f._uuid)
         if f.meta.has("label"):
           label += r"\label{%s}"%f.meta.label
         fig.add_caption(NoEscape(label+f.formatted_caption))

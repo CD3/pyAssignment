@@ -23,7 +23,7 @@ def BuildBlackboardAssignment(ass,basename,remove=False):
   # replaced.
   with open(blackboard_filename,'r') as f:
     text = f.read()
-    ms = [ m for m in re.finditer('\\\[a-zA-Z]+[\[{]',text) ]
+    ms = [ m for m in re.finditer(r'\\\[a-zA-Z]+[\[{]',text) ]
     if len(ms) > 0:
       print(ColorCodes.WARNING, file=sys.stderr)
       print("WARNING: it appears that the quiz text ({}) contains one ore more LaTeX macros.".format(blackboard_filename), file=sys.stderr)

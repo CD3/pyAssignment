@@ -1,7 +1,7 @@
 from types import SimpleNamespace
-from inspect import getargspec
+from inspect import signature
 
-import os, urllib, base64
+import os, urllib, urllib.request, base64
 
 import pyparsing
 
@@ -17,7 +17,8 @@ class Namespace(SimpleNamespace):
 
   def call(self,func,**kwargs):
     # get list of args required by f
-    rargs = getargspec(func).args
+    # rargs = getargspec(func).args # deprecated
+    rargs = signature(func).parameters
     # build args to pass to f from our __dict__ and kwargs.
     # use the value in __dict__ unless an entry exists in kwargs
 

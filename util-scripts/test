@@ -1,0 +1,38 @@
+#! /bin/bash
+
+set -e # exist immediatly on error
+
+ROOTDIR=$(git rev-parse --show-toplevel || echo $PWD)
+cd $ROOTDIR
+
+workdir=$(readlink -f ".test-sandbox")
+
+function cleanup ()
+{
+  [[ -d ${workdir} ]] && rm -rf ${workdir}
+}
+trap cleanup EXIT
+trap cleanup ERR
+
+set -e
+
+echo "Creating sandbox directory (${workdir}) to work in"
+mkdir ${workdir}
+cd ${workdir}
+echo "Copying repo to sandbox"
+cp -r ${ROOTDIR}/testing ./
+rm -f ./testing/pyAssignment
+cp -r ${ROOTDIR}/pyAssignment ./testing
+echo "Setting up virtual envirtonment to test"
+virtualenv -p python3 env
+source env/bin/activate
+#source ${ROOTDIR}/util-scripts/install_dependencies.sh
+pip install pytest pyparsing pint pylatex pyyaml markdown-to-json
+git clone git@github.com:CD3/pyErrorProp
+cd pyErrorProp
+#git checkout 3.0.1
+pip install .
+cd ..
+cd testing
+pwd
+pytest "$@"

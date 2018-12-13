@@ -23,6 +23,137 @@ def run(cmd,**kwargs):
   return r,o,e
 
 
+class Test(object):
+  def __init__(self):
+    self._name = None
+    self._desc = None
+    self._dir = None
+
+    self._on_fail_tests = collection()
+    self._on_pass_tests = collection()
+
+    self._formatter = SFFormatter()
+
+    self._namespace = Namespace()
+    self._meta      = Namespace()
+
+  @property
+  def NS(self):
+    return self._namespace
+
+  @property
+  def meta(self):
+    return self._meta
+
+  @property
+  def name(self):
+    if self._name is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._name , **self.NS.__dict__ )
+
+  @name.setter
+  def name(self,val):
+    self._name = val
+
+  @property
+  def description(self):
+    if self._desc is None:
+      return ""
+    else:
+      return self._formatter.fmt( self._desc , **self.NS.__dict__ )
+
+  @description.setter
+  def description(self,val):
+    self._desc = val
+
+  @property
+  def directory(self):
+    if self._dir is None:
+      return None
+    else:
+      return self._formatter.fmt( self._dir, **self.NS.__dict__ )
+
+  @directory.setter
+  def directory(self,val):
+    self._dir = val
+
+  def run(self):
+    
+    self._r,self._o,self._e = run(self.command_string,**self._meta.__dict__.get('run_kwargs',{}))
+    if self._r == 0 and len(self._on_pass_tests) > 0:
+      for t in self._on_pass_tests:
+        t.run()
+    if self._r != 0 and len(self._on_fail_tests) > 0:
+      for t in self._on_fail_tests:
+        t.run()
+
+
+  @contextlib.contextmanager
+  def add_on_fail_test(self):
+    t = ShellTest()
+    t.NS.__dict__.update( self.NS.__dict__ )
+    t.meta.__dict__.update( self.meta.__dict__ )
+    t.directory = self._dir
+    t.startup_command = self.startup_command
+    t.clenaup_command = self.cleanup_command
+    yield t
+    if t._name is None:
+      t.name = "Failure Follow-up Test "+str(len(self._on_fail_tests))
+    self._on_fail_tests.append(t)
+
+  @contextlib.contextmanager
+  def add_on_pass_test(self):
+    t = ShellTest()
+    t.NS.__dict__.update( self.NS.__dict__ )
+    t.meta.__dict__.update( self.meta.__dict__ )
+    t.directory = self._dir
+    t.startup_command = self.startup_command
+    t.clenaup_command = self.cleanup_command
+    yield t
+    if t._name is None:
+      t.name = "Success Follow-up Test "+str(len(self._on_pass_tests))
+    self._on_pass_tests.append(t)
+
+  @property
+  def weight(self):
+    try: return self._weight
+    except: return 1
+
+  @weight.setter
+  def weight(self,val):
+    self._weight = val
+
+  @property
+  def fail_tests_weight(self):
+    try: return self._fail_tests_weight
+    except: return 0.5
+
+  @fail_tests_weight.setter
+  def fail_tests_weight(self,val):
+    self._fail_tests_weight = val
+
+
+  @property
+  def score(self):
+    # return None if the test hasn't been run
+    if self._r is None:
+      return None
+
+    # if test succeeded, return 100%
+    if self._r == 0:
+      return 1
+    else:
+      # if test failed,
+      # add up the score from the _on_fail_tests (if any)
+      # and return
+      score = 0
+      total_weight = sum([t.weight for t in self._on_fail_tests])
+      for t in self._on_fail_tests:
+        score += t.weight * t.score / total_weight
+      score *= self.fail_tests_weight
+      return score
+
 #  ____  _          _ _ _____         _   
 # / ___|| |__   ___| | |_   _|__  ___| |_ 
 # \___ \| '_ \ / _ \ | | | |/ _ \/ __| __|
