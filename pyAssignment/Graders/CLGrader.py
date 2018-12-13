@@ -1,9 +1,12 @@
 from .GraderBase import *
 from ..Utils import Namespace, SFFormatter
 
-import contextlib, subprocess, io
+import contextlib, subprocess, io, inspect
 
 def run(cmd,**kwargs):
+  '''
+  Run a shell command and return the exit code, standard output, and standar error.
+  '''
   c = subprocess.run( cmd, shell=True, executable="/bin/bash", stdout=subprocess.PIPE, stderr=subprocess.PIPE )
   r = c.returncode
   o = c.stdout
@@ -28,6 +31,7 @@ class Test(object):
     self._name = None
     self._desc = None
     self._dir = None
+    self._result = None
 
     self._on_fail_tests = collection()
     self._on_pass_tests = collection()
@@ -79,19 +83,28 @@ class Test(object):
     self._dir = val
 
   def run(self):
-    
-    self._r,self._o,self._e = run(self.command_string,**self._meta.__dict__.get('run_kwargs',{}))
-    if self._r == 0 and len(self._on_pass_tests) > 0:
+    # run this test
+    self._result = self.__run__()
+
+    # if test passed, run the "on pass" tests
+    if self._result and len(self._on_pass_tests) > 0:
       for t in self._on_pass_tests:
         t.run()
-    if self._r != 0 and len(self._on_fail_tests) > 0:
+
+    # if test fails, run the "on fail" tests
+    if not self._result and len(self._on_fail_tests) > 0:
       for t in self._on_fail_tests:
         t.run()
 
-
   @contextlib.contextmanager
-  def add_on_fail_test(self):
-    t = ShellTest()
+  def add_on_fail_test(self,test=None):
+    if test is None:
+      test = self.__class__
+    if inspect.isclass(test):
+      t = test()
+    else:
+      t = test
+
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
@@ -103,8 +116,14 @@ class Test(object):
     self._on_fail_tests.append(t)
 
   @contextlib.contextmanager
-  def add_on_pass_test(self):
-    t = ShellTest()
+  def add_on_pass_test(self,test=None):
+    if test is None:
+      test = self.__class__
+    if inspect.isclass(test):
+      t = test()
+    else:
+      t = test
+
     t.NS.__dict__.update( self.NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.directory = self._dir
@@ -137,11 +156,11 @@ class Test(object):
   @property
   def score(self):
     # return None if the test hasn't been run
-    if self._r is None:
+    if self._result is None:
       return None
 
     # if test succeeded, return 100%
-    if self._r == 0:
+    if self._result:
       return 1
     else:
       # if test failed,
@@ -160,55 +179,15 @@ class Test(object):
 #  ___) | | | |  __/ | | | |  __/\__ \ |_ 
 # |____/|_| |_|\___|_|_| |_|\___||___/\__|
 
-class ShellTest(object):
+class ShellTest(Test):
   def __init__(self):
-    self._name = None
-    self._desc = None
-    self._scmds = "" #collection() # setup commands
-    self._cmds  = "" #collection()
-    self._ecmds = "" #collection() # teardown command
+    super().__init__()
+    self._scmds = "" # setup commands
+    self._cmds  = ""
+    self._ecmds = "" # teardown command
     self._o = None
     self._e = None
     self._r = None
-    self._dir = None
-
-    self._on_fail_tests = collection()
-    self._on_pass_tests = collection()
-
-    self._formatter = SFFormatter()
-
-    self._namespace = Namespace()
-    self._meta      = Namespace()
-
-  @property
-  def NS(self):
-    return self._namespace
-
-  @property
-  def meta(self):
-    return self._meta
-
-  @property
-  def name(self):
-    if self._name is None:
-      return ""
-    else:
-      return self._formatter.fmt( self._name , **self.NS.__dict__ )
-
-  @name.setter
-  def name(self,val):
-    self._name = val
-
-  @property
-  def description(self):
-    if self._desc is None:
-      return ""
-    else:
-      return self._formatter.fmt( self._desc , **self.NS.__dict__ )
-
-  @description.setter
-  def description(self,val):
-    self._desc = val
 
 
   @property
@@ -254,92 +233,9 @@ class ShellTest(object):
   def error(self):
     return self._e
 
-
-  @property
-  def directory(self):
-    if self._dir is None:
-      return None
-    else:
-      return self._formatter.fmt( self._dir, **self.NS.__dict__ )
-
-  @directory.setter
-  def directory(self,val):
-    self._dir = val
-
-  def run(self):
+  def __run__(self):
     self._r,self._o,self._e = run(self.command_string,**self._meta.__dict__.get('run_kwargs',{}))
-    if self._r == 0 and len(self._on_pass_tests) > 0:
-      for t in self._on_pass_tests:
-        t.run()
-    if self._r != 0 and len(self._on_fail_tests) > 0:
-      for t in self._on_fail_tests:
-        t.run()
-
-
-  @contextlib.contextmanager
-  def add_on_fail_test(self):
-    t = ShellTest()
-    t.NS.__dict__.update( self.NS.__dict__ )
-    t.meta.__dict__.update( self.meta.__dict__ )
-    t.directory = self._dir
-    t.startup_command = self.startup_command
-    t.clenaup_command = self.cleanup_command
-    yield t
-    if t._name is None:
-      t.name = "Failure Follow-up Test "+str(len(self._on_fail_tests))
-    self._on_fail_tests.append(t)
-
-  @contextlib.contextmanager
-  def add_on_pass_test(self):
-    t = ShellTest()
-    t.NS.__dict__.update( self.NS.__dict__ )
-    t.meta.__dict__.update( self.meta.__dict__ )
-    t.directory = self._dir
-    t.startup_command = self.startup_command
-    t.clenaup_command = self.cleanup_command
-    yield t
-    if t._name is None:
-      t.name = "Success Follow-up Test "+str(len(self._on_pass_tests))
-    self._on_pass_tests.append(t)
-
-  @property
-  def weight(self):
-    try: return self._weight
-    except: return 1
-
-  @weight.setter
-  def weight(self,val):
-    self._weight = val
-
-  @property
-  def fail_tests_weight(self):
-    try: return self._fail_tests_weight
-    except: return 0.5
-
-  @fail_tests_weight.setter
-  def fail_tests_weight(self,val):
-    self._fail_tests_weight = val
-
-
-  @property
-  def score(self):
-    # return None if the test hasn't been run
-    if self._r is None:
-      return None
-
-    # if test succeeded, return 100%
-    if self._r == 0:
-      return 1
-    else:
-      # if test failed,
-      # add up the score from the _on_fail_tests (if any)
-      # and return
-      score = 0
-      total_weight = sum([t.weight for t in self._on_fail_tests])
-      for t in self._on_fail_tests:
-        score += t.weight * t.score / total_weight
-      score *= self.fail_tests_weight
-      return score
+    return self._r == 0
 
 
 #   ____ _     ____               _           
