@@ -1,7 +1,7 @@
 import pytest
 import os,pickle
 
-from pyAssignment.Graders.CLGrader import CLGrader, ShellTest
+from pyAssignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
 
 
 class Approx(object):
@@ -72,7 +72,7 @@ def test_CLGrader_workdir():
     t.command = "pwd"
 
   with g.add_test() as t:
-    t.directory = "test"
+    t.working_directory = "test"
     t.command = "pwd"
 
   with g.directory("test"):
@@ -90,12 +90,12 @@ def test_CLGrader_workdir():
 
   for i in [ 0, 4 ]:
     assert g._tests[i].command_string.startswith("pwd")
-    assert g._tests[i].directory is None
+    assert g._tests[i].working_directory is None
     assert g._tests[i].output.strip() == os.getcwd()
 
   for i in range(1,4):
     assert g._tests[i].command_string.startswith("cd test")
-    assert g._tests[i].directory == "test"
+    assert g._tests[i].working_directory == "test"
     assert g._tests[i].output.strip() == os.path.join(os.getcwd(),"test")
 
 def test_CLGrader_shelltest_pickle():
@@ -329,7 +329,7 @@ def test_CLGrader_on_fail_extra_commands():
     t.NS.SCRIPTNAME = "sin.gnuplot"
     t.NS.IMAGENAME = "sin.png"
 
-    t.directory = "gnuplot"
+    t.working_directory = "gnuplot"
     t.commands += "gnuplot {SCRIPTNAME}"
     t.commands += "test -f {IMAGENAME}"
 
@@ -347,6 +347,122 @@ def test_CLGrader_basic():
   with a.add_test() as t:
     t.commands += "test -f {IMAGENAME}"
     t.run_if = cmd("test -e {IMAGENAME}")
+
+
+
+def test_Test_working_dir():
+  t = PythonTest()
+  comm  = dict()
+
+  def test():
+    comm['msg'] = "inside test"
+    comm['dir'] = os.getcwd()
+    return True
+
+  t.function = test
+  assert t.run()
+  assert comm['msg'] == "inside test"
+  assert comm['dir'] == os.getcwd()
+
+  os.mkdir("cwd_test")
+  cwd = os.getcwd()
+
+  assert cwd == os.getcwd()
+  t.working_directory = "cwd_test"
+  t.function = test
+  assert t.run()
+  assert comm['dir'] == os.path.join(os.getcwd(),"cwd_test")
+  assert cwd == os.getcwd()
+
+
+def test_ShellTest_throws_when_uninitializes():
+  t = ShellTest()
+  with pytest.raises(Exception):
+    t.run()
+
+def test_PythonTest_throws_when_uninitialized():
+  t = PythonTest()
+  with pytest.raises(Exception):
+    t.run()
+
+def test_PythonTest_simple_construction():
+  t = PythonTest()
+
+  t.function = lambda : True
+  assert t.run()
+
+  t.function = lambda : False
+  assert not t.run()
+
+  def test():
+    return True
+
+  t.function = test
+  assert t.run()
+
+  def test():
+    return False
+
+  t.function = test
+  assert not t.run()
+
+def test_GLGrader_working_directory():
+
+  os.mkdir("assignment")
+  os.chdir("assignment")
+  os.mkdir("dir1")
+  os.mkdir("dir2")
+  os.chdir("..")
+
+
+  comm = dict()
+  comm['cwd'] = list()
+
+  def get_cwd():
+    comm['cwd'].append(os.getcwd())
+
+  g = CLGrader()
+
+  assert g._dir == None
+
+  with g.add_test(PythonTest) as t:
+    t.function = get_cwd
+
+  with g.directory("assignment"):
+    with g.add_test(PythonTest) as t:
+      t.function = get_cwd
+
+  g.run()
+
+  assert len(comm['cwd']) == 2
+  assert comm['cwd'][0] == os.getcwd()
+  assert comm['cwd'][1] == os.path.join( os.getcwd(), 'assignment' )
+
+
+
+  comm['cwd'] = list()
+  g = CLGrader("assignment")
+
+  assert g._dir == os.path.join(os.getcwd(),"assignment")
+
+  with g.add_test(PythonTest) as t:
+    t.function = get_cwd
+
+  with g.directory("dir1"):
+    with g.add_test(PythonTest) as t:
+      t.function = get_cwd
+
+  g.run()
+
+  assert len(comm['cwd']) == 2
+  assert comm['cwd'][0] == os.path.join(os.getcwd(),'assignment')
+  assert comm['cwd'][1] == os.path.join(os.getcwd(),'assignment','dir1')
+
+
+
+
+
+
 
 
 

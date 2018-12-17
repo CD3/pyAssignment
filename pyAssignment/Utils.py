@@ -202,3 +202,14 @@ def image2html( filename, fmt=None, opts="" ):
 
   return text
 
+# a context manager for temperarily change the working directory.
+class working_directory(object):
+  def __init__(self,path):
+    self.old_dir = os.getcwd()
+    self.new_dir = path
+  def __enter__(self):
+    if self.new_dir is not None:
+      os.chdir(self.new_dir)
+  def __exit__(self,type,value,traceback):
+    if self.new_dir is not None:
+      os.chdir(self.old_dir)
