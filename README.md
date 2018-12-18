@@ -10,7 +10,7 @@ write homework assignments for physics classes. The rewrite is currently in prog
 ## Features
 
 - Build assignments and compute solutions in pure Python.
-    - Output assignment to LaTeX and bulid a PDF.
+    - Output assignment to LaTeX and build a PDF.
     - Output assignment to a Blackboard quiz.
     - Create problem set / Blackboard quiz pair. I.e. a Blackboard quiz that asks questions about
       a problem set distributed as PDF.
@@ -28,7 +28,7 @@ $ pip install .
 ```
 
 
-`pyAssignment` depends on the following modules avialble on PyPi, which you will need to install with `pip`.
+`pyAssignment` depends on the following modules available on PyPi, which you will need to install with `pip`.
 
 - pytest
 - markdown-to-json
@@ -56,7 +56,7 @@ You will also need a LaTeX installation, such as texlive, with `pdflatex` to use
 ## Examples
 
 My primary use case for `pyAssignment` is writing a Physics homework set. I want to create a PDF that contains
-problem that the students must work, and then I want to create a Blackboard quiz that the students must complete
+problems that the students must work, and then I want to create a Blackboard quiz for the students to complete
 that asks questions about the problem set. The Blackboard quiz will typically contain some multiple choice questions
 and several numerical answer questions, where the students must compute a numerical value for one of the problems
 in the problem set and enter their answer into the quiz.
@@ -65,8 +65,8 @@ The basic procedure for create this type of assignment is to
 
 1. Create an object of the `Assignment` class.
 1. Add questions to the assignment with the `add_question()` method of the assignment object.
-1. Add parts to the question with the `add_part()` method of the question object.
-1. Add quiz questions for a question  or part with the `add_question()` method of the question object.
+1. Add parts to a question with the `add_part()` method of the question object.
+1. Add quiz questions for a question or part with the `add_question()` method of the question object.
 1. Add an answer to the quiz question with the `add_answer()` method of the quiz question object.
 
 Here is a basic working example

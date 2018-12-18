@@ -1,5 +1,5 @@
 NUM	For problem #1: What is the average distance between the proton and electron? Give your answer in meter.	7.94E-11	7.94E-13
 NUM	For problem #1.1: What is the magnitude of the force? Give your answer in newton.	3.66E-26	3.66E-28
-NUM	For problem #1.2: What is the potential energy? Give your answer in electronvolt.	-1.81E-17	2.28E-20
+NUM	For problem #1.2: What is the potential energy? Give your answer in electronvolt.	-1.81E-17	1.81E-19
 NUM	For problem #2.1: What is the x component? Give your answer in newton.	5.08E-10	3.59E-11
 NUM	For problem #2.2: What is the direction? Give your answer as a positive angle with respect to the +x axis. Give your answer in degree.	7.60E+01	1.00E+00
