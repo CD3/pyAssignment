@@ -219,8 +219,8 @@ class Test(object):
     s += self.description
     s += "\n"
 
-    try: s += self.__summarize__()
-    except: pass
+    if hasattr(self,'__summarize__'):
+      s += self.__summarize__(prefix)
 
     if len(self._on_fail_tests):
       s += prefix+"  Additional Tests\n"
@@ -300,14 +300,15 @@ class ShellTest(Test):
     self._r,self._o,self._e = run(self.command_string,**self._meta.__dict__.get('run_kwargs',{}))
     return self._r == 0
 
-  def __summarize__(self):
+  def __summarize__(self,prefix=""):
     s = ""
-    if t.returncode != 0:
+    if self.returncode != 0:
+      s += prefix+"  ran command: "+self.command_string+"\n"
       s += prefix+"  return code: "
-      s += str(t.returncode)
+      s += str(self.returncode)
       s += "\n"
       s += prefix+"  error msg: "
-      s += t.error.strip()
+      s += self.error.strip()
       s += "\n"
 
     return s
@@ -420,7 +421,7 @@ class CLGrader(GraderBase):
     return s
 
   @contextlib.contextmanager
-  def add_test(self,test=None):
+  def add_test(self,test=None,NS=Namespace()):
     if test is None:
       test = ShellTest # if test type was not given, create a ShellTest
     if inspect.isclass(test):
@@ -429,6 +430,7 @@ class CLGrader(GraderBase):
       t = test
 
     t.NS.__dict__.update( self.NS.__dict__ )
+    t.NS.__dict__.update( NS.__dict__ )
     t.meta.__dict__.update( self.meta.__dict__ )
     t.working_directory = self._dir
     # this needs to be fixed. caller can easily overwrite parent setup command by accident.
