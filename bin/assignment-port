@@ -12,6 +12,10 @@ parser.add_argument("homework_script",
                     action="store",
                     help="Homework script" )
 
+parser.add_argument("-t", "--template",
+                    action="store",
+                    help="Template used for output script." )
+
 parser.add_argument("-o", "--output",
                     action="store",
                     default="/dev/stdout",
@@ -139,12 +143,12 @@ with ass.add_figure() as f:
 """.format(CAPTION=' '.join(f._caption),FILENAME=f.filename,LABEL=''.join(f._label))
   return text
 
-def fmt_GradeTest(n,cs):
+def fmt_GradeTest(t,n,cs):
   text = """\
-with g.add_test() as t:
+with {TYPE}.add_test(ShellTest,q.NS) as t:
   t.name = r'''{NAME}'''
   t.command = r'''{CMD}'''
-""".format(NAME=n,CMD=';'.join(cs))
+""".format(TYPE=t,NAME=n,CMD=';'.join(cs))
   return text
 
 def indent(text,level=1,chars="  "):
@@ -166,18 +170,17 @@ def indent(text,level=1,chars="  "):
 
 
 
-
-
-with open(args.output,'w') as f:
-  # SETUP
-  f.write("import os,sys, subprocess\n")
-  f.write("from pyAssignment.Assignment import Assignment\n")
-  f.write("import pyAssignment.Assignment.Answers as Answer\n")
-  f.write("from pyAssignment.Writers import Simple,Latex\n")
-  f.write("from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz\n")
-  f.write("from pyAssignment.Graders.CLGrader import CLGrader\n")
-
-  f.write('''\
+if args.template:
+  with open(args.template,'r') as f:
+    script = f.read()
+else:
+  script = r'''
+import os,sys, subprocess
+from pyAssignment.Assignment import Assignment
+import pyAssignment.Assignment.Answers as Answer
+from pyAssignment.Writers import Simple,Latex
+from pyAssignment.Actions import BuildProblemSetAndBlackboardQuiz
+from pyAssignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
 import numpy
 import pyErrorProp as err
 from utils import Constants
@@ -189,27 +192,10 @@ units = uconv._UNITREGISTRY
 Q_ = units.Quantity
 UQ_ = uconv.UncertainQuantity
 c = Constants.ConstantsCollection(units,3)
-''')
+ass = Assignment()
 
-  # create Assignment
-  f.write("ass = Assignment()\n")
+<<METADATA>>
 
-  # write config data. title, header, ,etc
-  try: f.write("ass.meta.title = r'{}'\n".format(ass._config['title']))
-  except: pass
-
-  f.write("ass.meta.header = dict()\n")
-  for fh in ["L", "C", "R"]:
-    try: f.write("ass.meta.header['{}'] = r'{}'\n".format(fh,ass._config[fh+"H"]))
-    except: pass
-
-  f.write("ass.meta.footer = dict()\n")
-  for ff in ["L", "C", "R"]:
-    try: f.write("ass.meta.footer['{}'] = r'{}'\n".format(ff,ass._config[ff+"F"]))
-    except: pass
-
-  # some stuff we will want in the LaTeX premble
-  f.write(r'''
 units.define('electronvolt = 1.60217653e-19 * J = eV')
 ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
                                 ,r'\DeclareSIUnit \degC {\degree C}'
@@ -237,88 +223,153 @@ ass.meta.latex_preamble_lines = [r'\DeclareSIUnit \degF {\degree F}'
                                 ,r'\DeclareSIUnit \turn {rev}'
                                 ,r'\sisetup{per-mode=fraction}'
                                 ]
-''')
 
-  # loop through questions
-  for q in ass._questions:
+<<ASSIGNMENT>>
+
+<<VALIDATOR>>
+
+<<COMPLETER>>
+
+<<GRADER>>
+
+basename = os.path.basename(__file__).replace(".py","")
+BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False)
+try:g.write_grader_script(basename+'-grader.py')
+except:pass
+from argparse import ArgumentParser
+parser = ArgumentParser()
+parser.add_argument("-s", "--spell-check",
+                    action="store_true",
+                    default=False,
+                    help="Run spell checker." )
+args = parser.parse_args()
+
+if args.spell_check:
+  Spelling.check_assignment(ass)
+
+'''
+
+
+
+
+# write metadata. title, header, ,etc
+f = StringIO.StringIO()
+
+try: f.write("ass.meta.title = r'{}'\n".format(ass._config['title']))
+except: pass
+
+f.write("ass.meta.header = dict()\n")
+for fh in ["L", "C", "R"]:
+  try: f.write("ass.meta.header['{}'] = r'{}'\n".format(fh,ass._config[fh+"H"]))
+  except: pass
+
+f.write("ass.meta.footer = dict()\n")
+for ff in ["L", "C", "R"]:
+  try: f.write("ass.meta.footer['{}'] = r'{}'\n".format(ff,ass._config[ff+"F"]))
+  except: pass
+
+script = script.replace("<<METADATA>>",f.getvalue())
+
+# write assignment
+f = StringIO.StringIO()
+
+# loop through questions
+for q in ass._questions:
+  f.write("\n")
+  f.write("\n")
+  f.write( fmt_Question(q,'ass','q') )
+
+  # write variables to questions namespace
+  for k in q.v.__dict__:
+    f.write( indent(fmt_NS_assignment_line(k,q.v.__dict__[k])))
+
+  # write answer
+  if len(q._answers) > 0:
+    f.write(indent(fmt_Answer(q._answers[0],'q','a')))
+
+  # look for quiz questions that reference this question
+  for j in range(len(quiz._questions)):
+    qq = quiz._questions[j]
+    if qq is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
+      text = fmt_Question(qq,'q','qq')
+      text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
+      f.write( indent(text) )
+      # write answer
+      if len(quiz._questions[j]._answers) > 0:
+        f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),2))
+      quiz._questions[j] = None
+
+  # loop through question's parts
+  for p in q._parts:
     f.write("\n")
-    f.write("\n")
-    f.write( fmt_Question(q,'ass','q') )
+    f.write( indent(fmt_Part(p,'q','p')))
 
-    # write variables to questions namespace
-    for k in q.v.__dict__:
-      f.write( indent(fmt_NS_assignment_line(k,q.v.__dict__[k])))
-
-    # write answer
+    # write answers
     if len(q._answers) > 0:
-      f.write(indent(fmt_Answer(q._answers[0],'q','a')))
+      f.write(indent(fmt_Answer(q._answers[0],'p','a'),2))
 
     # look for quiz questions that reference this question
     for j in range(len(quiz._questions)):
       qq = quiz._questions[j]
-      if qq is not None and quiz._questions[j].question_str.find(str(id(q))) > -1:
-        text = fmt_Question(qq,'q','qq')
+      if qq is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
+        text = fmt_Question(qq,'p','qq')
         text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
-        f.write( indent(text) )
-        # write answer
+        f.write( indent(text,2) )
+        # write answers
         if len(quiz._questions[j]._answers) > 0:
-          f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),2))
+          f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),3))
         quiz._questions[j] = None
 
-    # loop through question's parts
-    for p in q._parts:
-      f.write("\n")
-      f.write( indent(fmt_Part(p,'q','p')))
+# loop through assignment's figures
+for k in ass._figures:
+  fig = ass._figures[k]
+  f.write( fmt_Figure(fig) )
 
-      # write answers
-      if len(q._answers) > 0:
-        f.write(indent(fmt_Answer(q._answers[0],'p','a'),2))
+# write any quiz questions that were not found
+# so no information is lost
+f.write("#############################\n")
+f.write("### UNUSED QUIZ QUESTIONS ###\n")
+f.write("#############################\n")
+for qq in quiz._questions:
+  if qq is not None:
+    print("WARNING: an unused question was found in the quiz.")
+    f.write( indent(fmt_Question(qq),1,"#") )
+f.write("#############################\n")
 
-      # look for quiz questions that reference this question
-      for j in range(len(quiz._questions)):
-        qq = quiz._questions[j]
-        if qq is not None and quiz._questions[j].question_str.find(str(id(p))) > -1:
-          text = fmt_Question(qq,'p','qq')
-          text = re.sub("For problem #<<refs\[\d+\]>>: ","",text)
-          f.write( indent(text,2) )
-          # write answers
-          if len(quiz._questions[j]._answers) > 0:
-            f.write(indent(fmt_Answer(quiz._questions[j]._answers[0],'qq','a'),3))
-          quiz._questions[j] = None
+script = script.replace("<<ASSIGNMENT>>",f.getvalue())
 
-  # loop through assignment's figures
-  for k in ass._figures:
-    fig = ass._figures[k]
-    f.write( fmt_Figure(fig) )
+# write grading script if one exists
+f = StringIO.StringIO()
+try:
+  len(g._items)
+  f.write("# GRADING SCRIPT\n")
+  for k in g._items:
+    f.write( fmt_GradeTest('g',k,g._items[k]) )
+except: pass
+script = script.replace("<<GRADER>>",f.getvalue())
 
-  # write any quiz questions that were not found
-  # so no information is lost
-  f.write("#############################\n")
-  f.write("### UNUSED QUIZ QUESTIONS ###\n")
-  f.write("#############################\n")
-  for qq in quiz._questions:
-    if qq is not None:
-      print("WARNING: an unused question was found in the quiz.")
-      f.write( indent(fmt_Question(qq),1,"#") )
-  f.write("#############################\n")
+# write validation script if one exists
+f = StringIO.StringIO()
+try:
+  len(v._items)
+  f.write("# VALIDATION SCRIPT\n")
+  for k in v._items:
+    f.write( fmt_GradeTest('v',k,v._items[k]) )
+except: pass
+script = script.replace("<<VALIDATOR>>",f.getvalue())
 
-  try:
-    len(g._items)
-    f.write("g = CLGrader()\n")
-    for k in g._items:
-      f.write( fmt_GradeTest(k,g._items[k]) )
-  except: pass
-
-  f.write("""\
-
-basename = os.path.basename(__file__).replace(".py","")
-BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False)
-""")
-  try:
-    f.write("try:g.write_grader_script(basename+'-grader.py')\nexcept:pass")
-    len(g._items)
-  except: pass
+# write completion script if one exists
+f = StringIO.StringIO()
+try:
+  len(do._items)
+  f.write("# COMPLETION SCRIPT\n")
+  for k in do._items:
+    f.write( fmt_GradeTest('do',k,do._items[k]) )
+except: pass
+script = script.replace("<<COMPLETER>>",f.getvalue())
 
 
 
+with open(args.output,'w') as f:
+  f.write(script)
 
