@@ -88,14 +88,24 @@ def test_CLGrader_workdir():
   g.run()
   os.rmdir("test")
 
+  # first and last tests don't have
+  # the directory set
   for i in [ 0, 4 ]:
     assert g._tests[i].command_string.startswith("pwd")
     assert g._tests[i].working_directory is None
     assert g._tests[i].output.strip() == os.getcwd()
 
-  for i in range(1,4):
+  # second test sets the directory to 'test'
+  for i in [1]:
     assert g._tests[i].command_string.startswith("cd test")
     assert g._tests[i].working_directory == "test"
+    assert g._tests[i].output.strip() == os.path.join(os.getcwd(),"test")
+
+  # third and forth tets should have directory set by the grader,
+  # which will use the full absolute path name
+  for i in [2,3]:
+    assert g._tests[i].command_string.startswith("cd "+os.path.join(os.getcwd(),"test"))
+    assert g._tests[i].working_directory == os.path.join(os.getcwd(),"test")
     assert g._tests[i].output.strip() == os.path.join(os.getcwd(),"test")
 
 def test_CLGrader_shelltest_pickle():
