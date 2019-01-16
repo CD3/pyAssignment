@@ -44,7 +44,7 @@ class Test(object):
     name : A name for the test.
     description : A description of what the test does.
     directory : A directory that the test should be ran in.
-    result : The result of the test.
+    result : The result of the test. True means PASS. False means FAIL.
     score : The score for the test, i.e. the nubmer of points to add for this test.
     weight : The weight that should be given to the test score when total the score for multiple tests.
   '''
@@ -392,7 +392,7 @@ class CLGrader(GraderBase):
   def num_fail(self):
     n = 0
     for t in self._tests:
-      if t.returncode is not None and t.returncode != 0:
+      if t.result is not None and not t.result:
         n += 1
     return n
 
@@ -400,7 +400,7 @@ class CLGrader(GraderBase):
   def num_pass(self):
     n = 0
     for t in self._tests:
-      if t.returncode is not None and t.returncode == 0:
+      if t.result is not None and t.result:
         n += 1
     return n
 
@@ -457,9 +457,10 @@ class CLGrader(GraderBase):
   @property
   def score(self):
     score = 0
-    total_weight = sum([t.weight for t in self._tests])
+    total_weight = sum([t.weight for t in self._tests if t.score is not None])
     for t in self._tests:
-      score += t.weight * t.score / total_weight
+      if t.score is not None:
+        score += t.weight * t.score / total_weight
     return score
 
 
