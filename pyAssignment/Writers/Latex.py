@@ -62,6 +62,54 @@ class Latex(WriterBase):
     fh.write(doc.dumps())
 
     return
+
+  # we have to overwrite base class functions for getting the multiple choice
+  # answer texts so we can get and return the id for each answer so that we
+  # can create a \label/\ref pair
+  def MC_Answer_get_all_choices(self,a):
+    all_choices = list()
+
+    for i in range(len(a._choices)):
+      ans_id = id(a._choices[i])
+      ans_text = a._formatter.fmt( a._choices[i], **a.NS.__dict__ )
+      all_choices.append( (ans_id, ans_text) )
+
+    # we want to allow the answer to override the add_none_of_the_above_choice
+    # configuration option
+    add_none_of_the_above_choice = self.config.add_none_of_the_above_choice
+    if a.meta.has('add_none_of_the_above_choice'):
+      add_none_of_the_above_choice = a.meta.add_none_of_the_above_choice
+
+    none_of_the_above_text = self.config.none_of_the_above_text
+    if a.meta.has('none_of_the_above_text'):
+      none_of_the_above_text = a.meta.none_of_the_above_text
+
+    if add_none_of_the_above_choice:
+      all_choices += [ (-1,none_of_the_above_text) ]
+
+    return all_choices
+
+  def MC_Answer_get_correct_choices(self,a):
+
+    correct_choices = list()
+
+    for i in a._correct:
+      ans_id = id(a._choices[i])
+      ans_text = a._formatter.fmt( a._choices[i], **a.NS.__dict__ )
+      correct_choices.append( (ans_id, ans_text) )
+
+    add_none_of_the_above_choice = self.config.add_none_of_the_above_choice
+    if a.meta.has('add_none_of_the_above_choice'):
+      add_none_of_the_above_choice = a.meta.add_none_of_the_above_choice
+
+    none_of_the_above_text = self.config.none_of_the_above_text
+    if a.meta.has('none_of_the_above_text'):
+      none_of_the_above_text = a.meta.none_of_the_above_text
+
+    if len(correct_choices) == 0 and add_none_of_the_above_choice:
+      correct_choices += [(-1,none_of_the_above_text)]
+
+    return correct_choices
     
 
   def build_questions(self,doc,ass):
@@ -110,8 +158,8 @@ class Latex(WriterBase):
               pass
             with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
               for choice in all_choices:
-                label = r'\label{%s}'%id(choice)
-                clist.add_item( NoEscape(label+choice) )
+                label = r'\label{%s}'%choice[0]
+                clist.add_item( NoEscape(label+choice[1]) )
           except:
             pass
 
@@ -237,7 +285,7 @@ class Latex(WriterBase):
 
       if q._answer is not None:
         try: # multiple choice
-          answers = [ r'\ref{%s}'%id(choice) for choice in self.MC_Answer_get_correct_choices(q._answer) ]
+          answers = [ r'\ref{%s}'%choice[0] for choice in self.MC_Answer_get_correct_choices(q._answer) ]
           doc.append(NoEscape(",".join(answers)))
         except: pass
 
