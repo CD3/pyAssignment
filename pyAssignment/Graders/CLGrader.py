@@ -251,26 +251,24 @@ class ShellTest(Test):
     self._scmds = other._scmds
     self._scmds = other._ecmds
 
-  @property
-  def test_command_string(self):
-    startup = "cd %s;"%self._dir if self._dir is not None else ""
-    cmds = [ c.strip(';') for c in  [startup, self._cmds] if c != "" ]
-    cmds_string = self._formatter.fmt( ";".join(cmds), **self.NS.__dict__ )
+  def build_command_string( self,cmds ):
+    cmds_string = ";".join(cmds)
+    cmds_string = self._formatter.fmt( cmds_string, **self.NS.__dict__ )
     # need to check cmds_string for lines that start with a ';'. these will cause a syntax error
     # in bash.
     cmds_string = re.sub(r"^\s*;","", cmds_string, flags=re.M)
     return cmds_string
 
   @property
+  def test_command_string(self):
+    startup = "cd %s;"%self._dir if self._dir is not None else ""
+    cmds = [ c.strip(';') for c in  [startup, self._cmds] if c != "" ]
+    return self.build_command_string(cmds)
+
+  @property
   def command_string(self):
     cmds = [ c.strip(';') for c in  [self._scmds, self.test_command_string, self._ecmds] if c != "" ]
-    cmds_string = ";".join(cmds)
-    print(cmds_string)
-    cmds_string = self._formatter.fmt( cmds_string, **self.NS.__dict__ )
-    print(cmds_string)
-    cmds_string = re.sub(r"^\s*;","", cmds_string, flags=re.M)
-    print(cmds_string)
-    return cmds_string
+    return self.build_command_string(cmds)
 
   @property
   def command(self):
