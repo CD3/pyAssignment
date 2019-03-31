@@ -1,7 +1,7 @@
 from .GraderBase import *
 from ..Utils import Namespace, SFFormatter, working_directory
 
-import contextlib, subprocess, io, inspect, os
+import contextlib, subprocess, io, inspect, os, re
 
 def run(cmd,**kwargs):
   '''
@@ -256,6 +256,9 @@ class ShellTest(Test):
     startup = "cd %s;"%self._dir if self._dir is not None else ""
     cmds = [ c.strip(';') for c in  [startup, self._scmds, self._cmds, self._ecmds] if c != "" ]
     cmds_string = self._formatter.fmt( ";".join(cmds), **self.NS.__dict__ )
+    # need to check cmds_string for lines that start with a ';'. these will cause a syntax error
+    # in bash.
+    cmds_string = re.sub(r"^\s*;","", cmds_string, flags=re.M)
     return cmds_string
 
   @property

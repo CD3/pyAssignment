@@ -1,5 +1,5 @@
 import pytest
-import os,pickle
+import os,pickle,shutil
 
 from pyAssignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
 
@@ -248,12 +248,14 @@ def test_CLGrader_setup():
   assert g._tests[0].output.strip() == "startup"
   assert g._tests[1].output.strip() == "startup|exec"
 
+
+
   g = CLGrader()
   g.startup_command = 'MSG="grader startup"'
 
   with g.add_test() as t:
     # need to fix this...
-    # it would be very easty to forget that we have to use +=
+    # it would be very easy to forget that we have to use +=
     t.startup_command += ';MSG="${MSG}|test startup"'
     t.command = "echo ${MSG}"
 
@@ -262,6 +264,26 @@ def test_CLGrader_setup():
 
   assert g._tests[0].command_string == 'MSG="grader startup";MSG="${MSG}|test startup";echo ${MSG}'
   assert g._tests[0].output.strip() == "grader startup|test startup"
+  assert g._tests[0].error.strip() == ""
+  assert g._tests[0].result
+
+
+  # make sure blank lines are handled correctly
+  g = CLGrader()
+  g.startup_command = '''MSG="grader startup"
+'''
+
+  with g.add_test() as t:
+    t.command = "echo ${MSG}"
+
+
+  g.run()
+  print(g._tests[0].error)
+
+  assert g._tests[0].error.strip() == ""
+  assert g._tests[0].result
+  assert g._tests[0].output.strip() == "grader startup"
+  assert g._tests[0].command_string == 'MSG="grader startup"\necho ${MSG}'
 
 
 
@@ -374,6 +396,8 @@ def test_Test_working_dir():
   assert comm['msg'] == "inside test"
   assert comm['dir'] == os.getcwd()
 
+  if os.path.exists("cwd_test"):
+    shutil.rmtree("cwd_test")
   os.mkdir("cwd_test")
   cwd = os.getcwd()
 
@@ -418,6 +442,8 @@ def test_PythonTest_simple_construction():
 
 def test_GLGrader_working_directory():
 
+  if os.path.exists("assignment"):
+    shutil.rmtree("assignment")
   os.mkdir("assignment")
   os.chdir("assignment")
   os.mkdir("dir1")
@@ -468,6 +494,9 @@ def test_GLGrader_working_directory():
   assert comm['cwd'][0] == os.path.join(os.getcwd(),'assignment')
   assert comm['cwd'][1] == os.path.join(os.getcwd(),'assignment','dir1')
 
+
+def test_CLGrader_environment():
+  g = CLGrader()
 
 
 
