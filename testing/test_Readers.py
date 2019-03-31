@@ -31,7 +31,7 @@ def test_reader_base():
          quantity : 1.23
   '''
 
-  data = yaml.load(text)
+  data = yaml.load(text,Loader=yaml.SafeLoader)
 
   fh = io.StringIO()
 

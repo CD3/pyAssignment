@@ -47,7 +47,7 @@ class Markdown(ReaderBase):
     config = None
     if len(res):
       text = text.replace(res[0][0],"")
-      config = yaml.load(res[0][0].strip("-"))
+      config = yaml.load(res[0][0].strip("-"), Loader=yaml.FullLoader)
 
     in_data = json.loads(self._markdown_to_json(text))
 
