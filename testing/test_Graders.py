@@ -495,8 +495,25 @@ def test_GLGrader_working_directory():
   assert comm['cwd'][1] == os.path.join(os.getcwd(),'assignment','dir1')
 
 
-def test_CLGrader_environment():
+def test_CLGrader_util_functions():
   g = CLGrader()
+  g.startup_command = '''
+  function f1 {
+  echo "function 1"
+  }
+  '''
+
+  with g.add_test(ShellTest) as t:
+    t.command = "ls"
+
+  with g.add_test(ShellTest) as t:
+    t.command = "f1"
+
+  g.run()
+  print(g.summary)
+
+  assert g._tests[0].result
+  assert g._tests[1].result
 
 
 

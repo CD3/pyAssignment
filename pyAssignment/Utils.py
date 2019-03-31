@@ -48,7 +48,7 @@ class SFFormatter(object):
     self.throw = False
     self.warn  = False
 
-    self.token = pyparsing.Literal(self.delimiters[0]) + pyparsing.SkipTo(pyparsing.Literal(self.delimiters[1]), failOn=pyparsing.Literal(self.delimiters[0])) + pyparsing.Literal(self.delimiters[1])
+    self.token = pyparsing.Literal(self.delimiters[0]) + pyparsing.SkipTo(pyparsing.Literal(self.delimiters[1]), failOn=pyparsing.Literal(self.delimiters[0])).leaveWhitespace() + pyparsing.Literal(self.delimiters[1])
   
 
   def fmt(self,text,*args,**kwargs):

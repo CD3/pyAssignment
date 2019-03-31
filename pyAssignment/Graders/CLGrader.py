@@ -252,13 +252,24 @@ class ShellTest(Test):
     self._scmds = other._ecmds
 
   @property
-  def command_string(self):
+  def test_command_string(self):
     startup = "cd %s;"%self._dir if self._dir is not None else ""
-    cmds = [ c.strip(';') for c in  [startup, self._scmds, self._cmds, self._ecmds] if c != "" ]
+    cmds = [ c.strip(';') for c in  [startup, self._cmds] if c != "" ]
     cmds_string = self._formatter.fmt( ";".join(cmds), **self.NS.__dict__ )
     # need to check cmds_string for lines that start with a ';'. these will cause a syntax error
     # in bash.
     cmds_string = re.sub(r"^\s*;","", cmds_string, flags=re.M)
+    return cmds_string
+
+  @property
+  def command_string(self):
+    cmds = [ c.strip(';') for c in  [self._scmds, self.test_command_string, self._ecmds] if c != "" ]
+    cmds_string = ";".join(cmds)
+    print(cmds_string)
+    cmds_string = self._formatter.fmt( cmds_string, **self.NS.__dict__ )
+    print(cmds_string)
+    cmds_string = re.sub(r"^\s*;","", cmds_string, flags=re.M)
+    print(cmds_string)
     return cmds_string
 
   @property
@@ -306,7 +317,7 @@ class ShellTest(Test):
   def __summarize__(self,prefix=""):
     s = ""
     if self.returncode != 0:
-      s += prefix+"  ran command: "+self.command_string+"\n"
+      s += prefix+"  ran command: "+self.test_command_string+"\n"
       s += prefix+"  return code: "
       s += str(self.returncode)
       s += "\n"
