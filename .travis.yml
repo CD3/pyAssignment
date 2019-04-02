@@ -7,5 +7,6 @@ install:
   - pip install git+https://github.com/CD3/pyErrorProp
   - pip install git+https://github.com/CD3/macro_expander
 script:
+  - cd testing
   - pytest
 
