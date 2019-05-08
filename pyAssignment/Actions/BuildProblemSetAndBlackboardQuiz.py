@@ -5,7 +5,7 @@ from ..Filters import QuizExtractor
 from ..Utils import LatexAux, ColorCodes
 import os,shutil,subprocess,re,sys
 
-def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
+def BuildProblemSetAndBlackboardQuiz(ass,basename,extra_quiz_questions=None,remove=False):
   current_dir = os.getcwd()
   assignment_dir = "_"+basename
 
@@ -31,6 +31,10 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
 
   # Write quiz
   quiz = QuizExtractor().filter(ass)
+  if not extra_quiz_questions is None:
+    for q in extra_quiz_questions._questions:
+      quiz._questions.append(q)
+
 
   # We need/want to add a statement to reference which problem set question each
   # quiz question is about. The problem set question numbers will be written
@@ -67,6 +71,7 @@ def BuildProblemSetAndBlackboardQuiz(ass,basename,remove=False):
       prefix = template.format(LABEL=label)
     else:
       print("WARNING: A quiz question with no ancestors/parent was found. This means that no reference to the problem set will be added.")
+      prefix = ""
 
     qq.text = prefix + qq.text
 
