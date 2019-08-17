@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+pytest = "*"
+markdown-to-json = "*"
+numpy = "*"
+pyparsing = "*"
+Pint = "*"
+PyLaTeX = "*"
+PyYAML = "*"
+pyerrorprop = {git = "https://github.com/CD3/pyErrorProp"}
+
+[requires]
+python_version = "3.6"
