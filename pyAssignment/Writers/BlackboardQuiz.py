@@ -157,11 +157,15 @@ class BlackboardQuiz(WriterBase):
         pass
 
 
-      if unc is None and self.config.default_relative_numerical_uncertainty:
-        unc = val*self.config.default_relative_numerical_uncertainty
+      unc_type = type(val)
+      if unc_type is int:
+        unc_type = float
 
-      if self.config.minimum_relative_numerical_uncertainty and unc != None and abs(val*self.config.minimum_relative_numerical_uncertainty) > abs(unc):
-        unc = val*self.config.minimum_relative_numerical_uncertainty
+      if unc is None and self.config.default_relative_numerical_uncertainty:
+        unc = val*unc_type(self.config.default_relative_numerical_uncertainty)
+
+      if self.config.minimum_relative_numerical_uncertainty and unc != None and abs(val*unc_type(self.config.minimum_relative_numerical_uncertainty)) > abs(unc):
+        unc = val*unc_type(self.config.minimum_relative_numerical_uncertainty)
 
       unc = abs(unc)
 

@@ -342,4 +342,27 @@ MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
   with open("Bb-quiz-with-figure.txt","w") as f:
     writer.dump(ass,f)
     
+def test_blackboard_quiz_writer_with_numerical_answer_tolerance():
+  fh = io.StringIO()
+  writer = Writers.BlackboardQuiz(fh)
+
+  ass = Assignment()
+  with ass.add_question() as q:
+    q.text = "q1"
+    with q.add_answer(Answer.Numerical) as a:
+      a.quantity = UQ_(Q_(10,'m'),Q_(1,'m'))
+  with ass.add_question() as q:
+    q.text = "q2"
+    with q.add_answer(Answer.Numerical) as a:
+      a.quantity = UQ_(Q_('10','m'),Q_('1','cm'))
+  with ass.add_question() as q:
+    q.text = "q3"
+    with q.add_answer(Answer.Numerical) as a:
+      a.quantity = Q_(10,'m')
+  with ass.add_question() as q:
+    q.text = "q4"
+    with q.add_answer(Answer.Numerical) as a:
+      a.quantity = Q_('10','m')
+
+  writer.dump(ass)
 

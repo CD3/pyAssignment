@@ -37,7 +37,7 @@ def test_problem_set_builder():
   Actions.BuildProblemSetAndBlackboardQuiz(ass,"test")
   shutil.rmtree("_test")
 
-  Actions.BuildProblemSetAndBlackboardQuiz(ass,"test",True)
+  Actions.BuildProblemSetAndBlackboardQuiz(ass,"test",remove=True)
 
 
   assert os.path.isdir("_test")
