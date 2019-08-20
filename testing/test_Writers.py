@@ -184,6 +184,22 @@ FIB\tq3.2\tfirst correct answer\tsecond correct answer
 
   assert fh.getvalue() == quiz_text
 
+def test_blackboard_quiz_writer_removed_newlines_in_question_text():
+  fh = io.StringIO()
+  writer = Writers.BlackboardQuiz(fh)
+
+  ass = Assignment()
+  with ass.add_question() as q:
+    q.text = '''A question
+    with line breaks.'''
+    with q.add_answer(Answer.MultipleChoice) as a:
+      a.incorrect += "a1"
+      a.correct += "a2"
+
+  writer.dump(ass)
+
+  assert fh.getvalue() == "MC\tA question with line breaks.\ta1\tincorrect\ta2\tcorrect\tNone of the above.\tincorrect\n"
+
 @pytest.mark.skip(reason="Have not added expand-macros support to rewrite")
 def test_blackboard_quiz_writer_output_with_macros():
   fh = io.StringIO()

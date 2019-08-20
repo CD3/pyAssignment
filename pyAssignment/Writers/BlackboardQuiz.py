@@ -91,7 +91,7 @@ class BlackboardQuiz(WriterBase):
           fmt = f.meta.fmt
         text += image2html(f.filename,fmt)+"</br>Consider the figure above. "
 
-    text += q.formatted_text
+    text += re.sub("[ \n]+"," ",q.formatted_text)
 
 
 
