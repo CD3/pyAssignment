@@ -122,14 +122,17 @@ class Latex(WriterBase):
     while len(enumeration_symbols) < 5:
       enumeration_symbols.append(r'\arabic*.')
         
-    for i in sorted(ass._information.keys()):
-      info = ass._information[i]
-      doc.append(NoEscape(info.formatted_text))
+    if -1 in ass._information:
+      doc.append(NoEscape(ass._information[-1].formatted_text))
+      doc.append(NoEscape(""))
 
     level = 0
-    with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
-      level += 1
-      for i in range(len(ass._questions)):
+    for i in range(len(ass._questions)):
+      if i in ass._information:
+        doc.append(NoEscape(ass._information[i].formatted_text))
+      with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
+        doc.append(Command('setcounter',['enumi',i]))
+        level += 1
         q = ass._questions[i]
         label = r"\label{%s}"%q._uuid
         if q.meta.has('label'):
@@ -259,6 +262,8 @@ class Latex(WriterBase):
       maketitle = True
     else:
       doc.preamble.append(Command('date',''))
+
+    doc.preamble.append(Command('setlength',[NoEscape(r'\parindent'),'0in']))
 
     if maketitle:
       doc.append(NoEscape(r'\maketitle'))

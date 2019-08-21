@@ -252,6 +252,8 @@ def test_latex_writer():
       a.incorrect += "a2"
       a.incorrect += "a3"
       a.correct += "a4"
+  with ass.add_information() as info:
+    info.text = "This information should appear between the first and second question."
   with ass.add_question() as q:
     q.text = "q2"
     with q.add_answer(Answer.Numerical) as a:
@@ -316,6 +318,9 @@ def test_latex_writer_header_and_footers():
   assert re.search( "right footer", fh.getvalue() )
   assert re.search( r"\\title\{The Title\}", fh.getvalue() )
 
+
+def test_latex_writer_information_handling():
+  pass
 
 def test_blackboard_writer_figures():
 
