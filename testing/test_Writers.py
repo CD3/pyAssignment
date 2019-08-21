@@ -200,7 +200,6 @@ def test_blackboard_quiz_writer_removed_newlines_in_question_text():
 
   assert fh.getvalue() == "MC\tA question with line breaks.\ta1\tincorrect\ta2\tcorrect\tNone of the above.\tincorrect\n"
 
-@pytest.mark.skip(reason="Have not added expand-macros support to rewrite")
 def test_blackboard_quiz_writer_output_with_macros():
   fh = io.StringIO()
   writer = Writers.BlackboardQuiz(fh)
@@ -356,7 +355,7 @@ def test_blackboard_writer_figures():
   quiz_text = """\
 MC\t{IMAGE_TEXT}</br>Consider the figure above. See image above.\ta\tincorrect\tb\tcorrect\tNone of the above.\tincorrect
 MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
-""".format(IMAGE_TEXT=image_text.replace("\n","\n"))
+""".format(IMAGE_TEXT=image_text.replace("\n"," "))
 
   assert fh.getvalue() == quiz_text
 
