@@ -3,7 +3,6 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
-import version
 
 here = path.abspath(path.dirname(__file__))
 
@@ -12,10 +11,9 @@ here = path.abspath(path.dirname(__file__))
     # long_description = f.read()
 long_description= ""
 
-print("version:",version.__version__)
 setup(
     name='pyAssignment',
-    version=version.__version__,
+    version="1.1.1",
     description='A Python module for authoring and assessing homework assignments',
     long_description=long_description,  # Optional
     url='https://github.com/CD3/pyAssignment',
