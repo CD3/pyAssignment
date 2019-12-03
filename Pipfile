@@ -13,8 +13,8 @@ pyparsing = "*"
 Pint = "*"
 PyLaTeX = "*"
 PyYAML = "*"
-pyerrorprop = {git = "https://github.com/CD3/pyErrorProp"}
-macro-expander = {git = "https://github.com/CD3/macro_expander"}
+macro-expander = "*"
+pyerrorprop = "*"
 
 [requires]
 python_version = "3.6"
