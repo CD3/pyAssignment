@@ -4,9 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
+twine = "*"
+jedi = "*"
 
 [packages]
-pytest = "*"
 markdown-to-json = "*"
 numpy = "*"
 pyparsing = "*"
