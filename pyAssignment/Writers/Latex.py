@@ -5,6 +5,8 @@ from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumera
 from pylatex.section import Section,Paragraph
 from pylatex.utils import italic, NoEscape
 
+import random
+
 
 
 class Latex(WriterBase):
@@ -23,6 +25,11 @@ class Latex(WriterBase):
   assignment.meta.config['answer']['multiple_choice_symbol'] : symbol used for multiple choice answers.
   assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
   assignment.meta.config['answer']['numerical_spacing'] : spacing added after a question with a numerical answer.
+  assignment.meta.randomize_multiple_choice : randomize multiple choice answers displayed under question.
+
+  question.meta.pre_vspace : verticle space to pace before question/part text
+  question.meta.post_vspace : verticle space to pace after question/part text
+  question.meta.newline: if true, put question/part on new page
 
   '''
   def __init__(self,fh=None):
@@ -112,6 +119,50 @@ class Latex(WriterBase):
     return correct_choices
     
 
+  def build_answer(self,doc,q):
+
+    if q._answer is not None:
+      try: # multiple choice
+        # NOTE: need to access all_formatted_choices member of q._answer
+        # so that try block will fail before an enumeration is created
+        all_choices = self.MC_Answer_get_all_choices(q._answer)
+        symb = r'\alph*)'
+        try:
+          symb = ass.meta.config['answer']['multiple_choice/symbol']
+        except:
+          pass
+        with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
+          for choice in all_choices:
+            label = r'\label{%s}'%choice[0]
+            clist.add_item( NoEscape(label+choice[1]) )
+      except:
+        pass
+
+      try: # numerical
+        ans = q._answer.quantity
+        space="2in"
+        try:
+          space = ass.meta.config['answer']['numerical/spacing']
+        except:
+          pass
+        doc.append(NoEscape(r"\vspace{%s}"%space))
+      except:
+        pass
+
+
+      try: # text
+        ans = q._answer.text
+        space="2in"
+        try:
+          space = ass.meta.config['answer']['text/spacing']
+        except:
+          pass
+        doc.append(NoEscape(r"\vspace{%s}"%space))
+      except:
+        pass
+
+
+
   def build_questions(self,doc,ass):
     enumeration_symbols = list()
     if ass.meta.has("config"):
@@ -130,10 +181,20 @@ class Latex(WriterBase):
     for i in range(len(ass._questions)):
       if i in ass._information:
         doc.append(NoEscape(ass._information[i].formatted_text))
+
+      q = ass._questions[i]
+
+      if q.meta.has('newpage') and q.meta.newpage:
+        doc.append(Command('newpage'))
+
+      if q.meta.has('pre_vspace'):
+        doc.append(Command('vspace',q.meta.pre_vspace))
+
       with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
         doc.append(Command('setcounter',['enumi',i]))
         level += 1
-        q = ass._questions[i]
+
+
         label = r"\label{%s}"%q._uuid
         if q.meta.has('label'):
           label += r"\label{%s}"%q.meta.label
@@ -148,53 +209,15 @@ class Latex(WriterBase):
         qlist.add_item( NoEscape(text) )
 
 
-
-        if q._answer is not None:
-          try: # multiple choice
-            # NOTE: need to access all_formatted_choices member of q._answer
-            # so that try block will fail before an enumeration is created
-            all_choices = self.MC_Answer_get_all_choices(q._answer)
-            symb = r'\alph*)'
-            try:
-              symb = ass.meta.config['answer']['multiple_choice/symbol']
-            except:
-              pass
-            with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
-              for choice in all_choices:
-                label = r'\label{%s}'%choice[0]
-                clist.add_item( NoEscape(label+choice[1]) )
-          except:
-            pass
-
-          try: # numerical
-            ans = q._answer.quantity
-            space="2in"
-            try:
-              space = ass.meta.config['answer']['numerical/spacing']
-            except:
-              pass
-            doc.append(NoEscape(r"\vspace{%s}"%space))
-          except:
-            pass
-
-
-          try: # text
-            ans = q._answer.text
-            space="2in"
-            try:
-              space = ass.meta.config['answer']['text/spacing']
-            except:
-              pass
-            doc.append(NoEscape(r"\vspace{%s}"%space))
-          except:
-            pass
-
-
+        self.build_answer(doc,q)
 
 
         with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as plist:
           level += 1
           for p in q._parts:
+            if p.meta.has('pre_vspace'):
+              doc.append(Command('vspace',p.meta.pre_vspace))
+
             label = r"\label{%s}"%p._uuid
             if p.meta.has('label'):
               label += r"\label{%s}"%p.meta.label
@@ -209,8 +232,15 @@ class Latex(WriterBase):
 
             plist.add_item( NoEscape(text) )
 
+            self.build_answer(doc,p)
+
+            if p.meta.has('post_vspace'):
+              doc.append(Command('vspace',p.meta.post_vspace))
+
         level -= 1
 
+      if q.meta.has('post_vspace'):
+        doc.append(Command('vspace',q.meta.post_vspace))
       level -= 1
 
   def build_preamble(self,doc,ass):
