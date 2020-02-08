@@ -30,6 +30,7 @@ class Latex(WriterBase):
   question.meta.pre_vspace : verticle space to pace before question/part text
   question.meta.post_vspace : verticle space to pace after question/part text
   question.meta.newline: if true, put question/part on new page
+  question.meta.points: if set, a label indicating the number of points will be added to the question text.
 
   '''
   def __init__(self,fh=None):
@@ -161,6 +162,56 @@ class Latex(WriterBase):
       except:
         pass
 
+  def get_counter_for_level(self,i):
+    if i == 0: return "enumi"
+    if i == 1: return "enumii"
+    if i == 2: return "enumiii"
+    if i == 3: return "enumiv"
+    
+
+  def build_question(self,doc,q,i,enum_symbs,level):
+
+    if q.meta.has('newpage') and q.meta.newpage:
+      doc.append(Command('newpage'))
+
+    if q.meta.has('pre_vspace'):
+      doc.append(Command('vspace',q.meta.pre_vspace))
+
+    with doc.create(Enumerate(enumeration_symbol=NoEscape(enum_symbs[level]))) as qlist:
+      doc.append(Command('setcounter',[self.get_counter_for_level(level),i]))
+
+      label = r"\label{%s}"%q._uuid
+      if q.meta.has('label'):
+        label += r"\label{%s}"%q.meta.label
+
+      # start text for question
+      text = label
+
+      # add points indicator if given
+      if q.meta.has('points') and int(q.meta.points) > 0:
+        if int(q.meta.points) == 1:
+          text += f"({q.meta.points} point) "
+        else:
+          text += f"({q.meta.points} points) "
+
+      if len(q._figures) > 0:
+        if len(q._figures) > 1:
+          raise RuntimeError("WARNING: multiple figures detected in a single question. This is not supported by the LaTeX Writer.\n")
+        f = q._figures[0]
+        text += r"For this question, consider Figure \ref{%s}. "%f._uuid
+      text += q.formatted_text
+      qlist.add_item( NoEscape(text) )
+
+      self.build_answer(doc,q)
+
+      if q.meta.has('post_vspace'):
+        doc.append(Command('vspace',q.meta.post_vspace))
+
+      for j in range(len(q._parts)):
+        p = q._parts[j]
+        self.build_question(doc,p,j,enum_symbs,level+1)
+
+
 
 
   def build_questions(self,doc,ass):
@@ -183,65 +234,9 @@ class Latex(WriterBase):
         doc.append(NoEscape(ass._information[i].formatted_text))
 
       q = ass._questions[i]
-
-      if q.meta.has('newpage') and q.meta.newpage:
-        doc.append(Command('newpage'))
-
-      if q.meta.has('pre_vspace'):
-        doc.append(Command('vspace',q.meta.pre_vspace))
-
-      with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as qlist:
-        doc.append(Command('setcounter',['enumi',i]))
-        level += 1
+      self.build_question(doc,q,i,enumeration_symbols,level)
 
 
-        label = r"\label{%s}"%q._uuid
-        if q.meta.has('label'):
-          label += r"\label{%s}"%q.meta.label
-
-        text = label
-        if len(q._figures) > 0:
-          if len(q._figures) > 1:
-            raise RuntimeError("WARNING: multiple figures detected in a single question. This is not supported by the LaTeX Writer.\n")
-          f = q._figures[0]
-          text += r"For this question, consider Figure \ref{%s}. "%f._uuid
-        text += q.formatted_text
-        qlist.add_item( NoEscape(text) )
-
-
-        self.build_answer(doc,q)
-
-
-        with doc.create(Enumerate(enumeration_symbol=NoEscape(enumeration_symbols[level]))) as plist:
-          level += 1
-          for p in q._parts:
-            if p.meta.has('pre_vspace'):
-              doc.append(Command('vspace',p.meta.pre_vspace))
-
-            label = r"\label{%s}"%p._uuid
-            if p.meta.has('label'):
-              label += r"\label{%s}"%p.meta.label
-
-            text = label
-            if len(p._figures) > 0:
-              if len(p._figures) > 1:
-                raise RuntimeError("WARNING: multiple figures detected in a single part. This is not supported by the LaTeX Writer.\n")
-              f = p._figures[0]
-              text += r"For this part, consider Figure \ref{%s}. "%f._uuid
-            text += p.formatted_text
-
-            plist.add_item( NoEscape(text) )
-
-            self.build_answer(doc,p)
-
-            if p.meta.has('post_vspace'):
-              doc.append(Command('vspace',p.meta.post_vspace))
-
-        level -= 1
-
-      if q.meta.has('post_vspace'):
-        doc.append(Command('vspace',q.meta.post_vspace))
-      level -= 1
 
   def build_preamble(self,doc,ass):
 
