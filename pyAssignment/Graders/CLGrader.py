@@ -235,6 +235,50 @@ class Test(object):
 
     return s
 
+  def test_output(self,prefix=""):
+
+    s = ""
+    if self.result is None:
+      s += prefix+"DID NOT RUN\n"
+      return s
+
+    if self.result:
+      s += prefix+"PASS"
+
+    if not self.result:
+      s += prefix+"FAIL"
+
+    s += "  "
+    s += self.name
+    s += ": "
+    s += self.description
+    s += "\n"
+
+    s += "stdout:\n"
+    if hasattr(self,'_o'):
+      s += self._o
+    if hasattr(self,'_output'):
+      s += self._o
+
+    s += "stderr:\n"
+    if hasattr(self,'_e'):
+      s += self._e
+    if hasattr(self,'_error'):
+      s += self._e
+
+    if len(self._on_fail_tests):
+      s += prefix+"  Additional Tests\n"
+      for ft in self._on_fail_tests:
+        s += ft.test_output(prefix="  "+prefix)
+
+    if len(self._on_pass_tests):
+      s += prefix+"  Additional Tests\n"
+      for pt in self._on_pass_tests:
+        s += pt.test_output(prefix="  "+prefix)
+
+
+    return s
+
 
 class ShellTest(Test):
   def __init__(self):
@@ -242,8 +286,8 @@ class ShellTest(Test):
     self._scmds = "" # setup commands
     self._cmds  = ""
     self._ecmds = "" # teardown command
-    self._o = None
-    self._e = None
+    self._o = ""
+    self._e = ""
     self._r = None
 
   def _update(self,other):
@@ -429,7 +473,11 @@ class CLGrader(GraderBase):
     s += "===========================\n"
     s += "score: %.2f%%\n"%(100*self.score)
 
-
+  @property
+  def test_output(self):
+    s = ""
+    for t in self._tests:
+      s += t.test_output()
     return s
 
   @contextlib.contextmanager

@@ -75,13 +75,21 @@ class BlackboardQuiz(WriterBase):
   def _dump_question(self,q,fh,level=0):
     t = self._get_type(q)
 
+    if t == "MULTIPART":
+      print("Detected multi-part question. Will merge question text with text from first part.")
+      q._text += "</br>"+q._parts[0]._text
+      q._answer = q._parts[0]._answer
+      q._parts = q._parts[1:]
+      t = self._get_type(q)
+      
+
     toks = list()
     toks.append(t)
 
     text = ""
 
     if level > 0:
-      text += "This question is about the same scenario as the previous question. "
+      text += "This question is about the same scenario as the previous question.</br>"
 
 
     if len(q._figures):
@@ -92,6 +100,8 @@ class BlackboardQuiz(WriterBase):
         text += image2html(f.filename,fmt)+"</br>Consider the figure above. "
 
     text += re.sub("[ \n]+"," ",q.formatted_text)
+
+      
 
 
 
@@ -190,6 +200,8 @@ class BlackboardQuiz(WriterBase):
       
   def _get_type(self,q):
     if q._answer is None:
+      if len(q._parts) > 0:
+        return "MULTIPART"
       raise RuntimeError( "Question does not contain an answer: " + q.text )
 
     a = q._answer

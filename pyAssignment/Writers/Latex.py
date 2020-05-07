@@ -1,7 +1,7 @@
 from .WriterBase import *
 from ..Assignment import *
 
-from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate,Figure
+from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumerate,Figure,MiniPage
 from pylatex.section import Section,Paragraph
 from pylatex.utils import italic, NoEscape
 
@@ -132,10 +132,12 @@ class Latex(WriterBase):
           symb = ass.meta.config['answer']['multiple_choice/symbol']
         except:
           pass
-        with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
-          for choice in all_choices:
-            label = r'\label{%s}'%choice[0]
-            clist.add_item( NoEscape(label+choice[1]) )
+        doc.append(NoEscape(r' \\ '))
+        with doc.create(MiniPage()):
+          with doc.create(Enumerate(enumeration_symbol=NoEscape(symb))) as clist:
+            for choice in all_choices:
+              label = r'\label{%s}'%choice[0]
+              clist.add_item( NoEscape(label+choice[1]) )
       except:
         pass
 
@@ -171,6 +173,29 @@ class Latex(WriterBase):
 
   def build_question(self,doc,q,i,enum_symbs,level):
 
+    label = r"\label{%s}"%q._uuid
+    if q.meta.has('label'):
+      label += r"\label{%s}"%q.meta.label
+
+    # start text for question
+    text = label
+
+    # add points indicator if given
+    if q.meta.has('points') and int(q.meta.points) > 0:
+      if int(q.meta.points) == 1:
+        text += f"({q.meta.points} point) "
+      else:
+        text += f"({q.meta.points} points) "
+
+    if len(q._figures) > 0:
+      if len(q._figures) > 1:
+        raise RuntimeError("WARNING: multiple figures detected in a single question. This is not supported by the LaTeX Writer.\n")
+      f = q._figures[0]
+      text += r"For this question, consider Figure \ref{%s}. "%f._uuid
+    text += q.formatted_text
+
+
+
     if q.meta.has('newpage') and q.meta.newpage:
       doc.append(Command('newpage'))
 
@@ -180,28 +205,8 @@ class Latex(WriterBase):
     with doc.create(Enumerate(enumeration_symbol=NoEscape(enum_symbs[level]))) as qlist:
       doc.append(Command('setcounter',[self.get_counter_for_level(level),i]))
 
-      label = r"\label{%s}"%q._uuid
-      if q.meta.has('label'):
-        label += r"\label{%s}"%q.meta.label
-
-      # start text for question
-      text = label
-
-      # add points indicator if given
-      if q.meta.has('points') and int(q.meta.points) > 0:
-        if int(q.meta.points) == 1:
-          text += f"({q.meta.points} point) "
-        else:
-          text += f"({q.meta.points} points) "
-
-      if len(q._figures) > 0:
-        if len(q._figures) > 1:
-          raise RuntimeError("WARNING: multiple figures detected in a single question. This is not supported by the LaTeX Writer.\n")
-        f = q._figures[0]
-        text += r"For this question, consider Figure \ref{%s}. "%f._uuid
-      text += q.formatted_text
-      qlist.add_item( NoEscape(text) )
-
+      
+      qlist.add_item( NoEscape(text))
       self.build_answer(doc,q)
 
       if q.meta.has('post_vspace'):
@@ -217,8 +222,8 @@ class Latex(WriterBase):
   def build_questions(self,doc,ass):
     enumeration_symbols = list()
     if ass.meta.has("config"):
-      if ass.meta.config.get('question',dict()).get('enumeration_symbols', None) is not None:
-        for symb in ass.meta.config['question']['enumeration_symbols']:
+      if ass.meta.config.get('questions',dict()).get('enumeration_symbols', None) is not None:
+        for symb in ass.meta.config['questions']['enumeration_symbols']:
           enumeration_symbols.append(symb)
 
     while len(enumeration_symbols) < 5:
