@@ -12,6 +12,28 @@ except:
   have_macro_expander = False
 
 
+import io
+import multiprocessing
+
+def format_line(text):
+  if have_macro_expander:
+    latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
+    def latex_math_to_mathimg(s,loc,toks):
+      return [ r'\mathimg[o="html",tex2im_opts="-r 80x80"]{%s}'%t for t in toks ]
+    latex_math.addParseAction(latex_math_to_mathimg)
+    text = latex_math.transformString(text)
+
+    proc = macro_expander.MacroProcessor()
+    text = proc.process(text)
+
+    # need to clean up text.
+    # should not have any new line chars
+    text = text.replace("\n"," ")
+    text = re.sub(" +"," ",text)
+    # should not have multiple spaces together
+
+  return text
+
 class BlackboardQuiz(WriterBase):
   def __init__(self,fh=None):
     super().__init__(fh)
@@ -47,7 +69,14 @@ class BlackboardQuiz(WriterBase):
   def dump(self, ass, fh=None):
     fh = super().get_fh(fh)
 
-    self._dump_questions(ass._questions, fh)
+    buffer = io.StringIO()
+    self._dump_questions(ass._questions, buffer)
+
+    # do line formatting in parallel
+    p = multiprocessing.Pool()
+    lines = p.map(format_line, buffer.getvalue().split("\n") )
+
+    fh.write("\n".join(lines))
 
   def _format_line(self,text):
     if have_macro_expander:
@@ -189,7 +218,7 @@ class BlackboardQuiz(WriterBase):
         toks.append(answer)
 
 
-    fh.write(self._format_line("\t".join(toks))+"\n")
+    fh.write("\t".join(toks)+"\n")
 
     # write question parts
     if len(q._parts) > 0:
