@@ -293,7 +293,7 @@ class ShellTest(Test):
   def _update(self,other):
     super()._update(other)
     self._scmds = other._scmds
-    self._scmds = other._ecmds
+    self._ecmds = other._ecmds
 
   def build_command_string( self,cmds ):
     cmds_string = ";".join(cmds)
@@ -362,6 +362,9 @@ class ShellTest(Test):
       s += prefix+"  ran command: "+self.test_command_string+"\n"
       s += prefix+"  return code: "
       s += str(self.returncode)
+      s += "\n"
+      s += prefix+"     output: "
+      s += self.output.strip()
       s += "\n"
       s += prefix+"  error msg: "
       s += self.error.strip()
@@ -472,6 +475,8 @@ class CLGrader(GraderBase):
     s += " missing: %d\n"%(self.num_tests - self.num_pass - self.num_fail)
     s += "===========================\n"
     s += "score: %.2f%%\n"%(100*self.score)
+
+    return s
 
   @property
   def test_output(self):
