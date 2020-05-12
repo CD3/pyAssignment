@@ -13,7 +13,7 @@ long_description= ""
 
 setup(
     name='pyAssignment',
-    version="1.1.1",
+    version="1.1.2",
     description='A Python module for authoring and assessing homework assignments',
     long_description=long_description,  # Optional
     url='https://github.com/CD3/pyAssignment',
