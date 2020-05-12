@@ -10,12 +10,16 @@ try:
   have_macro_expander = True
 except:
   have_macro_expander = False
+  class DummyMacroProcessor:
+    def process(self,text):
+      return text
 
 
 import io
 import multiprocessing
 
-def format_line(text):
+# A stand-alone function that can be pickled so we can use it with multiprocessing
+def format_line(text,macro_processor):
   if have_macro_expander:
     latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
     def latex_math_to_mathimg(s,loc,toks):
@@ -23,8 +27,7 @@ def format_line(text):
     latex_math.addParseAction(latex_math_to_mathimg)
     text = latex_math.transformString(text)
 
-    proc = macro_expander.MacroProcessor()
-    text = proc.process(text)
+    text = macro_processor.process(text)
 
     # need to clean up text.
     # should not have any new line chars
@@ -39,6 +42,11 @@ class BlackboardQuiz(WriterBase):
     super().__init__(fh)
     self.config.default_relative_numerical_uncertainty = 0.01
     self.config.minimum_relative_numerical_uncertainty = 0.01
+    if have_macro_expander:
+      self.macro_processor = macro_expander.MacroProcessor()
+    else:
+      self.macro_processor = DummyMacroProcessor()
+
 
   @property
   def default_relative_numerical_uncertainty(self):
@@ -75,7 +83,7 @@ class BlackboardQuiz(WriterBase):
     # do line formatting in parallel
     # p = multiprocessing.Pool()
     # lines = p.map(format_line, buffer.getvalue().split("\n") )
-    lines = [ format_line(line) for line in buffer.getvalue().split("\n") ]
+    lines = [ format_line(self,line) for line in buffer.getvalue().split("\n") ]
 
     fh.write("\n".join(lines))
 
