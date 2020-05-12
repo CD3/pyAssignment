@@ -31,3 +31,5 @@ def test_html_images():
     os.mkdir("_tmp")
   with open( "_tmp/html-image-svg.html","w") as f:
     f.write(text)
+
+

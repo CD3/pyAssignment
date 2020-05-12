@@ -1,5 +1,7 @@
 import pytest
 
+import utils
+
 import io,os,re
 
 from pyAssignment.Assignment import Assignment
@@ -16,33 +18,35 @@ UQ_ = uconv.UncertainQuantity
 Q_  = UQ_.Quantity
 
 
-def test_simple_writer():
-  ass = Assignment()
 
-  with ass.add_question() as q:
-    q.text = "q1"
-    with q.add_part() as p:
-      p.text = "q1p1"
-    with q.add_part() as p:
-      p.text = "q1p2"
+def test_simple_writer(tmpdir):
+  with utils.TempDir(tmpdir):
+    ass = Assignment()
 
-  with ass.add_question() as q:
-    q.text = "q2"
-    with q.add_part() as p:
-      p.text = "q2p1"
-    with q.add_part() as p:
-      p.text = "q2p2"
+    with ass.add_question() as q:
+      q.text = "q1"
+      with q.add_part() as p:
+        p.text = "q1p1"
+      with q.add_part() as p:
+        p.text = "q1p2"
 
-  with pytest.raises(RuntimeError):
-    w = Writers.Simple()
-    w.dump(ass)
+    with ass.add_question() as q:
+      q.text = "q2"
+      with q.add_part() as p:
+        p.text = "q2p1"
+      with q.add_part() as p:
+        p.text = "q2p2"
+
+    with pytest.raises(RuntimeError):
+      w = Writers.Simple()
+      w.dump(ass)
 
 
-  fh = io.StringIO()
-  writer = Writers.Simple(fh)
-  writer.dump(ass)
+    fh = io.StringIO()
+    writer = Writers.Simple(fh)
+    writer.dump(ass)
 
-  # assert fh.getvalue() == "1. q1\n  1. q1p1\n  2. q1p2\n2. q2\n  1. q2p1\n  2. q2p2\n"
+    # assert fh.getvalue() == "1. q1\n  1. q1p1\n  2. q1p2\n2. q2\n  1. q2p1\n  2. q2p2\n"
 
 def test_latex_writer_raises_with_no_fh():
   ass = Assignment()
@@ -225,56 +229,57 @@ MC\tq1.1 {CWD}\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone o
   
   
 
-def test_latex_writer():
-  fh = io.StringIO()
-  writer = Writers.Latex(fh)
-  writer.make_key = True
+def test_latex_writer(tmpdir):
+  with utils.TempDir(tmpdir):
+    fh = io.StringIO()
+    writer = Writers.Latex(fh)
+    writer.make_key = True
 
-  ass = Assignment()
-  ass.meta.title = "Homework Assignment"
-  ass.meta.header = {'R':r"powered by \LaTeX"}
-  ass.meta.config = {
-                    'answers' : {
-                      'numerical/spacing' :  '2in',
-                      'multiple_choice/symbol' :  r'\alph*)',
-                      'text/spacing' :  r'3in'
+    ass = Assignment()
+    ass.meta.title = "Homework Assignment"
+    ass.meta.header = {'R':r"powered by \LaTeX"}
+    ass.meta.config = {
+                      'answers' : {
+                        'numerical/spacing' :  '2in',
+                        'multiple_choice/symbol' :  r'\alph*)',
+                        'text/spacing' :  r'3in'
+                        }
                       }
-                    }
 
-  with ass.add_information() as info:
-    info.text = "This is some information for the assignment."
+    with ass.add_information() as info:
+      info.text = "This is some information for the assignment."
 
-  with ass.add_question() as q:
-    q.text = "q1"
-    with q.add_answer(Answer.MultipleChoice) as a:
-      a.incorrect += "a1"
-      a.incorrect += "a2"
-      a.incorrect += "a3"
-      a.correct += "a4"
-  with ass.add_information() as info:
-    info.text = "This information should appear between the first and second question."
-  with ass.add_question() as q:
-    q.text = "q2"
-    with q.add_answer(Answer.Numerical) as a:
-      a.quantity = 1.23
-  with ass.add_question() as q:
-    q.text = "q3"
-    with q.add_part() as p:
-      p.text = "q3p1"
-    with q.add_part() as p:
-      p.text = "q3p2"
-  with ass.add_question() as q:
-    q.text = "q1"
-    with q.add_answer(Answer.MultipleChoice) as a:
-      a.correct += "a1"
-      a.incorrect += "a2"
-      a.incorrect += "a3"
-      a.correct += "a4"
+    with ass.add_question() as q:
+      q.text = "q1"
+      with q.add_answer(Answer.MultipleChoice) as a:
+        a.incorrect += "a1"
+        a.incorrect += "a2"
+        a.incorrect += "a3"
+        a.correct += "a4"
+    with ass.add_information() as info:
+      info.text = "This information should appear between the first and second question."
+    with ass.add_question() as q:
+      q.text = "q2"
+      with q.add_answer(Answer.Numerical) as a:
+        a.quantity = 1.23
+    with ass.add_question() as q:
+      q.text = "q3"
+      with q.add_part() as p:
+        p.text = "q3p1"
+      with q.add_part() as p:
+        p.text = "q3p2"
+    with ass.add_question() as q:
+      q.text = "q1"
+      with q.add_answer(Answer.MultipleChoice) as a:
+        a.correct += "a1"
+        a.incorrect += "a2"
+        a.incorrect += "a3"
+        a.correct += "a4"
 
-  writer.dump(ass)
+    writer.dump(ass)
 
-  with open('test.tex', 'w') as f:
-    f.write(fh.getvalue())
+    with open('test.tex', 'w') as f:
+      f.write(fh.getvalue())
 
 def test_latex_writer_header_and_footers():
   ass = Assignment()
@@ -321,46 +326,46 @@ def test_latex_writer_header_and_footers():
 def test_latex_writer_information_handling():
   pass
 
-def test_blackboard_writer_figures():
-
-  image_text = r"""<?xml version="1.0" encoding="UTF-8" ?>
+def test_blackboard_writer_figures(tmpdir):
+  with utils.TempDir(tmpdir):
+    image_text = r"""<?xml version="1.0" encoding="UTF-8" ?>
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
 <circle cx="125" cy="125" r="75" fill="orange" />
 </svg>
 """
-  with open("file.svg", "w") as f:
-    f.write(image_text)
+    with open("file.svg", "w") as f:
+      f.write(image_text)
 
 
 
-  fh = io.StringIO()
-  writer = Writers.BlackboardQuiz(fh)
+    fh = io.StringIO()
+    writer = Writers.BlackboardQuiz(fh)
 
-  ass = Assignment()
-  with ass.add_question() as q:
-    q.text = "See image above."
-    with q.add_figure() as f:
-      f.filename = "file.svg"
-    with q.add_answer(Answer.MultipleChoice) as a:
-      a.incorrect += "a"
-      a.correct += "b"
-  with ass.add_question() as q:
-    q.text = "no image here."
-    with q.add_answer(Answer.MultipleChoice) as a:
-      a.correct += "a"
-      a.incorrect += "b"
+    ass = Assignment()
+    with ass.add_question() as q:
+      q.text = "See image above."
+      with q.add_figure() as f:
+        f.filename = "file.svg"
+      with q.add_answer(Answer.MultipleChoice) as a:
+        a.incorrect += "a"
+        a.correct += "b"
+    with ass.add_question() as q:
+      q.text = "no image here."
+      with q.add_answer(Answer.MultipleChoice) as a:
+        a.correct += "a"
+        a.incorrect += "b"
 
-  writer.dump(ass)
+    writer.dump(ass)
 
-  quiz_text = """\
+    quiz_text = """\
 MC\t{IMAGE_TEXT}</br>Consider the figure above. See image above.\ta\tincorrect\tb\tcorrect\tNone of the above.\tincorrect
 MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
 """.format(IMAGE_TEXT=image_text.replace("\n"," "))
 
-  assert fh.getvalue() == quiz_text
+    assert fh.getvalue() == quiz_text
 
-  with open("Bb-quiz-with-figure.txt","w") as f:
-    writer.dump(ass,f)
+    with open("Bb-quiz-with-figure.txt","w") as f:
+      writer.dump(ass,f)
     
 def test_blackboard_quiz_writer_with_numerical_answer_tolerance():
   fh = io.StringIO()

@@ -1,7 +1,0 @@
-pytest
-markdown-to-json
-numpy
-Pint
-PyLaTeX
-pyparsing
-PyYAML

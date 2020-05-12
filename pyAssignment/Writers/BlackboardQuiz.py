@@ -73,8 +73,9 @@ class BlackboardQuiz(WriterBase):
     self._dump_questions(ass._questions, buffer)
 
     # do line formatting in parallel
-    p = multiprocessing.Pool()
-    lines = p.map(format_line, buffer.getvalue().split("\n") )
+    # p = multiprocessing.Pool()
+    # lines = p.map(format_line, buffer.getvalue().split("\n") )
+    lines = [ format_line(line) for line in buffer.getvalue().split("\n") ]
 
     fh.write("\n".join(lines))
 
@@ -126,7 +127,7 @@ class BlackboardQuiz(WriterBase):
         fmt = None
         if f.meta.has("fmt"):
           fmt = f.meta.fmt
-        text += image2html(f.filename,fmt)+"</br>Consider the figure above. "
+        text += image2html(f.filename,fmt).replace("\n"," ")+"</br>Consider the figure above. "
 
     text += re.sub("[ \n]+"," ",q.formatted_text)
 
