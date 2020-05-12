@@ -19,7 +19,6 @@ run-cli_tests:
 run-tests:
 	make test-install
 	make run-unit_tests
-	make run-cli_tests
 
 list-requirements:
 	@ pipenv graph | grep '^[^ ]' 
