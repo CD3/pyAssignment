@@ -4,6 +4,7 @@ from ..Utils import image2html
 
 import pyparsing
 import re
+import pathlib
 
 try:
   import macro_expander
@@ -13,6 +14,10 @@ except:
   class DummyMacroProcessor:
     def process(self,text):
       return text
+    def readCache(self,trash):
+      pass
+    def writeCache(self,trash):
+      pass
 
 
 import io
@@ -38,14 +43,18 @@ def format_line(text,macro_processor):
   return text
 
 class BlackboardQuiz(WriterBase):
-  def __init__(self,fh=None):
+  def __init__(self,fh=None,use_macro_expander_cache=True):
     super().__init__(fh)
     self.config.default_relative_numerical_uncertainty = 0.01
     self.config.minimum_relative_numerical_uncertainty = 0.01
+    self.macro_expander_cache_path = pathlib.Path("pyAssignment-BlackboardQuiz-Writer-Cache.bin")
     if have_macro_expander:
-      self.macro_processor = macro_expander.MacroProcessor()
+      self.macro_processor = macro_expander.MacroProcessor(use_cache=use_macro_expander_cache)
     else:
       self.macro_processor = DummyMacroProcessor()
+
+    if self.macro_expander_cache_path.is_file():
+      self.macro_processor.readCache(str(self.macro_expander_cache_path))
 
 
   @property
@@ -83,9 +92,12 @@ class BlackboardQuiz(WriterBase):
     # do line formatting in parallel
     # p = multiprocessing.Pool()
     # lines = p.map(format_line, buffer.getvalue().split("\n") )
-    lines = [ format_line(self,line) for line in buffer.getvalue().split("\n") ]
+    # lines = [ self._format_line(line) for line in buffer.getvalue().split("\n") ]
 
-    fh.write("\n".join(lines))
+    fh.write( self._format_line(buffer.getvalue()) )
+
+    # save the macro_expander cache for future calls.
+    self.macro_processor.writeCache(str(self.macro_expander_cache_path))
 
   def _format_line(self,text):
     if have_macro_expander:
@@ -95,8 +107,7 @@ class BlackboardQuiz(WriterBase):
       latex_math.addParseAction(latex_math_to_mathimg)
       text = latex_math.transformString(text)
 
-      proc = macro_expander.MacroProcessor()
-      text = proc.process(text)
+      text = self.macro_processor.process(text)
 
       # need to clean up text.
       # should not have any new line chars

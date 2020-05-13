@@ -19,7 +19,7 @@ setup(
     url='https://github.com/CD3/pyAssignment',
     author='C.D. Clark III',
     packages=find_packages(),
-    install_requires=['markdown-to-json','numpy','pyparsing','Pint','PyLaTeX','PyYAML','macro-expander','pyErrorProp'],
+    install_requires=['markdown-to-json','numpy','pyparsing','Pint','PyLaTeX','PyYAML','macro-expander>=0.2','pyErrorProp'],
 
     scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-make-quiz", "bin/assignment-preview-bb-quiz"]
 )
