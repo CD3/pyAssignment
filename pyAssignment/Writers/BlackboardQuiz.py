@@ -23,25 +23,6 @@ except:
 import io
 import multiprocessing
 
-# A stand-alone function that can be pickled so we can use it with multiprocessing
-def format_line(text,macro_processor):
-  if have_macro_expander:
-    latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
-    def latex_math_to_mathimg(s,loc,toks):
-      return [ r'\mathimg[o="html",tex2im_opts="-r 80x80"]{%s}'%t for t in toks ]
-    latex_math.addParseAction(latex_math_to_mathimg)
-    text = latex_math.transformString(text)
-
-    text = macro_processor.process(text)
-
-    # need to clean up text.
-    # should not have any new line chars
-    text = text.replace("\n"," ")
-    text = re.sub(" +"," ",text)
-    # should not have multiple spaces together
-
-  return text
-
 class BlackboardQuiz(WriterBase):
   def __init__(self,fh=None,use_macro_expander_cache=True):
     super().__init__(fh)
@@ -92,9 +73,9 @@ class BlackboardQuiz(WriterBase):
     # do line formatting in parallel
     # p = multiprocessing.Pool()
     # lines = p.map(format_line, buffer.getvalue().split("\n") )
-    # lines = [ self._format_line(line) for line in buffer.getvalue().split("\n") ]
+    lines = map(self._format_line, buffer.getvalue().split("\n") )
 
-    fh.write( self._format_line(buffer.getvalue()) )
+    fh.write( "\n".join(lines) )
 
     # save the macro_expander cache for future calls.
     self.macro_processor.writeCache(str(self.macro_expander_cache_path))
@@ -112,8 +93,8 @@ class BlackboardQuiz(WriterBase):
       # need to clean up text.
       # should not have any new line chars
       text = text.replace("\n"," ")
-      text = re.sub(" +"," ",text)
       # should not have multiple spaces together
+      text = re.sub(" +"," ",text)
 
     return text
 
