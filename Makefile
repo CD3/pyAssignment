@@ -2,6 +2,10 @@ test-install:
 	virtualenv _test-install-virtualenv
 	. _test-install-virtualenv/bin/activate && pip install .
 
+devel-install:
+	virtualenv _devel-install-virtualenv
+	. _devel-install-virtualenv/bin/activate && pip install -e .
+
 build-package:
 	pipenv run python setup.py sdist
 

@@ -37,6 +37,8 @@ class BlackboardQuiz(WriterBase):
     if self.macro_expander_cache_path.is_file():
       self.macro_processor.readCache(str(self.macro_expander_cache_path))
 
+    self.figure_text = "</br>Consider the figure above. "
+
 
   @property
   def default_relative_numerical_uncertainty(self):
@@ -84,7 +86,7 @@ class BlackboardQuiz(WriterBase):
     if have_macro_expander:
       latex_math = pyparsing.QuotedString( quoteChar='$', convertWhitespaceEscapes=False )
       def latex_math_to_mathimg(s,loc,toks):
-        return [ r'\mathimg[o="html",tex2im_opts="-r 80x80"]{%s}'%t for t in toks ]
+        return [ r'\mathimg[o="html",tex2im_opts="-r 100x100"]{%s}'%t for t in toks ]
       latex_math.addParseAction(latex_math_to_mathimg)
       text = latex_math.transformString(text)
 
@@ -127,7 +129,10 @@ class BlackboardQuiz(WriterBase):
         fmt = None
         if f.meta.has("fmt"):
           fmt = f.meta.fmt
-        text += image2html(f.filename,fmt).replace("\n"," ")+"</br>Consider the figure above. "
+        attrs = ""
+        if f.meta.has("attributes"):
+          attrs = f.meta.attributes
+        text += image2html(f.filename,fmt,attrs).replace("\n"," ")+self.figure_text
 
     text += re.sub("[ \n]+"," ",q.formatted_text)
 
