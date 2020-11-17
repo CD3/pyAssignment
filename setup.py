@@ -21,5 +21,8 @@ setup(
     packages=find_packages(),
     install_requires=['markdown-to-json','numpy','pyparsing','Pint','PyLaTeX','PyYAML','macro-expander>=0.2','pyErrorProp'],
 
-    scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-make-quiz", "bin/assignment-preview-bb-quiz"]
+    scripts=["bin/assignment", "bin/assignment-new", "bin/assignment-make-quiz", "bin/assignment-preview-bb-quiz", "bin/create-blackboard-quiz-from-images.py"]
+    # entry_points='''
+    # [console_scripts]
+    # create-blackboard-quiz-from-images=pyAssignment.scripts.command_line_programs:create_blackboard_quiz_from_images
 )
