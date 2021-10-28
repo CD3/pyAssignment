@@ -5,7 +5,7 @@ from pylatex import Document,Command,Head,Foot,PageStyle,Package,Itemize,Enumera
 from pylatex.section import Section,Paragraph
 from pylatex.utils import italic, NoEscape
 
-import random
+import random, string
 
 
 
@@ -76,11 +76,12 @@ class Latex(WriterBase):
   # can create a \label/\ref pair
   def MC_Answer_get_all_choices(self,a):
     all_choices = list()
+    salt = str(id(a))
 
     for i in range(len(a._choices)):
       ans_id = id(a._choices[i])
       ans_text = a._formatter.fmt( a._choices[i], **a.NS.__dict__ )
-      all_choices.append( (ans_id, ans_text) )
+      all_choices.append( (salt+"-"+str(ans_id), ans_text) )
 
     # we want to allow the answer to override the add_none_of_the_above_choice
     # configuration option
@@ -93,29 +94,19 @@ class Latex(WriterBase):
       none_of_the_above_text = a.meta.none_of_the_above_text
 
     if add_none_of_the_above_choice:
-      all_choices += [ (-1,none_of_the_above_text) ]
+      all_choices += [ (salt+"-1",none_of_the_above_text) ]
 
     return all_choices
 
   def MC_Answer_get_correct_choices(self,a):
 
+    all_choices = self.MC_Answer_get_all_choices(a)
     correct_choices = list()
 
+    if len(a._correct) == 0:
+        correct_choices.append(all_choices[-1])
     for i in a._correct:
-      ans_id = id(a._choices[i])
-      ans_text = a._formatter.fmt( a._choices[i], **a.NS.__dict__ )
-      correct_choices.append( (ans_id, ans_text) )
-
-    add_none_of_the_above_choice = self.config.add_none_of_the_above_choice
-    if a.meta.has('add_none_of_the_above_choice'):
-      add_none_of_the_above_choice = a.meta.add_none_of_the_above_choice
-
-    none_of_the_above_text = self.config.none_of_the_above_text
-    if a.meta.has('none_of_the_above_text'):
-      none_of_the_above_text = a.meta.none_of_the_above_text
-
-    if len(correct_choices) == 0 and add_none_of_the_above_choice:
-      correct_choices += [(-1,none_of_the_above_text)]
+        correct_choices.append(all_choices[i])
 
     return correct_choices
     
@@ -321,6 +312,7 @@ class Latex(WriterBase):
       if q._answer is not None:
         try: # multiple choice
           answers = [ r'\ref{%s}'%choice[0] for choice in self.MC_Answer_get_correct_choices(q._answer) ]
+            
           doc.append(NoEscape(",".join(answers)))
         except: pass
 
