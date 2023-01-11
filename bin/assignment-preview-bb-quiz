@@ -1,16 +1,35 @@
 #! /usr/bin/env python
 
 import tempfile, subprocess
+import sys
 
 from argparse import ArgumentParser
 
-parser = ArgumentParser(description="A sweet program for doing something.")
+parser = ArgumentParser(description="Convert a Blackboard text-format quiz file to HTML and preview it in a browser..")
+
+parser.add_argument("--output","-o", 
+                    action="store",
+                    help="Output file.")
+
+parser.add_argument("--view","-v", 
+                    action="store_true",
+                    help="Launch browser to view the genrated HTML file.")
+
+parser.add_argument("--browser","-b",
+                    action="append",
+                    help="Specify the browser to use when viewing the generated HTML file.")
 
 parser.add_argument("quiz_file",
                     action="store",
                     help="Blackboard quiz text file to preview." )
 
 args = parser.parse_args()
+
+input_file = args.quiz_file
+output_file = args.output
+if output_file is None:
+    output_file = tempfile.mkstemp(suffix=".html")[1]
+
 
 
 with open(args.quiz_file) as f:
@@ -22,17 +41,30 @@ text = text.replace("\tincorrect","")
 text = text.replace("\t",r"</br>")
 text = text.replace("\n",r"</br></br>")
 
-with tempfile.NamedTemporaryFile(mode="w",suffix=".html",delete=False) as f:
-  f.write(text)
-  filename = f.name
+with open(output_file, mode="w") as f:
+    f.write("!<DOCTYPE html>\n")
+    f.write("<html>\n")
+    f.write("<body>\n")
+    f.write("""<script>
+    function timedRefresh(timeoutPeriod) {
+	setTimeout("location.reload(true);",timeoutPeriod);
+    window.onload = timedRefresh(1000);
+    </script>\n""")
+    f.write(text)
+    f.write("</body>\n")
+    f.write("</html>\n")
 
-browsers = ["chromium", "chromium-browser", "firefox", "firefox-bin"]
+if args.browser is None:
+    browsers = ["chromium", "chromium-browser", "firefox", "firefox-bin"]
+else:
+    browsers = args.browser
 
-for browser in browsers:
-  try:
-    subprocess.run( [browser,filename] )
-    break
-  except:
-    pass
+if args.view:
+    for browser in browsers:
+      try:
+        subprocess.run( [browser,output_file] )
+        break
+      except:
+        pass
 
 
