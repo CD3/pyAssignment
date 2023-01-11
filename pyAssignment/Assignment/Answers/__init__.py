@@ -3,3 +3,4 @@ from .Numerical import *
 from .MultipleChoice import *
 from .Text import *
 from .Essay import *
+from .FileResponse import *

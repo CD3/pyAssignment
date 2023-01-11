@@ -253,6 +253,9 @@ class BlackboardQuiz(WriterBase):
     if isinstance(a,Essay):
       return "ESS"
 
+    if isinstance(a,FileResponse):
+      return "FIL"
+
     if isinstance(a,Text):
       return "FIB"
 
