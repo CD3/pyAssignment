@@ -4,11 +4,11 @@ import io,os,shutil,copy
 
 import utils
 
-from pyAssignment.Assignment import Assignment
-import pyAssignment.Actions as Actions
-import pyAssignment.Assignment.Answers as Answer
-import pyAssignment.Writers as Writers
-from pyAssignment.Filters.Predicates import has_tag
+from pyassignment.Assignment import Assignment
+import pyassignment.Actions as Actions
+import pyassignment.Assignment.Answers as Answer
+import pyassignment.Writers as Writers
+from pyassignment.Filters.Predicates import has_tag
 
 import pint
 ureg = pint.UnitRegistry()

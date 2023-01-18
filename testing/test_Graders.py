@@ -2,7 +2,7 @@ import pytest
 import os,pickle,shutil
 import utils
 
-from pyAssignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
+from pyassignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
 
 
 class Approx(object):

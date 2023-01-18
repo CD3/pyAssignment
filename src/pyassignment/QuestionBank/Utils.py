@@ -1,8 +1,8 @@
-import pyAssignment.Filters as Filters
+from .. import Filters as Filters
 import random
 import sys
 import inspect
-import io 
+import io
 
 
 def PullRandomQuestions(bank, num=None, predicate=None, shuffle=True):
@@ -87,7 +87,7 @@ class Checks:
     if q._answer is None:
       msgfh.write("Question did not have an answer.")
       return False
-    
+
     if hasattr(q._answer,'_choices'):
       if len(q._answer._choices) < 1:
         msgfh.write("Multiple choice question did not have any choices.")

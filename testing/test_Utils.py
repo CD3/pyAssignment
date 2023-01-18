@@ -4,7 +4,7 @@ import io,os,re,pathlib
 
 import utils
 
-from pyAssignment.Utils import *
+from pyassignment.Utils import *
 
 def test_html_images(tmpdir):
   cwd = str(pathlib.Path().absolute())

@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "pyassignment"
+version = "2.0"
+description = "A python module for authoring and assessing homework assignments."
+authors = ["CD Clark III <clifton.clark@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^1.24.1"
+pyparsing = "^3.0.9"
+pint = "^0.20.1"
+pylatex = "^1.4.1"
+pyyaml = "^6.0"
+macro-expander = "^0.3"
+pyerrorprop = "^3.1.2"
+
+
+# [tool.poetry.scripts]
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.2.1"
+pytest-pudb = "^0.7.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

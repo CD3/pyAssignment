@@ -4,9 +4,9 @@ import utils
 
 import io,os,re
 
-from pyAssignment.Assignment import Assignment
-import pyAssignment.Writers as Writers
-import pyAssignment.Assignment.Answers as Answer
+from pyassignment.Assignment import Assignment
+import pyassignment.Writers as Writers
+import pyassignment.Assignment.Answers as Answer
 
 import pint
 u = pint.UnitRegistry()

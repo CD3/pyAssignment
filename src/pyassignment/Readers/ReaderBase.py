@@ -20,7 +20,7 @@ class ReaderBase(object):
     This can be used as the "backend" for many different readers:
     if a reader can get data into a python dictionary, then
     it can pass the dictionary off to this function to generate
-    a pyAssignment.Assignment instance.
+    a pyassignment.Assignment instance.
 
     dict format:
 

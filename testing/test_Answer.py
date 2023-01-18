@@ -1,5 +1,5 @@
 import pytest
-import pyAssignment.Assignment.Answers as Answers
+import pyassignment.Assignment.Answers as Answers
 
 def test_Numerical():
 

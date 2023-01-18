@@ -28,7 +28,7 @@ class BlackboardQuiz(WriterBase):
     super().__init__(fh)
     self.config.default_relative_numerical_uncertainty = 0.01
     self.config.minimum_relative_numerical_uncertainty = 0.01
-    self.macro_expander_cache_path = pathlib.Path("pyAssignment-BlackboardQuiz-Writer-Cache.bin")
+    self.macro_expander_cache_path = pathlib.Path("pyassignment-BlackboardQuiz-Writer-Cache.bin")
     if have_macro_expander:
       self.macro_processor = macro_expander.MacroProcessor(use_cache=use_macro_expander_cache)
     else:
@@ -113,7 +113,7 @@ class BlackboardQuiz(WriterBase):
       q._answer = q._parts[0]._answer
       q._parts = q._parts[1:]
       t = self._get_type(q)
-      
+
 
     toks = list()
     toks.append(t)
@@ -136,7 +136,7 @@ class BlackboardQuiz(WriterBase):
 
     text += re.sub("[ \n]+"," ",q.formatted_text)
 
-      
+
 
 
 
@@ -229,10 +229,10 @@ class BlackboardQuiz(WriterBase):
     # write question parts
     if len(q._parts) > 0:
       self._dump_questions( q._parts, fh, level+1)
-      
-       
 
-      
+
+
+
   def _get_type(self,q):
     if q._answer is None:
       if len(q._parts) > 0:

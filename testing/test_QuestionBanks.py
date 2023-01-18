@@ -2,11 +2,11 @@ import pytest
 
 import io,os,shutil,copy
 
-from pyAssignment.Assignment import Assignment
-import pyAssignment.Assignment.Answers as Answer
-import pyAssignment.Writers as Writers
-from pyAssignment.Filters.Predicates import has_tag
-from pyAssignment.QuestionBank.Utils import Checks,PullRandomQuestions,CheckQuestionBank
+from pyassignment.Assignment import Assignment
+import pyassignment.Assignment.Answers as Answer
+import pyassignment.Writers as Writers
+from pyassignment.Filters.Predicates import has_tag
+from pyassignment.QuestionBank.Utils import Checks,PullRandomQuestions,CheckQuestionBank
 
 import pint
 ureg = pint.UnitRegistry()
