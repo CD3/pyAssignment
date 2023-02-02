@@ -2,11 +2,11 @@ import pytest
 
 import io,os,shutil,copy
 
-from pyassignment.Assignment import Assignment
-import pyassignment.Assignment.Answers as Answer
-import pyassignment.Writers as Writers
-from pyassignment.Filters.Predicates import has_tag
-from pyassignment.QuestionBank.Utils import Checks,PullRandomQuestions,CheckQuestionBank
+from pyassignment.assignment import Assignment
+import pyassignment.assignment.answers as Answer
+import pyassignment.writers as Writers
+from pyassignment.filters.predicates import has_tag
+from pyassignment.question_bank.utils import Checks,PullRandomQuestions,CheckQuestionBank
 
 import pint
 ureg = pint.UnitRegistry()
@@ -25,7 +25,7 @@ def test_test_question_bank():
     q.NS.Mass = Q_(10,'kg')
     with q.add_answer( Answer.Numerical ) as a:
       a.quantity = CalcAnswer
-    
+
   with bank.add_question(copy.deepcopy(q)) as q:
     q.NS.Mass = Q_(20,'kg')
     q.answer.NS.__dict__.update( q.NS.__dict__ )
@@ -52,7 +52,7 @@ def test_test_question_bank():
     q.NS.Distance = Q_(10,'m')
     with q.add_answer( Answer.Numerical ) as a:
       a.quantity = CalcAnswer
-    
+
   with bank.add_question(copy.deepcopy(q)) as q:
     q.NS.Mass1 = Q_(35,'kg')
     q.answer.NS.__dict__.update( q.NS.__dict__ )
@@ -100,7 +100,7 @@ def test_test_question_bank():
 
   with bank.add_question() as q:
     q.text = "None"
-  
+
   assert not CheckQuestionBank(bank, Checks.has_answer)
 
   del bank._questions[-1]

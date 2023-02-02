@@ -1,5 +1,5 @@
 import pytest
-from pyassignment.Assignment import Assignment
+from pyassignment.assignment import Assignment
 import os
 
 

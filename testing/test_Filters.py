@@ -2,11 +2,11 @@ import pytest
 
 import io
 
-from pyassignment.Assignment import Assignment
-import pyassignment.Writers as Writers
-import pyassignment.Assignment.Answers as Answer
+from pyassignment.assignment import Assignment
+import pyassignment.writers as Writers
+import pyassignment.assignment.answers as Answer
 
-import pyassignment.Filters as Filters
+import pyassignment.filters as Filters
 
 def test_extract_quiz():
 

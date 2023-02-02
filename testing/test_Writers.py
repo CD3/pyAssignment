@@ -4,9 +4,9 @@ import utils
 
 import io,os,re
 
-from pyassignment.Assignment import Assignment
-import pyassignment.Writers as Writers
-import pyassignment.Assignment.Answers as Answer
+from pyassignment.assignment import Assignment
+import pyassignment.writers as Writers
+import pyassignment.assignment.answers as Answer
 
 import pint
 u = pint.UnitRegistry()
@@ -226,8 +226,8 @@ MC\tq1.1 {CWD}\ta1\tincorrect\ta2\tincorrect\ta3\tincorrect\ta4\tcorrect\tNone o
 
 
   assert fh.getvalue() == quiz_text
-  
-  
+
+
 
 def test_latex_writer(tmpdir):
   with utils.TempDir(tmpdir):
@@ -366,7 +366,7 @@ MC\tno image here.\ta\tcorrect\tb\tincorrect\tNone of the above.\tincorrect
 
     with open("Bb-quiz-with-figure.txt","w") as f:
       writer.dump(ass,f)
-    
+
 def test_blackboard_quiz_writer_with_numerical_answer_tolerance():
   fh = io.StringIO()
   writer = Writers.BlackboardQuiz(fh)

@@ -1,5 +1,5 @@
 import pytest
-import pyassignment.Assignment.Answers as Answers
+import pyassignment.assignment.answers as Answers
 
 def test_Numerical():
 
@@ -24,7 +24,7 @@ def test_Numerical():
   del a.NS.x
   with pytest.raises(RuntimeError):
     assert a.quantity == 5
-  
+
 def test_MultipleChoice_choices_property():
 
   a = Answers.MultipleChoice()
@@ -103,7 +103,7 @@ def test_MultipleChoice_correct_incorrect_properties():
 
 
 def test_Text():
-  
+
   a = Answers.Text()
 
   a.text = "the"

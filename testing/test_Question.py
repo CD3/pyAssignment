@@ -1,7 +1,7 @@
 import pytest
 import copy
-from pyassignment.Assignment.Question import Question
-from pyassignment.Assignment.Answers  import MultipleChoice
+from pyassignment.assignment.question import Question
+from pyassignment.assignment.answers  import MultipleChoice
 # from .Utils import Approx
 
 def test_adding_text():
@@ -142,7 +142,7 @@ def test_adding_answer():
   assert len(q.answer.choices) == 2
   assert q.answer.choices[0] == "c1"
   assert q.answer.choices[1] == "i1"
-  
+
   a = MultipleChoice()
   a.correct = 'correct'
   a.incorrect += 'incorrect 1'

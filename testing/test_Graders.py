@@ -2,8 +2,8 @@ import pytest
 import os, pickle, shutil
 import utils
 
-from pyassignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest
-from pyassignment.Utils import Namespace
+from pyassignment.graders.cl_grader import CLGrader, ShellTest, PythonTest
+from pyassignment.utils import Namespace
 
 
 def test_CLGrader_simple(tmpdir):

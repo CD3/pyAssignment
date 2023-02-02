@@ -2,9 +2,9 @@ import pytest
 
 import io
 
-from pyassignment.Assignment import Assignment
-import pyassignment.Readers as Readers
-import pyassignment.Writers as Writers
+from pyassignment.assignment import Assignment
+import pyassignment.readers as Readers
+import pyassignment.writers as Writers
 
 import yaml,json
 

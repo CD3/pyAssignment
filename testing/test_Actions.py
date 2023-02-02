@@ -4,11 +4,11 @@ import io,os,shutil,copy
 
 import utils
 
-from pyassignment.Assignment import Assignment
-import pyassignment.Actions as Actions
-import pyassignment.Assignment.Answers as Answer
-import pyassignment.Writers as Writers
-from pyassignment.Filters.Predicates import has_tag
+from pyassignment.assignment import Assignment
+import pyassignment.actions as Actions
+import pyassignment.assignment.answers as Answer
+import pyassignment.writers as Writers
+from pyassignment.filters.predicates import has_tag
 
 import pint
 ureg = pint.UnitRegistry()
@@ -50,6 +50,6 @@ def test_problem_set_builder(tmpdir):
     assert os.path.isfile("_test/test-quiz.txt")
 
 
-    
+
 
 
