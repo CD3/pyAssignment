@@ -192,7 +192,7 @@ class CLGrader(GraderBase):
 
 
     lines = []
-    lines.append('''from pyassignment.Graders.CLGrader import CLGrader, ShellTest, PythonTest''')
+    lines.append('''from pyassignment.graders.cl_grader import CLGrader, ShellTest, PythonTest''')
 
     lines.append('''g = CLGrader()''')
 
