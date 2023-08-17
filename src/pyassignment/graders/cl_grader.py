@@ -168,16 +168,16 @@ class CLGrader(GraderBase):
     def write_test(test,depth=1):
         lines = []
         for k,v in test.NS.__dict__.items():
-            lines.append(f'''{'  '*depth}t.NS.{k} = "{v}"''')
-        lines.append(f'''{'  '*depth}{'t'*depth}._name = "{test._name}"''')
-        lines.append(f'''{'  '*depth}{'t'*depth}._desc = "{test._desc}"''')
+            lines.append(f'''{'  '*depth}t.NS.{k} = """{v}"""''')
+        lines.append(f'''{'  '*depth}{'t'*depth}._name = """{test._name}"""''')
+        lines.append(f'''{'  '*depth}{'t'*depth}._desc = """{test._desc}"""''')
 
         if isinstance(test,ShellTest):
-            lines.append(f'''{'  '*depth}{'t'*depth}._scmds = "{test._scmds}"''')
-            lines.append(f'''{'  '*depth}{'t'*depth}._cmds = "{test._cmds}"''')
-            lines.append(f'''{'  '*depth}{'t'*depth}._ecmds = "{test._ecmds}"''')
+            lines.append(f'''{'  '*depth}{'t'*depth}._scmds = """{test._scmds}"""''')
+            lines.append(f'''{'  '*depth}{'t'*depth}._cmds = """{test._cmds}"""''')
+            lines.append(f'''{'  '*depth}{'t'*depth}._ecmds = """{test._ecmds}"""''')
         if isinstance(test,PythonTest):
-            lines.append(textwrap.indent(textwrap.dedent(inspect.getsource(t._func)),prefix="  "*depth))
+            lines.append(textwrap.indent(textwrap.dedent(inspect.getsource(test._func)),prefix="  "*depth))
             lines.append(f'''{'  '*depth}{'t'*depth}._func = {test._func.__name__}''')
 
         for ttest in test._on_fail_tests:

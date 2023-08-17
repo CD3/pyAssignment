@@ -96,12 +96,10 @@ class Test(object):
             self._result = self.__run__()
 
         # if test passed, run the "on pass" tests
-        if self._result and len(self._on_pass_tests) > 0:
+        if self._result:
             for t in self._on_pass_tests:
                 t.run()
-
-        # if test fails, run the "on fail" tests
-        if not self._result and len(self._on_fail_tests) > 0:
+        else:
             for t in self._on_fail_tests:
                 t.run()
 
