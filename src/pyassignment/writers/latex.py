@@ -6,8 +6,8 @@ from pylatex import (Command, Document, Enumerate, Figure, Foot, Head, Itemize,
 from pylatex.section import Paragraph, Section
 from pylatex.utils import NoEscape, italic
 
-from ..assignment import *
-from .writer_base import *
+from ..utils import collection
+from .writer_base import WriterBase
 
 
 class Latex(WriterBase):
