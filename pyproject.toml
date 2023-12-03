@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyassignment"
-version = "2.0.4"
+version = "2.0.5"
 description = "A python module for authoring and assessing homework assignments."
 authors = ["CD Clark III <clifton.clark@gmail.com>"]
 license = "MIT"
