@@ -331,7 +331,7 @@ class Latex(WriterBase):
                     pass
 
                 try:  # text
-                    ans = q._answer.text
+                    ans = q._answer.formatted_text
                     doc.append(NoEscape("{}".format(ans)))
                 except:
                     pass
