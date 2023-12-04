@@ -230,6 +230,10 @@ class Latex(WriterBase):
             doc.append(NoEscape(""))
 
         level = 0
+        # allow documents with only information (and no questions) to be generated.
+        if len(ass._questions) == 0 and 0 in ass._information:
+                doc.append(NoEscape(ass._information[0].formatted_text))
+
         for i in range(len(ass._questions)):
             if i in ass._information:
                 doc.append(NoEscape(ass._information[i].formatted_text))
