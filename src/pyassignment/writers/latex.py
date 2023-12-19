@@ -232,7 +232,7 @@ class Latex(WriterBase):
         level = 0
         # allow documents with only information (and no questions) to be generated.
         if len(ass._questions) == 0 and 0 in ass._information:
-                doc.append(NoEscape(ass._information[0].formatted_text))
+            doc.append(NoEscape(ass._information[0].formatted_text))
 
         for i in range(len(ass._questions)):
             if i in ass._information:
@@ -314,7 +314,13 @@ class Latex(WriterBase):
 
     def build_key(self, doc, ass):
         doc.append(NoEscape(r"\newpage"))
-        doc.append(NoEscape(r"\textbf{\large Answers:}"))
+
+        heading = (
+            ass.meta.key_heading
+            if ass.meta.has("key_heading")
+            else r"\textbf{\large Answers:}"
+        )
+        doc.append(NoEscape(heading))
 
         def write_answer(q):
             if q._answer is not None:
