@@ -15,9 +15,12 @@ pylatex = "^1.4.1"
 pyyaml = "^6.0"
 macro-expander = "^0.3"
 pyerrorprop = "^3.1.2"
+typer = "^0.9.0"
+jinja2 = "^3.1.2"
 
 
-# [tool.poetry.scripts]
+[tool.poetry.scripts]
+pyassignment = "pyassignment.cli:app"
 
 
 [tool.poetry.group.dev.dependencies]
