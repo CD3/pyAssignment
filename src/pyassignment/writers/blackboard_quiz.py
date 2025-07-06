@@ -223,6 +223,12 @@ class BlackboardQuiz(WriterBase):
       for answer in answers:
         toks.append(answer)
 
+    if t == "ESS":
+        if a.formatted_text is not None:
+          example = a.formatted_text
+          toks.append(example)
+
+
 
     fh.write("\t".join(toks)+"\n")
 
