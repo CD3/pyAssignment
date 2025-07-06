@@ -1,0 +1,26 @@
+---
+title: Example Homework
+---
+
+<info>
+There are multiple questions
+</info>
+
+<question>
+A {Wavelength} laser that emits {Duration} pulses is ...
+
+Wavelength := 532 nm
+Duration := 40 ns
+
+```
+calc = pyMPE.TimedLaserExposure()
+calc.setWavelength(Wavelength)
+calc.setExposureDuration(Duration)
+
+mpe = calc.getMPE()
+```
+
+MPEH := mpe.getRadiantExposure()
+</question>
+
+

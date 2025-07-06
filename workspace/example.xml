@@ -1,0 +1,40 @@
+<document>
+  <information>
+    The MPEs are defined by the standard as a radiant exposure or and irradiance. When we compare an actual exposure
+    to the MPE, we have to average the exposure over a limiting aperture (which is also defined by the standard).
+  </information>
+
+  <question>
+    Consider two {{Power|quant}} lasers. One laser has a {{Diameter|quant}} flat top beam profile and the other has a {{Diameter|quant}} 1/e Gaussian beam profile.
+    How much power is transmitted through a {{ApertureDiameter|quant}} limiting aperture for each laser? Compute the energy tranmitted through the limiting
+    aperture for a {{Duration|quant}} pulse. The energy is {{Energy|quant }}
+
+    <inputs>
+    Power = 20 mW
+    Diameter = 6 mm
+    Duration = 20 ns
+    </inputs>
+    <calculations>
+
+    #exp = pyMPE.TimedLaserExposure()
+    #exp.setWavelength(Wavelength)
+    #exp.setExposureDuration(Duration)
+    #exp.setPower(Power)
+    #mpe = exp.getMPE(exp)
+    #MPEH = mpe.getRadiantExposure()
+
+    Energy = Power * Duration
+
+    </calculations>
+    <outputs>
+      Energy = Energy
+    </outputs>
+    <answer>
+    </answer>
+  </question>
+
+  <information>
+    Some more information...
+  </information>
+
+</document>

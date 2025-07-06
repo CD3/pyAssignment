@@ -1,0 +1,11 @@
+title: Example Problem
+questions:
+  - text: Determine the MPE for a {Wavelength} laser. The laser outputs {Power|mW} of power ({Power|W}).
+    vars:
+      Wavelength: 532 nm
+      Duration: 40 ns
+      Power: 1 W
+      Energy: Power * Duration
+      _Code: exp =  TimedLaserExposure()
+             exp.setWavelength(Wavelength)
+             exp.setExposureDuration(Duration)
